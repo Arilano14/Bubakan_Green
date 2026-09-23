@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Informasi Tanaman — BUBAKAN GREEN</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <h1>BUBAKAN GREEN</h1>
+      <p>Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang</p>
+    </header>
+
+    <main class="content">
+      <div class="plant-image-placeholder" id="plant-photo">🌱</div>
+      <h2 class="plant-title" id="plant-name">Informasi Tanaman</h2>
+      <p class="plant-latin" id="plant-latin">Nama Ilmiah</p>
+
+      <div class="plant-mandarin-box" id="mandarin-container">
+        <div class="mandarin-char" id="plant-mandarin">--</div>
+        <div class="pinyin" id="plant-pinyin">--</div>
+      </div>
+
+      <div class="section-label">Manfaat & Khasiat Herbal</div>
+      <p class="desc-text" id="plant-desc">
+        Memuat informasi manfaat botani dan panduan perawatan tanaman...
+      </p>
+
+      <div class="cta-box">
+        <p><strong>Ingin mendengar pelafalan audio Mandarin & informasi kebun lengkap?</strong></p>
+        <a href="/index.html" class="btn-primary">📲 Buka di Aplikasi BUBAKAN GREEN</a>
+      </div>
+    </main>
+
+    <footer class="footer">
+      Taman Toga & Urban Farming &bull; Kelurahan Bubakan
+    </footer>
+  </div>
+
+  <script>
+    // Lightweight vanilla URL reader
+    (function() {
+      const pathParts = window.location.pathname.split('/');
+      const plantId = pathParts[pathParts.length - 1] || new URLSearchParams(window.location.search).get('id');
+      if (plantId && plantId !== 'plant.html') {
+        document.getElementById('plant-name').textContent = "Tanaman ID: " + decodeURIComponent(plantId);
+      }
+    })();
+  </script>
+</body>
+</html>
