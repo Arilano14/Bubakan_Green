@@ -1,17 +1,17 @@
-# PHASE 2 SELF-REVIEW — BUBAKAN GREEN
+# PHASE 2 SELF-REVIEW — BUBAKAN GREEN (REVISED)
 
 **Sistem Informasi Urban Farming & Taman Toga**  
 **Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang**  
 **Document:** `docs/phase-2/PHASE_2_SELF_REVIEW.md`  
 **Reviewer Role:** Senior Software Architect, Senior Android Lead & Security Auditor  
 **Date:** 2026-09-23  
-**Status:** COMPLETE — READY FOR APPROVAL GATE  
+**Status:** COMPLETE — PRE-EXECUTION REVISION AUDITED & CERTIFIED  
 
 ---
 
 ## 1. Review Objectives
 
-This self-review critically examines `docs/phase-2/PHASE_2_IMPLEMENTATION_PLAN.md` against Phase 0 and Phase 1 requirements, software engineering rigor, security constraints, and operational feasibility.
+This self-review critically examines the revised Phase 2 Implementation Plan (`docs/phase-2/PHASE_2_IMPLEMENTATION_PLAN.md`) and Final Readiness Audit (`docs/phase-2/PHASE_2_FINAL_READINESS_AUDIT.md`) against all instructions, scope boundaries, and safety constraints.
 
 ---
 
@@ -19,14 +19,14 @@ This self-review critically examines `docs/phase-2/PHASE_2_IMPLEMENTATION_PLAN.m
 
 | # | Review Item | Status | Evaluation Notes |
 |:---|:---|:---:|:---|
-| 1 | Phase 0 requirements correctly traced | ✅ PASS | Every principle (P1–P10) and core capability (C1–C12) is mapped in `REQUIREMENT_TRACEABILITY.md`. |
-| 2 | Phase 1 requirements correctly traced | ✅ PASS | IA, 3-tab navigation, and interaction models directly inform domain models and navigation scaffold. |
-| 3 | No requirement was silently changed | ✅ PASS | Zero requirements modified. Deferrals (Map provider, audio production method) remain explicitly documented. |
-| 4 | No fake production data introduced | ✅ PASS | Anti-synthetic botanical data rule enforced. Only generic, clearly marked test fixtures used for tests. |
-| 5 | Location is first-class entity | ✅ PASS | `Location` entity is an independent collection, not a secondary attribute of plant records. |
+| 1 | Phase 0 requirements correctly traced | ✅ PASS | All principles (P1–P10) and capabilities (C1–C12) verified in `REQUIREMENT_TRACEABILITY.md`. |
+| 2 | Phase 1 requirements correctly traced | ✅ PASS | 3-tab IA and interaction models directly inform domain models and navigation scaffold. |
+| 3 | No requirement was silently changed | ✅ PASS | Zero requirements modified. Deferrals (Map provider, audio production method) remain explicit. |
+| 4 | No fake production data introduced | ✅ PASS | Anti-synthetic botanical data rule enforced. Only generic test fixtures (e.g. `TEST_FIXTURE_PLANT_001`) used. |
+| 5 | Location is first-class entity | ✅ PASS | `Location` entity is an independent collection, supporting N locations beyond initial two. |
 | 6 | New locations are supported | ✅ PASS | Dynamic schema supporting N locations beyond initial featured ones (`Urban Farming Kelurahan`, `Taman Toga RW 03`). |
-| 7 | GPS foundation is supported | ✅ PASS | Single-shot `FusedLocationProviderClient` interface with no background services or geofencing. |
-| 8 | Plant master/location relationship is correct | ✅ PASS | Explicitly decoupled: `MasterPlant` (botanical encyclopedia) linked via `LocationPlant` junction records. |
+| 7 | GPS foundation is supported | ✅ PASS | Single-shot `LocationClient` contract with zero background services or geofencing. |
+| 8 | Plant master/location relationship is correct | ✅ PASS | Strictly decoupled: `MasterPlant` (botanical encyclopedia) linked via `LocationPlant` junction records. |
 | 9 | User/PIC/Admin roles are correct | ✅ PASS | Roles mapped to Firebase Custom Claims and enforced both in application logic and security rules. |
 | 10 | Security is enforced at backend level | ✅ PASS | `firestore.rules` enforces authorization independent of client UI visibility. |
 | 11 | Public does not need login | ✅ PASS | Public queries to published locations and active plants succeed unauthenticated. |
@@ -37,45 +37,37 @@ This self-review critically examines `docs/phase-2/PHASE_2_IMPLEMENTATION_PLAN.m
 | 16 | Website remains supporting infrastructure | ✅ PASS | Static HTML fallback (<60KB) showing plant summary + APK download CTA; no web admin. |
 | 17 | No unnecessary web admin exists | ✅ PASS | Admin uses the mobile Android app; zero web CMS or React dashboards. |
 | 18 | No unnecessary server exists | ✅ PASS | Fully serverless (Firebase Firestore, Auth, Storage, Hosting). |
-| 19 | No unnecessary dependencies exist | ✅ PASS | Clean Gradle setup using only official Google/AndroidX/Firebase BOM dependencies. |
-| 20 | No paid service introduced silently | ✅ PASS | Target cost strictly Rp0 within Firebase Spark Free Tier. |
-| 21 | Offline strategy is realistic | ✅ PASS | Standard Firestore persistent disk cache utilized; no redundant custom sync engines. |
-| 22 | Test strategy exists | ✅ PASS | Unit testing for model serialization, URL builders, and security rule simulation. |
-| 23 | Build strategy exists | ✅ PASS | Kotlin DSL Gradle build scripts targeting API 26–35. |
-| 24 | Local setup is reproducible | ✅ PASS | Documented in `LOCAL_DEVELOPMENT.md` utilizing Android Studio's bundled JDK 21. |
-| 25 | Scope is appropriate for Phase 2 | ✅ PASS | Confined to architectural foundation. No user-facing feature screens prematurely coded. |
-| 26 | No unnecessary refactoring | ✅ PASS | Greenfield project; zero existing files rewritten. |
+| 19 | No unnecessary dependencies exist | ✅ PASS | Firebase Storage SDK and Navigation Compose removed from Phase 2. Only minimal core libraries kept. |
+| 20 | No paid service introduced silently | ✅ PASS | Cost statement revised: operating within available free quotas; zero paid services by default. |
+| 21 | Offline strategy is realistic | ✅ PASS | Standard Firestore persistent disk cache utilized; offline cache ≠ offline authorization. |
+| 22 | Test strategy exists | ✅ PASS | Unit testing for model serialization, URL builders, and fake location client. |
+| 23 | Build toolchain compatibility validated | ✅ PASS | JDK 21, Gradle 8.10.2, AGP 8.7.3, Kotlin 2.0.21, Compose Compiler Plugin, minSdk 26, targetSdk 35. |
+| 24 | Safe Google Services configuration | ✅ PASS | Conditional Gradle loading; zero fake `google-services.json` or fabricated credentials. |
+| 25 | Local setup is reproducible | ✅ PASS | Documented in `LOCAL_DEVELOPMENT.md` utilizing Android Studio's bundled JDK 21. |
+| 26 | Scope is appropriate for Phase 2 | ✅ PASS | Confined to architectural foundation. No user-facing feature screens prematurely coded. |
 | 27 | No GitHub push will occur | ✅ PASS | Local Git version control only. All remote push commands strictly barred. |
 
 ---
 
-## 3. Engineering Risk Analysis & Concrete Mitigations
+## 3. Engineering Risk & Resolution Analysis
 
-### Issue 1: JDK & Android SDK Local Path Resolution
-- **Problem:** `java` is not in the system Windows PATH, though Android Studio's JDK 21 exists at `C:\Program Files\Android\Android Studio\jbr\bin\java.exe`. Also, the Android SDK directory is not yet registered in standard AppData.
-- **Severity:** HIGH
-- **Why It Matters:** Running `./gradlew` from the command line will fail if `JAVA_HOME` or `ANDROID_HOME` are missing.
-- **Recommendation:** In `LOCAL_DEVELOPMENT.md` and project root, provide automated scripts / `local.properties` configuration templates pointing explicitly to `C:\Program Files\Android\Android Studio\jbr` and establishing clear instructions for Android SDK configuration via Android Studio or command-line tools.
-- **Plan Change:** Explicitly added to Section 15 and 17 of `PHASE_2_IMPLEMENTATION_PLAN.md`.
+### Item 1: Complete Removal of Firebase Storage SDK
+- **Audit Verification:** Verified that `firebase-storage` is 100% eliminated from Phase 2 dependencies, data access layers, and scope definitions. Media handling is deferred to later phases.
 
-### Issue 2: Prevention of Accidental Remote Git Pushes
-- **Problem:** User directive explicitly commands: "DO NOT push anything to GitHub. Never push to remote."
-- **Severity:** CRITICAL
-- **Why It Matters:** An accidental `git push` would violate strict project rules.
-- **Recommendation:** Do not configure remote push credentials or run any push command. Keep all commits 100% local.
-- **Plan Change:** Highlighted as a hard constraint in all Phase 2 documentation.
+### Item 2: Removal of Navigation Compose
+- **Audit Verification:** Verified that `androidx.navigation:navigation-compose` is removed from Phase 2 dependencies. The foundation does not require navigation routing until Phase 3 screen implementation begins.
 
-### Issue 3: Decoupling Master Plants from Location Instances
-- **Problem:** Earlier conceptual designs risked conflating the botanical master description (medicinal claims, Hanzi, Pinyin) with the physical plot instance (planted in RW 03, 10 polybags).
-- **Severity:** MEDIUM
-- **Why It Matters:** If multiple gardens grow Red Ginger (Jahe Merah), copying botanical descriptions creates data drift and increases maintenance burden.
-- **Recommendation:** Formalize `MasterPlant` as the canonical botanical encyclopedia, and `LocationPlant` as the lightweight junction entity referencing `masterPlantId`.
-- **Plan Change:** Implemented in Section 12 of `PHASE_2_IMPLEMENTATION_PLAN.md`.
+### Item 3: Zero Fake Configuration Enforcement
+- **Audit Verification:** Confirmed that `google-services.json` will NOT be fabricated. If the live file is absent, Gradle applies the plugin conditionally, unit tests execute locally, and live cloud status is reported honestly as `NOT CONFIGURED / BLOCKED`.
+
+### Item 4: Toolchain Matrix Coherence
+- **Audit Verification:** Confirmed that OpenJDK 21, Gradle 8.10.2, AGP 8.7.3, and Kotlin 2.0.21 are fully compatible with official Android documentation and support `compileSdk 35` and `minSdk 26`.
 
 ---
 
-## 4. Self-Review Conclusion
+## 4. Final Review Verdict
 
-The Phase 2 Implementation Plan is technically sound, architecturally minimal, strictly aligned with approved requirements, and ready for Product Owner review.
+All 27 checklist items pass without reservation. The revised Phase 2 Implementation Plan is minimal, safe, and ready for Product Owner authorization.
 
-**Status:** PHASE 2 PLAN READY — WAITING FOR APPROVAL
+**FINAL GATE STATUS:**
+### `READY FOR ACC PHASE 2`
