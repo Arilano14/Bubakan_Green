@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import id.bubakangreen.app.ui.theme.BubakanGreenTheme
 
 /**
- * Minimal compilation boot shell for Phase 2 foundation verification.
- * User-facing feature screens belong strictly to Phase 3 onward.
+ * Main Activity hosting BUBAKAN GREEN.
+ * Connects the public Compose navigation shell, trilingual botanical encyclopedia,
+ * community garden directory, and deep-link routing.
  */
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,16 +26,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "BUBAKAN GREEN\nSistem Informasi Urban Farming & Taman Toga",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
+                    BubakanAppNavHost()
                 }
             }
         }
