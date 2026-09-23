@@ -182,15 +182,64 @@ sealed interface UiState<out T> {
 
 ---
 
-## 10. Design Token Usage (Palette Alam Bubakan)
+## 10. Visual Direction & Design Strategy (Planta-Inspired, Bubakan-Owned)
 
-- **Primary:** `PrimaryForest` (`#2D6A4F`) for main buttons, active tabs, and section titles.
-- **Primary Container:** `PrimaryContainerMint` (`#D8F3DC`) for category chip backgrounds and featured banners.
-- **Surface:** `SurfaceWhite` (`#FFFFFF`) for cards, dialogs, and bottom sheets.
-- **Background:** `BackgroundLight` (`#F8F9FA`) for all screen backgrounds.
-- **Text:** `OnSurfaceDark` (`#1B4332`) achieving **12.8:1** contrast ratio (exceeds WCAG AA).
-- **Typography:** Material 3 scale (HeadlineLarge 32sp, HeadlineMedium 24sp, TitleMedium 16sp, BodyLarge 16sp, BodyMedium 14sp).
-- **Chinese Typography:** 24sp Noto Sans SC for clean Hanzi character rendering.
+Full specification available in [`docs/phase-3/VISUAL_DIRECTION.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-3/VISUAL_DIRECTION.md).
+
+### 10.1 Visual Reference Analysis (Planta Adaptation)
+We adapt the visual clarity, generous breathing room, and botanical dignity of **Planta (Plant & Garden Care by Planta AB)** without cloning its proprietary assets, layouts, typography, or monetization mechanics.
+- **Plant-First Visual Hierarchy:** Botanical photography leads; botanical attributes take center stage over administrative statistics.
+- **Clean, Natural Surfaces:** Off-white canvas (`#F8F9FA`) and pure white card surfaces (`#FFFFFF`) provide calm contrast.
+- **Low Visual Noise:** Flat surfaces with delicate 1dp borders (`OutlineGrey` `#D0DBCE`) and 16dp rounded corners; zero heavy drop-shadows.
+- **Generous Whitespace:** Strict 8-point grid with 16dp standard gutters and 24dp section spacing.
+- **Content-First Ergonomics:** 100% open public access without registration gates or paywalls.
+
+### 10.2 Bubakan Brand Strategy
+- **Hierarchy:** PRIMARY: `BUBAKAN GREEN`; SECONDARY: `Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang`.
+- **Product Context:** Urban Farming, Taman Toga, Edukasi Tanaman, Informasi Lokasi, Pengetahuan Khasiat Herbal.
+- **Tone:** Dignified, community-owned, educational civic utility. Not a student app, not a bureaucratic government dashboard, and not a generic consumer houseplant app.
+- **Locality Integration:** Geographical context (RW numbers, garden names, local coordinate pins) is woven into real content, avoiding repetitive coat-of-arms clutter.
+
+### 10.3 Bubakan Differentiation Strategy (vs Commercial Apps)
+1. **Civic & Community Mission:** 100% free public access; zero login barriers for browsing, searching, or scanning QR codes.
+2. **Physical Garden Anchoring:** Plants are linked to real community plots in Bubakan (`LocationPlant` -> `Location` e.g., RW 03).
+3. **Dual Category Focus:** Distinct visual treatment for **Urban Farming** (food security / vegetables) and **Taman Toga** (family medicinal herbs).
+4. **Trilingual Botanical Education:** Seamless integration of Indonesian common names, Scientific binomial Latin (*italic*), and Mandarin Hanzi + Pinyin + user-triggered audio pronunciation.
+5. **Physical QR Code Touchpoints:** Deep links directly connected to physical weather-resistant signs in the community gardens.
+
+### 10.4 Color Token Strategy (Palette Alam Bubakan)
+Derived from Kelurahan Bubakan's lush natural landscape:
+- **PrimaryForest (`#2D6A4F`):** Deep botanical green for primary actions, active tabs, and key headers.
+- **PrimaryContainerMint (`#D8F3DC`):** Gentle mint wash for category chips and highlight cards.
+- **OnPrimaryContainer (`#081C15`):** Deep forest contrast tone.
+- **SecondarySage (`#52796F`):** Herbal sage green for secondary elements and Taman Toga accents.
+- **BackgroundLight (`#F8F9FA`):** Warm botanical off-white canvas.
+- **SurfaceWhite (`#FFFFFF`):** Crisp white card surface.
+- **OnSurfaceDark (`#1B4332`):** Deep earthy charcoal/green text providing **12.8:1** contrast ratio (exceeds WCAG 2.1 AA requirement of 4.5:1).
+- **OnSurfaceVariant (`#5B7065`):** Sage gray for scientific Latin names and secondary metadata.
+- **OutlineGrey (`#D0DBCE`):** 1dp subtle garden border.
+- **StatusVerifiedGreen (`#2D6A4F`) / StatusPendingOrange (`#E09F3E`):** Harvest amber for pending items.
+- **ErrorRed (`#BA1A1A`):** Restrained warning red.
+
+### 10.5 Typography Strategy
+- **Material 3 Font Scale:** HeadlineLarge (`32sp` Bold), HeadlineMedium (`24sp` SemiBold), TitleMedium (`16sp` SemiBold), BodyLarge (`16sp` Regular), BodyMedium (`14sp` Regular).
+- **Scientific Nomenclature:** Latin names formatted in *TitleSmall Italic* (`14sp`) in `OnSurfaceVariant` (`#5B7065`).
+- **Mandarin Glyph Scale:** Chinese Hanzi displayed prominently at `24sp` using Noto Sans SC with Pinyin at `14sp`.
+
+### 10.6 Photography Strategy
+- **Authenticity First:** Real photography of Kelurahan Bubakan's community gardens and plants has top priority.
+- **No Synthetic Slop:** Zero AI-generated fantasy images or fake stock photography claiming to be real Bubakan locations or plants.
+- **Aspect Ratios:** Location heroes at `16:9`, plant cards at `4:3` or `1:1`, and plant detail heroes at `16:10`.
+- **Graceful Loading:** Coil image loader with subtle crossfade and mint shimmer skeleton placeholder (`#D8F3DC`).
+
+### 10.7 Component Visual System
+- **`LocationCard`:** 16:9 photo, category badge (`Urban Farming` vs `Taman Toga`), RW indicator, plant count badge (`🌿 14 Koleksi Tanaman`), 16dp radius, 1dp outline.
+- **`PlantCard`:** Clean botanical card with prominent photo, Indonesian common name, italic Latin name, and category chip.
+- **`MandarinSpeakerButton`:** 48x48dp circular touch target, manual tap only, single-play audio, auto-resets to idle. Zero autoplay.
+- **Card Styling Rule:** Low visual noise, 16dp rounded corners, flat surface `#FFFFFF`, 1dp border `#D0DBCE`, zero drop shadows.
+
+### 10.8 Visual QA Checklist (Pre-Release Audit)
+All screens must pass the 20 visual criteria detailed in [`docs/phase-3/VISUAL_DIRECTION.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-3/VISUAL_DIRECTION.md#10-visual-qa-checklist-mandatory-pre-release-audit) before final acceptance.
 
 ---
 
