@@ -1,0 +1,47 @@
+/*
+ * TEMPLATE FILE — DO NOT USE DIRECTLY AS PRODUCTION CONFIGURATION
+ *
+ * To connect the Android application to live Firebase services:
+ * 1. Go to the Firebase Console: https://console.firebase.google.com/
+ * 2. Select or create your Firebase project for Kelurahan Bubakan.
+ * 3. Add an Android app with Package Name / Application ID:
+ *      id.bubakangreen.app
+ * 4. Download the generated 'google-services.json' file.
+ * 5. Place the downloaded file directly in this folder:
+ *      Bubakan Green/app/google-services.json
+ *
+ * NOTE: The Gradle build is configured to conditionally apply the
+ * com.google.gms.google-services plugin ONLY when 'app/google-services.json'
+ * exists. Until this file is added, live Firebase connection is:
+ *      STATUS: NOT CONFIGURED / BLOCKED
+ * Local unit tests and domain logic compile and execute without it.
+ */
+{
+  "project_info": {
+    "project_number": "YOUR_PROJECT_NUMBER",
+    "project_id": "YOUR_PROJECT_ID",
+    "storage_bucket": "YOUR_STORAGE_BUCKET"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "YOUR_MOBILE_SDK_APP_ID",
+        "android_client_info": {
+          "package_name": "id.bubakangreen.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "YOUR_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,9 @@
+## This file must NOT be checked into Version Control Systems,
+# as it contains information specific to your local configuration.
+#
+# Location of the Android SDK. This is only used by Gradle.
+# For Windows, use escaped backslashes or forward slashes, for example:
+# sdk.dir=C\:\\Users\\Arilano\\AppData\\Local\\Android\\Sdk
+# or if located on another drive:
+# sdk.dir=C:/Android/sdk
+sdk.dir=
