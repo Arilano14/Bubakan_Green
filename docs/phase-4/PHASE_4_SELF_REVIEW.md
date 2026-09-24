@@ -21,7 +21,7 @@ This self-review evaluates the Phase 4 Implementation Plan, architecture, securi
 | # | Check Item | Category | Status | Evaluation & Verification Evidence |
 |:---:|:---|:---|:---:|:---|
 | 1 | Requirement compliance with Phase 0 | Requirements | ✅ PASS | Covers authenticated PIC location/plant management and Admin approval workflows. |
-| 2 | Requirement compliance with Phase 1 | Requirements | ✅ PASS | Translates `SCR-AUTH-01`, `SCR-PIC-01`–`04`, and `SCR-ADM-01`–`02` specifications. |
+| 2 | Requirement compliance with Phase 1 | Requirements | ✅ PASS | Translates `SCR-AUTH-01`, `SCR-PIC-01`–`03`, and `SCR-ADM-01`–`02`. QR generation (`SCR-PIC-04`) strictly assigned to Phase 5. |
 | 3 | Phase 3 foundational compatibility | Architecture | ✅ PASS | Integrates smoothly with `BubakanAppNavHost`, `UiState`, and `Palette Alam Bubakan`. |
 | 4 | Single unified APK architecture | Architecture | ✅ PASS | Both PIC and Admin features reside in `id.bubakangreen.app`. Zero split APKs. |
 | 5 | Role-based backend authorization | Security | ✅ PASS | Enforced via declarative `firestore.rules` checking `request.auth.token.role`. |
@@ -30,7 +30,7 @@ This self-review evaluates the Phase 4 Implementation Plan, architecture, securi
 | 8 | Location is first-class entity | Domain Model | ✅ PASS | Supports dynamic community locations across `URBAN_FARMING` and `TAMAN_TOGA`. |
 | 9 | MasterPlant vs LocationPlant separation | Domain Model | ✅ PASS | PIC links to existing `MasterPlant` records, avoiding botanical encyclopedia duplication. |
 | 10 | Single-shot GPS principle maintained | Hardware | ✅ PASS | Uses `LocationClient` for one-time coordinate lock. Zero background tracking or geofencing. |
-| 11 | GPS accuracy threshold enforced | Hardware | ✅ PASS | Location capture verifies `< 25m` horizontal accuracy before form submission. |
+| 11 | GPS accuracy threshold contract | Hardware | ✅ PASS | Records device-reported accuracy in meters; enforces operational acceptance threshold (<=25m) with retry prompt. Zero false accuracy guarantee. |
 | 12 | Visual quality: Planta-inspired | UI Polish | ✅ PASS | Generous whitespace, calm green palette, clear hierarchy, low visual noise cards. |
 | 13 | Visual quality: No AI slop | UI Polish | ✅ PASS | Zero random gradients, zero glassmorphism, zero unnecessary shadows, zero carousels. |
 | 14 | Bubakan local civic identity | Product | ✅ PASS | Primary: `BUBAKAN GREEN`, Secondary: `Kelurahan Bubakan, Mijen`. No KKN branding. |
@@ -50,9 +50,9 @@ This self-review evaluates the Phase 4 Implementation Plan, architecture, securi
 | 28 | Audit logging mechanism | Governance | ✅ PASS | Sensitive civic operations (create, approve, reject) recorded in `/audit_logs`. |
 | 29 | Zero fake production botanical data | Data Safety | ✅ PASS | No fictitious plants or imaginary addresses committed to production. |
 | 30 | Preview fixtures explicitly marked | Data Safety | ✅ PASS | Fallback development fixtures clearly labeled `UI_PREVIEW_ONLY`. |
-| 31 | Zero paid cloud services introduced | Cost Safety | ✅ PASS | Zero paid Firebase Storage or proprietary map APIs introduced. Cost remains 100% zero. |
+| 31 | Zero paid cloud services introduced | Cost Safety | ✅ PASS | Zero paid Firebase Storage or proprietary APIs. Media upload infrastructure deferred until media strategy approval. |
 | 32 | Dependency minimalism | Dependencies | ✅ PASS | Zero new external dependencies required for Phase 4. Existing catalog is sufficient. |
-| 33 | Unapproved features rejected | Scope Control | ✅ PASS | Zero e-commerce carts, user chats, public registration, or gamification elements. |
+| 33 | Unapproved features rejected | Scope Control | ✅ PASS | Zero e-commerce carts, user chats, public registration, QR label export, or gamification elements. |
 | 34 | Strict Git safety (No push) | Git Safety | ✅ PASS | Zero `git push` commands executed. All operations remain strictly local. |
 | 35 | Pre-execution gate stop condition | Governance | ✅ PASS | Execution stops immediately after plan and audit. Coding halted until `ACC PHASE 4`. |
 

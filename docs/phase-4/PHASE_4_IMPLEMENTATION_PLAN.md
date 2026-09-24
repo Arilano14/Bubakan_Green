@@ -48,15 +48,15 @@ Phase 4 bridges public botanical discovery with authoritative field governance: 
 1. **PIC Dashboard (`SCR-PIC-01`):** Overview of assigned community gardens, plant inventory count, and quick action buttons.
 2. **Garden Registration & Edit (`SCR-PIC-02`):**
    - Form inputs: Garden Name, Garden Type (`URBAN_FARMING` vs `TAMAN_TOGA`), RW selection (RW 01 to RW 08), Address, and Description.
-   - **Single-Shot GPS Capture:** Integrated `GpsCaptureWidget` invoking `LocationClient.getCurrentLocation()` once upon user tap, displaying accuracy radius and coordinate badge.
+   - **Single-Shot GPS Capture:** Integrated `GpsCaptureWidget` invoking `LocationClient.getCurrentLocation()` once upon user tap, recording device-reported horizontal accuracy in meters and displaying an operational accuracy badge.
    - Initial status submitted as `PENDING_APPROVAL`.
 3. **Garden Plant Inventory Management (`SCR-PIC-03`):**
    - Link existing `MasterPlant` species from encyclopedia to the physical garden plot (`LocationPlant`).
    - Add bed location notes, bed number, and planting quantity notes.
-   - Toggle QR eligibility recommendation.
-4. **QR Code Label Preview (`SCR-PIC-04`):**
-   - Preview approved QR code labels containing deterministic URL: `https://bubakangreen.web.app/plant/{plantId}`.
-   - Option to share/save label image for printing.
+   - Maintain data model flag `featuredForQr: Boolean` for future integration.
+4. **QR Generation & Export Boundary (Strict Phase 5 Assignment):**
+   - **EXCLUDED FROM PHASE 4:** QR Label Preview, sticker export, label printing, and field layout integration are strictly assigned to **Phase 5**.
+   - Phase 4 only maintains existing data model fields (`featuredForQr: Boolean`) without generating QR codes, exporting stickers, or claiming physical QR field readiness.
 
 ### 4.3 Admin Kelurahan Capabilities (Pemerintah Kelurahan)
 1. **Admin Dashboard (`SCR-ADM-01`):** Civic governance summary, pending approval queue counter, total registered gardens, and PIC roster.
@@ -75,9 +75,11 @@ Phase 4 bridges public botanical discovery with authoritative field governance: 
 
 - ❌ **No Separate Apps:** Do NOT create a separate "Bubakan Admin APK" or "PIC APK". All roles reside in the single `id.bubakangreen.app` package.
 - ❌ **No Public Registration:** Zero "Sign Up / Register" buttons for general public. PIC and Admin accounts are provisioned via administrative channels.
+- ❌ **No Production QR Code Generation, Sticker Export, or Label Printing:** Assigned strictly to **Phase 5**. Phase 4 maintains only existing data models/fields (`featuredForQr: Boolean`).
+- ❌ **No Unsupported GPS Accuracy Guarantees:** Never claim "<25m accuracy guarantee". The system records device-reported horizontal accuracy in meters with an operational acceptance threshold (<=25m).
 - ❌ **No Live GPS Tracking:** Strictly prohibited. Location capture is strictly single-shot (`LocationClient.getCurrentLocation()`).
-- ❌ **No Geofencing / Background Tracking Services:** Banned.
-- ❌ **No Paid Firebase Storage:** Images are handled via compressed local bitmaps / external verified HTTPS URLs to prevent cloud storage billing.
+- ❌ **No Geofencing / Background Tracking / Location History:** Banned.
+- ❌ **No Paid Firebase Storage or Unapproved Upload Pipelines:** Actual media upload infrastructure deferred until media strategy approval. URL references only.
 - ❌ **No In-App QR Scanner:** Public and officers use standard camera / Google Lens.
 - ❌ **No E-Commerce, Chat, or Social Feeds:** Banned by anti-slop rules.
 - ❌ **No Remote Git Push:** `git push` remains permanently prohibited.
@@ -292,19 +294,48 @@ Every management form adheres to a strict 9-state resilience contract:
 
 ## 14. GPS Acquisition Implementation Details
 
-Leverages `AndroidLocationClient` implemented in Phase 2:
-- **Accuracy Guarantee:** Requires `< 25m` horizontal accuracy.
-- **Single-Shot Timeout:** Times out after 15 seconds if satellite fix is obstructed, offering: `[ Coba Lagi di Tempat Terbuka ]`.
-- **Zero Background Service:** GPS listener is released immediately upon receiving coordinate fix.
+Leverages `AndroidLocationClient` implemented in Phase 2 with strict adherence to device-reported measurement reality:
+- **No Accuracy Guarantee:** The application **never claims** a "<25m accuracy guarantee" because satellite accuracy depends on device hardware, environment, tree canopy, permissions, and OS behavior.
+- **Approved Operational Contract:**
+  > *"GPS capture supports recording the device-reported horizontal accuracy in meters. The system defines an operational acceptance threshold (accuracy <= 25m) for location submission, subject to approved requirements."*
+- **Required Metadata Fields Recorded:**
+  - `latitude: Double`
+  - `longitude: Double`
+  - `accuracyMeters: Float` (Device-reported horizontal accuracy)
+  - `capturedAt: Long` (Epoch millisecond timestamp of fix)
+- **Runtime GPS Behavior:**
+  - [x] Request runtime `ACCESS_FINE_LOCATION` permission defensively.
+  - [x] Capture single-shot location fix (`LocationClient.getCurrentLocation()`).
+  - [x] Display device-reported accuracy radius in UI badge.
+  - [x] Reject or warn if accuracy exceeds approved threshold (> 25m) and prompt retry in an open area.
+  - [x] Provide one-tap retry button.
+  - [x] Gracefully handle permission denial and guide user.
+  - [x] Gracefully handle unavailable location / GPS disabled.
+  - [x] **Zero Coordinate Fabrication:** Never generate fake or simulated coordinates if fix fails.
+- **Strict Prohibitions:**
+  - ❌ ABSOLUTELY NO background tracking.
+  - ❌ ABSOLUTELY NO live tracking or continuous updates.
+  - ❌ ABSOLUTELY NO geofencing.
+  - ❌ ABSOLUTELY NO turn-by-turn navigation.
+  - ❌ ABSOLUTELY NO location history logs.
 
 ---
 
-## 15. Media Strategy (Zero Paid Storage)
+## 15. Media Strategy (Cost Safety & Upload Infrastructure Boundary)
 
-To maintain cost-zero operation without paid Firebase Storage billing:
-1. Field officers can input direct image URLs hosted on official Kelurahan repositories or Wikimedia Commons.
-2. If camera photo is taken, bitmap is compressed locally (`< 250KB`) and stored with a URI contract.
-3. No paid storage dependencies are added.
+Audit of current media architecture:
+1. **Zero Paid Cloud Services:** No paid Firebase Storage or cloud buckets may be provisioned. Billing is permanently disabled.
+2. **Upload Infrastructure Deferred:** The repository currently has no approved physical storage/upload mechanism. Phase 4 **does not invent one**.
+3. **Approved Phase 4 Scope:**
+   - Maintain `photoUrl: String?` and `audioUrl: String?` fields in domain entities.
+   - Display already-available HTTPS images (e.g. Wikimedia Commons or approved civic image repositories) via Coil image loader.
+   - Support data model URL reference inputs.
+   - Actual production upload pipelines are **deferred** until a zero-cost, permanent civic media storage strategy is formally approved via Change Request.
+4. **Prohibitions:**
+   - ❌ Do NOT enable paid storage.
+   - ❌ Do NOT enable cloud billing.
+   - ❌ Do NOT create hidden external upload services.
+   - ❌ Do NOT fabricate media URLs.
 
 ---
 
