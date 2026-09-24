@@ -64,8 +64,10 @@ class CatalogViewModelTest {
             flowOf(Result.Success(emptyList()))
 
         override suspend fun createMasterPlant(plant: MasterPlant): Result<String> = Result.Success(plant.id)
+        override suspend fun updateMasterPlant(plant: MasterPlant): Result<Unit> = Result.Success(Unit)
         override suspend fun addPlantToLocation(locationPlant: LocationPlant): Result<String> = Result.Success(locationPlant.id)
         override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> = Result.Success(Unit)
+        override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> = Result.Success(Unit)
     }
 
     @Before

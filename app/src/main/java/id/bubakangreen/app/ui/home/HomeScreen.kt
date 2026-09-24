@@ -61,6 +61,7 @@ fun HomeScreen(
     onNavigateToLocations: (LocationType?) -> Unit,
     onNavigateToCatalog: () -> Unit,
     onInfoClick: () -> Unit,
+    onLoginClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -73,7 +74,8 @@ fun HomeScreen(
                 title = "BUBAKAN GREEN",
                 subtitle = "Kelurahan Bubakan, Mijen",
                 canNavigateBack = false,
-                onInfoClick = onInfoClick
+                onInfoClick = onInfoClick,
+                onLoginClick = onLoginClick
             )
         },
         containerColor = BackgroundLight,

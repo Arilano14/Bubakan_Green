@@ -75,6 +75,8 @@ class LocationsViewModelTest {
         override suspend fun createLocation(location: Location): Result<String> = Result.Success(location.id)
         override suspend fun updateLocation(location: Location): Result<Unit> = Result.Success(Unit)
         override suspend fun getAssignedLocations(picUid: String): Result<List<Location>> = Result.Success(fakeLocations)
+        override suspend fun getPendingLocations(): Result<List<Location>> = Result.Success(emptyList())
+        override suspend fun deleteLocation(locationId: String): Result<Unit> = Result.Success(Unit)
     }
 
     @Before

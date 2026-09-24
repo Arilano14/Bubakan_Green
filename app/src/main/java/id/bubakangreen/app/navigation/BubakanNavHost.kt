@@ -21,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -31,13 +33,28 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import id.bubakangreen.app.core.di.RepositoryProvider
+import id.bubakangreen.app.data.location.AndroidLocationClient
 import id.bubakangreen.app.ui.about.AboutScreen
+import id.bubakangreen.app.ui.admin.AdminDashboardScreen
+import id.bubakangreen.app.ui.admin.AdminDashboardViewModel
+import id.bubakangreen.app.ui.admin.LocationApprovalScreen
+import id.bubakangreen.app.ui.admin.LocationApprovalViewModel
+import id.bubakangreen.app.ui.admin.MasterPlantFormScreen
+import id.bubakangreen.app.ui.admin.MasterPlantViewModel
+import id.bubakangreen.app.ui.auth.LoginScreen
+import id.bubakangreen.app.ui.auth.LoginViewModel
 import id.bubakangreen.app.ui.catalog.CatalogScreen
 import id.bubakangreen.app.ui.catalog.PlantDetailScreen
 import id.bubakangreen.app.ui.home.HomeScreen
 import id.bubakangreen.app.ui.locations.LocationDetailScreen
 import id.bubakangreen.app.ui.locations.LocationsScreen
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
+import id.bubakangreen.app.ui.pic.LocationFormScreen
+import id.bubakangreen.app.ui.pic.LocationFormViewModel
+import id.bubakangreen.app.ui.pic.PicDashboardScreen
+import id.bubakangreen.app.ui.pic.PicDashboardViewModel
+import id.bubakangreen.app.ui.pic.PlantFormScreen
+import id.bubakangreen.app.ui.pic.PlantFormViewModel
 import id.bubakangreen.app.ui.theme.OnSurfaceVariant
 import id.bubakangreen.app.ui.theme.OutlineGrey
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
@@ -46,7 +63,8 @@ import id.bubakangreen.app.ui.theme.SurfaceWhite
 
 /**
  * Main application navigation shell.
- * Coordinates 3-tab bottom bar, screen backstack, and deep-link routing.
+ * Coordinates 3-tab bottom bar, screen backstack, deep-link routing,
+ * and authenticated PIC & Admin governance workflows.
  */
 @Composable
 fun BubakanAppNavHost(
@@ -55,6 +73,7 @@ fun BubakanAppNavHost(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
+    val context = LocalContext.current
 
     val rootRoutes = listOf(
         Screen.Home.route,
@@ -138,6 +157,9 @@ fun BubakanAppNavHost(
                     },
                     onInfoClick = {
                         navController.navigate(Screen.About.route)
+                    },
+                    onLoginClick = {
+                        navController.navigate(Screen.Login.route)
                     }
                 )
             }
@@ -225,6 +247,171 @@ fun BubakanAppNavHost(
                     onNavigateBack = {
                         navController.popBackStack()
                     }
+                )
+            }
+
+            // ==========================================
+            // PHASE 4: AUTHENTICATED MANAGEMENT ROUTES
+            // ==========================================
+
+            // SCR-AUTH-01: Login Screen
+            composable(Screen.Login.route) {
+                val loginViewModel = viewModel {
+                    LoginViewModel(RepositoryProvider.getAuthRepository())
+                }
+                LoginScreen(
+                    viewModel = loginViewModel,
+                    onNavigateBack = { navController.popBackStack() },
+                    onNavigateToPicDashboard = {
+                        navController.navigate(Screen.PicDashboard.route) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    },
+                    onNavigateToAdminDashboard = {
+                        navController.navigate(Screen.AdminDashboard.route) {
+                            popUpTo(Screen.Home.route)
+                        }
+                    }
+                )
+            }
+
+            // SCR-PIC-01: PIC Dashboard
+            composable(Screen.PicDashboard.route) {
+                val picDashboardViewModel = viewModel {
+                    PicDashboardViewModel(
+                        RepositoryProvider.getLocationRepository(),
+                        RepositoryProvider.getAuthRepository()
+                    )
+                }
+                PicDashboardScreen(
+                    viewModel = picDashboardViewModel,
+                    onNavigateToLocationForm = { locId ->
+                        navController.navigate(Screen.LocationForm.createRoute(locId))
+                    },
+                    onNavigateToPlantForm = { locId ->
+                        navController.navigate(Screen.PlantForm.createRoute(locId))
+                    },
+                    onSignedOut = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // SCR-PIC-02: Location Form with Single-Shot GPS
+            composable(
+                route = Screen.LocationForm.route,
+                arguments = listOf(
+                    navArgument("locationId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val locationId = backStackEntry.arguments?.getString("locationId")
+                val locationFormViewModel = viewModel {
+                    LocationFormViewModel(
+                        RepositoryProvider.getLocationRepository(),
+                        RepositoryProvider.getAuditRepository(),
+                        AndroidLocationClient(context)
+                    )
+                }
+                LocationFormScreen(
+                    viewModel = locationFormViewModel,
+                    picUid = "pic_officer",
+                    locationId = locationId,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // SCR-PIC-03: Plant Form
+            composable(
+                route = Screen.PlantForm.route,
+                arguments = listOf(
+                    navArgument("locationId") { type = NavType.StringType }
+                )
+            ) { backStackEntry ->
+                val locationId = backStackEntry.arguments?.getString("locationId") ?: ""
+                val plantFormViewModel = viewModel {
+                    PlantFormViewModel(
+                        locationId,
+                        RepositoryProvider.getLocationRepository(),
+                        RepositoryProvider.getPlantRepository(),
+                        RepositoryProvider.getAuditRepository()
+                    )
+                }
+                PlantFormScreen(
+                    viewModel = plantFormViewModel,
+                    picUid = "pic_officer",
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // SCR-ADM-01: Admin Dashboard
+            composable(Screen.AdminDashboard.route) {
+                val adminDashboardViewModel = viewModel {
+                    AdminDashboardViewModel(
+                        RepositoryProvider.getLocationRepository(),
+                        RepositoryProvider.getPlantRepository(),
+                        RepositoryProvider.getAuthRepository()
+                    )
+                }
+                AdminDashboardScreen(
+                    viewModel = adminDashboardViewModel,
+                    onNavigateToApprovalQueue = {
+                        navController.navigate(Screen.LocationApproval.route)
+                    },
+                    onNavigateToMasterPlantForm = { plantId ->
+                        navController.navigate(Screen.MasterPlantForm.createRoute(plantId))
+                    },
+                    onSignedOut = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Home.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
+            // SCR-ADM-02: Location Approval Queue
+            composable(Screen.LocationApproval.route) {
+                val approvalViewModel = viewModel {
+                    LocationApprovalViewModel(
+                        RepositoryProvider.getLocationRepository(),
+                        RepositoryProvider.getAuditRepository()
+                    )
+                }
+                LocationApprovalScreen(
+                    viewModel = approvalViewModel,
+                    adminUid = "admin_kelurahan",
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // Master Plant Encyclopedia Form
+            composable(
+                route = Screen.MasterPlantForm.route,
+                arguments = listOf(
+                    navArgument("plantId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    }
+                )
+            ) { backStackEntry ->
+                val plantId = backStackEntry.arguments?.getString("plantId")
+                val masterPlantViewModel = viewModel {
+                    MasterPlantViewModel(
+                        RepositoryProvider.getPlantRepository(),
+                        RepositoryProvider.getAuditRepository()
+                    )
+                }
+                MasterPlantFormScreen(
+                    viewModel = masterPlantViewModel,
+                    adminUid = "admin_kelurahan",
+                    plantId = plantId,
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
         }

@@ -31,6 +31,7 @@ fun BubakanTopBar(
     canNavigateBack: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onInfoClick: (() -> Unit)? = null,
+    onLoginClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -63,6 +64,15 @@ fun BubakanTopBar(
             }
         },
         actions = {
+            if (onLoginClick != null) {
+                IconButton(onClick = onLoginClick) {
+                    androidx.compose.material3.Icon(
+                        imageVector = androidx.compose.material.icons.Icons.Filled.Lock,
+                        contentDescription = "Masuk Petugas & Admin",
+                        tint = PrimaryForest
+                    )
+                }
+            }
             if (onInfoClick != null) {
                 IconButton(onClick = onInfoClick) {
                     Icon(

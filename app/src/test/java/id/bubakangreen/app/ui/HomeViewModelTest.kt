@@ -68,6 +68,8 @@ class HomeViewModelTest {
         override suspend fun createLocation(location: Location): Result<String> = Result.Success(location.id)
         override suspend fun updateLocation(location: Location): Result<Unit> = Result.Success(Unit)
         override suspend fun getAssignedLocations(picUid: String): Result<List<Location>> = Result.Success(listOf(featuredLocation))
+        override suspend fun getPendingLocations(): Result<List<Location>> = Result.Success(emptyList())
+        override suspend fun deleteLocation(locationId: String): Result<Unit> = Result.Success(Unit)
     }
 
     private val fakePlantRepo = object : PlantRepository {
@@ -81,8 +83,10 @@ class HomeViewModelTest {
             flowOf(Result.Success(emptyList()))
 
         override suspend fun createMasterPlant(plant: MasterPlant): Result<String> = Result.Success(plant.id)
+        override suspend fun updateMasterPlant(plant: MasterPlant): Result<Unit> = Result.Success(Unit)
         override suspend fun addPlantToLocation(locationPlant: LocationPlant): Result<String> = Result.Success(locationPlant.id)
         override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> = Result.Success(Unit)
+        override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> = Result.Success(Unit)
     }
 
     @Before
