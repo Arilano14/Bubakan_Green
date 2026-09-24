@@ -91,6 +91,22 @@ class FirestoreLocationRepository(
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)
         }
+    override suspend fun getPendingLocations(): Result<List<Location>> {
+        return try {
+            val snapshot = collection.whereEqualTo("status", LocationStatus.PENDING_APPROVAL.name).get().await()
+            Result.Success(snapshot.documents.mapNotNull { it.toLocation() })
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override suspend fun deleteLocation(locationId: String): Result<Unit> {
+        return try {
+            collection.document(locationId).delete().await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
     }
 
     companion object {
@@ -108,6 +124,9 @@ class FirestoreLocationRepository(
             "photoUrl" to photoUrl,
             "picUid" to picUid,
             "status" to status.name,
+            "accuracyMeters" to accuracyMeters,
+            "capturedAt" to capturedAt,
+            "rejectionNote" to rejectionNote,
             "createdAt" to createdAt,
             "updatedAt" to updatedAt
         )
@@ -130,6 +149,9 @@ class FirestoreLocationRepository(
             val picUid = getString("picUid") ?: ""
             val statusStr = getString("status") ?: LocationStatus.DRAFT.name
             val status = runCatching { LocationStatus.valueOf(statusStr) }.getOrDefault(LocationStatus.DRAFT)
+            val accuracyMeters = getDouble("accuracyMeters")?.toFloat()
+            val capturedAt = getLong("capturedAt")
+            val rejectionNote = getString("rejectionNote")
             val createdAt = getLong("createdAt") ?: System.currentTimeMillis()
             val updatedAt = getLong("updatedAt") ?: System.currentTimeMillis()
 
@@ -147,6 +169,9 @@ class FirestoreLocationRepository(
                 photoUrl = photoUrl,
                 picUid = picUid,
                 status = status,
+                accuracyMeters = accuracyMeters,
+                capturedAt = capturedAt,
+                rejectionNote = rejectionNote,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )

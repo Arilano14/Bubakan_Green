@@ -13,4 +13,6 @@ interface LocationRepository {
     suspend fun createLocation(location: Location): Result<String>
     suspend fun updateLocation(location: Location): Result<Unit>
     suspend fun getAssignedLocations(picUid: String): Result<List<Location>>
+    suspend fun getPendingLocations(): Result<List<Location>>
+    suspend fun deleteLocation(locationId: String): Result<Unit>
 }

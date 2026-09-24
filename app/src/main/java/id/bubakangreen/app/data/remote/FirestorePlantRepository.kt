@@ -81,9 +81,18 @@ class FirestorePlantRepository(
         }
     }
 
-    override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> {
+    override suspend fun updateMasterPlant(plant: MasterPlant): Result<Unit> {
         return try {
-            locationPlantsCollection.document(locationPlant.id).set(locationPlant.toMap()).await()
+            masterPlantsCollection.document(plant.id).set(plant.toMap()).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> {
+        return try {
+            locationPlantsCollection.document(locationPlantId).delete().await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)

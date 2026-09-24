@@ -35,6 +35,9 @@ data class Location(
     val photoUrl: String? = null,
     val picUid: String,
     val status: LocationStatus = LocationStatus.PENDING_APPROVAL,
+    val accuracyMeters: Float? = null,
+    val capturedAt: Long? = null,
+    val rejectionNote: String? = null,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

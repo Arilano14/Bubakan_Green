@@ -18,6 +18,23 @@ sealed class Screen(
         fun createRoute(plantId: String): String = "plant/$plantId"
     }
     data object About : Screen("about", "Tentang")
+
+    // Phase 4 Authenticated Management Screens
+    data object Login : Screen("login", "Masuk Petugas")
+    data object PicDashboard : Screen("pic_dashboard", "Dashboard Petugas")
+    data object LocationForm : Screen("location_form?locationId={locationId}", "Form Kebun") {
+        fun createRoute(locationId: String? = null): String =
+            if (locationId != null) "location_form?locationId=$locationId" else "location_form"
+    }
+    data object PlantForm : Screen("plant_form/{locationId}", "Tambah Tanaman") {
+        fun createRoute(locationId: String): String = "plant_form/$locationId"
+    }
+    data object AdminDashboard : Screen("admin_dashboard", "Admin Kelurahan")
+    data object LocationApproval : Screen("location_approval", "Persetujuan Kebun")
+    data object MasterPlantForm : Screen("master_plant_form?plantId={plantId}", "Master Tanaman") {
+        fun createRoute(plantId: String? = null): String =
+            if (plantId != null) "master_plant_form?plantId=$plantId" else "master_plant_form"
+    }
 }
 
 data class BottomNavItem(
