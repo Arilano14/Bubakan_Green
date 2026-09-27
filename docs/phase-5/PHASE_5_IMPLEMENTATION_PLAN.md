@@ -1,316 +1,299 @@
-# BUBAKAN GREEN — PHASE 5 IMPLEMENTATION PLAN
+# BUBAKAN GREEN — PHASE 5 IMPLEMENTATION PLAN (FINAL PRE-EXECUTION REVISION)
 **Product:** BUBAKAN GREEN  
 **Sub-title:** Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan  
 **Phase:** Phase 5 — QR, App Links, Web Fallback & Field Integration  
-**Governance:** Implementation Plan strictly prepared before code execution. Approval gate required: `ACC PHASE 5`.  
+**Governance:** Implementation Plan strictly locked prior to code execution. Pre-requisite gate: `ACC PHASE 5`.  
 **Date:** 2026-09-27  
+**Revision:** Final Pre-Execution Revision  
 
 ---
 
 ## 1. Phase 4 Completion Status
 
-Phase 4 (PIC & Admin Management Implementation) is **100% COMPLETE & VERIFIED**:
-- Administrative authentication and persistent session management are operational.
-- Firestore security rules strictly enforce role isolation (Public, PIC, Admin) and append-only civic audit logs.
-- Single-shot GPS acquisition records horizontal accuracy and enforces the $\le 25\text{m}$ quality gate.
-- Garden plot registration, plant-to-plot junction mapping, and Admin approval/rejection queues are fully functional.
-- Zero fake production data, zero premature Phase 5 implementation, and working tree clean with zero remote push.
-- Full details documented in [`PHASE_4_COMPLETION_AUDIT.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/PHASE_4_COMPLETION_AUDIT.md) and [`PHASE_4_CONNECTOR_VERIFICATION.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/PHASE_4_CONNECTOR_VERIFICATION.md).
+Phase 4 (PIC & Admin Management Implementation) is **PASS (VERIFIED)**:
+- Full authentication, session persistence, role-based backend authorization, and immutable audit logs verified.
+- Single-shot GPS acquisition enforces $\le 25\text{m}$ accuracy gate with clear officer retry prompts.
+- All 13 end-to-end data connectors verified without production mocks or client-only security.
+- Comprehensive audit documented in [`PHASE_4_COMPLETION_AUDIT.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/PHASE_4_COMPLETION_AUDIT.md).
 
 ---
 
 ## 2. Phase 5 Objective
 
-Connect verified real-world Bubakan botanical specimens and garden plots with the digital application ecosystem:
-$$\text{REAL BUBAKAN PLANT / PLOT} \longrightarrow \text{STABLE ID} \longrightarrow \text{QR URL} \longrightarrow \text{EXTERNAL PHONE SCANNER} \longrightarrow \text{HTTPS DESTINATION} \longrightarrow \begin{cases} \text{APP LINK (if installed)} & \longrightarrow \text{Native Detail Screen} \\ \text{WEB FALLBACK (if not installed)} & \longrightarrow \text{Lightweight Web Page} \end{cases}$$
+Establish a reliable, permanent connection between physical botanical specimens and garden plots in Kelurahan Bubakan and their digital knowledge records:
+$$\text{FIELD-VERIFIED BUBAKAN SPECIMEN} \longrightarrow \text{IMMUTABLE STABLE ID} \longrightarrow \text{CANONICAL HTTPS URL} \longrightarrow \text{QR} \longrightarrow \text{PHONE SCANNER} \longrightarrow \begin{cases} \text{APP INSTALLED} & \longrightarrow \text{Android App Link} \longrightarrow \text{Native Detail Screen} \\ \text{APP NOT INSTALLED} & \longrightarrow \text{Web Fallback} \longrightarrow \text{Botanical Web Card} \end{cases}$$
 
 ---
 
-## 3. Scope
+## 3. Scope Lock
 
-1. **Production QR Code Contract**: Standardized HTTPS routing contract for botanical species and garden plots.
-2. **Deterministic QR Generation**: Automated generation of vector/high-resolution PNG QR matrices for verified records.
-3. **Physical QR Label Specification**: Weatherproof, botanical-themed label layout incorporating verified Kelurahan Bubakan identity, quiet zones, and scannable visual contrast.
-4. **Android App Links Integration**: Complete HTTPS intent filters with `android:autoVerify="true"` and `assetlinks.json` verification.
-5. **Universal Deep-Link Routing**: In-app navigation parsing for `/plant/{plantId}` and `/location/{locationId}`, managing loading, success, not-found, and error UI states.
-6. **Responsive Web Fallback**: Public web experience (`plant.html` and `index.html`) on Firebase Hosting delivering botanical identity, trilingual nomenclature, and app download CTA.
-7. **Field Integration Protocol**: Systematic 15-step on-site validation procedure for physical label installation and multi-device camera testing.
-
----
-
-## 4. Out-of-Scope
-
-- Redesigning authentication, Firestore security architecture, or PIC/Admin workflows.
-- Web Admin CMS, Web PIC dashboard, or Web user account management (Web remains strictly read-only fallback).
-- In-app live camera barcode scanner (unnecessary bloat; modern Android and iOS devices feature native camera QR scanners).
-- Paid cloud storage, third-party URL shorteners, or paid dynamic link redirect services.
-- Automated bulk sticker printing machinery drivers (Phase 5 exports standard print-ready PDF/PNG templates).
+The scope of Phase 5 is strictly locked to:
+1. Canonical HTTPS QR payload contract and deterministic QR generation.
+2. Recommended physical QR label specification (Bubakan-owned design, weatherproofing, quiet zones).
+3. Android App Links configuration (`AndroidManifest.xml`, `assetlinks.json`).
+4. In-app deep link route parsing, backstack handling, and empty/error states.
+5. Lightweight, responsive web fallback (`plant.html` and `index.html`) on Firebase Hosting.
+6. 15-step physical field deployment protocol and multi-device hardware verification logging.
 
 ---
 
-## 5. QR Architecture
+## 4. Explicitly Out-of-Scope (Forbidden Scope Creep)
 
-- **Payload Principle**: The physical QR code encodes **only** the stable canonical HTTPS URL.
-- **Payload Anti-Pattern**: Zero raw JSON, base64 data, or embedded botanical descriptions inside the QR matrix. This guarantees minimum matrix density (Version 2–4), maximum physical scannability, and high damage tolerance.
-- **Data Update Independence**:
+- ❌ In-app camera QR barcode scanner (Redundant; modern smartphone camera apps handle this natively).
+- ❌ Web Admin CMS, Web PIC dashboard, or Web login workflows (Web is strictly a read-only fallback viewer).
+- ❌ Modifying authentication models, database schema, or Phase 4 governance workflows.
+- ❌ Third-party URL shorteners (e.g. bit.ly, tinyurl) or deprecated Firebase Dynamic Links.
+- ❌ Background continuous GPS tracking or geofencing.
+- ❌ Social feeds, chat, commercial marketplaces, or AI chat assistants.
+- ❌ Paid cloud storage, paid hosting plans, or external paid APIs.
+
+---
+
+## 5. QR Data Contract & Lifespan Principle
+
+- **Payload Rule:** Physical QR codes encode **ONLY** the canonical HTTPS destination URL (e.g. `https://bubakangreen.web.app/plant/<stable-id>`).
+- **Anti-Pattern Ban:** Zero botanical descriptions, Latin text, photos, or raw JSON payloads may be embedded inside the QR matrix.
+- **Validity Contract:**
+  > *"A deployed QR code remains valid as long as the canonical URL and the referenced stable resource remain active and published in the system."*
+- **Database Update Independence:**
   $$\text{Botanical Information Update in Database} \implies \text{\textbf{ZERO}} \text{ Physical Sticker Reprint}$$
-  Physical QR stickers are permanent assets that reflect database updates instantly upon scan.
+  Stickers deployed in garden beds are permanent physical infrastructure.
+- **Deleted / Unpublished Handling:**
+  If a record is unpublished or archived, the QR target resolves to a clean, user-friendly `StateEmptyView` ("Tanaman Tidak Tersedia" or "Lokasi Belum Terbit") without throwing an error.
 
 ---
 
-## 6. Stable ID Strategy
+## 6. Opaque Stable Identity Strategy
 
-To prevent URL breakage and ensure readability:
-1. **Botanical Species (MasterPlant)**:
-   - Pattern: `pl-<kebab-case-indonesian-name>`
-   - Example: `pl-jahe-merah`, `pl-kumis-kucing`, `pl-temulawak`
-   - Stability: Permanent; tied to taxonomic species definition.
-2. **Garden Plot (Location)**:
-   - Pattern: `loc-<type>-<rw>-<slug>`
-   - Example: `loc-toga-rw03-bersemi`, `loc-farm-rw01-makmur`
-   - Stability: Permanent; tied to the physical civic plot boundary.
+To guarantee that physical stickers never become obsolete:
+1. **Creation & Authority:** Stable IDs are generated by the system when a record is initially registered and verified by an Admin.
+2. **Immutability:** Once assigned to a physical specimen or plot, the Stable ID is **PERMANENT** and never changes.
+3. **Format Standard:** Opaque, collision-free alphanumeric slug:
+   - Botanical Species (`MasterPlant`): `pl-[a-z0-9]{6,12}` (e.g. `pl-jhem-01`)
+   - Garden Plot (`Location`): `loc-[a-z0-9]{6,12}` (e.g. `loc-tg03-01`)
+4. **Decoupling Rules:**
+   - Stable IDs **MUST NOT** depend on plant common name (e.g. if spelling changes or local synonym is added).
+   - Stable IDs **MUST NOT** depend on botanical Latin name (taxonomic reclassifications do not break the QR).
+   - Stable IDs **MUST NOT** depend on RW numbers or temporary database sequence ordering.
+5. **Plot & Bed Moves:**
+   If a physical planting moves to a new bed, only the `LocationPlant` junction table is updated in Firestore. The `MasterPlant` QR code remains 100% valid.
 
 ---
 
 ## 7. Approved QR Types
 
-| QR Type | Target Entity | Canonical Path | Primary Destination Screen | Web Fallback Destination |
+| QR Type | Target Entity | Canonical URL Pattern | In-App Destination | Web Fallback Destination |
 |---|---|---|---|---|
-| **PLANT QR** | Botanical Species (`MasterPlant`) | `/plant/{stableId}` | `PlantDetailScreen.kt` | `/plant.html?id={stableId}` |
-| **LOCATION QR** | Garden Plot (`Location`) | `/location/{stableId}` | `LocationDetailScreen.kt` | `/index.html?loc={stableId}` |
+| **PLANT QR** | Botanical Species (`MasterPlant`) | `https://bubakangreen.web.app/plant/<stable-id>` | `PlantDetailScreen.kt` | `/plant.html?id=<stable-id>` |
+| **LOCATION QR** | Garden Plot (`Location`) | `https://bubakangreen.web.app/location/<stable-id>` | `LocationDetailScreen.kt` | `/index.html?loc=<stable-id>` |
 
 ---
 
-## 8. Canonical URL Strategy
+## 8. Dynamic QR Versioning & Encoding Specification
 
-- **Primary Canonical Domain**: `https://bubakangreen.web.app`
-- **Secondary Domain (Future / Custom)**: `https://bubakangreen.app`
-- **Path Standards**:
-  - Species Encyclopedia: `https://bubakangreen.web.app/plant/pl-jahe-merah`
-  - Plot Directory: `https://bubakangreen.web.app/location/loc-toga-rw03-bersemi`
-
----
-
-## 9. Android App Links Specification
-
-- **Manifest Declaration** in [`AndroidManifest.xml`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/AndroidManifest.xml):
-  ```xml
-  <intent-filter android:autoVerify="true">
-      <action android:name="android.intent.action.VIEW" />
-      <category android:name="android.intent.category.DEFAULT" />
-      <category android:name="android.intent.category.BROWSABLE" />
-      <data android:scheme="https" android:host="bubakangreen.web.app" android:pathPrefix="/plant/" />
-      <data android:scheme="https" android:host="bubakangreen.web.app" android:pathPrefix="/location/" />
-  </intent-filter>
-  ```
-- **Disambiguation Dialog Elimination**: `android:autoVerify="true"` instructs Android OS to verify domain ownership via Digital Asset Links. Once verified, scanning the QR opens Bubakan Green directly without prompting "Open with Chrome or Bubakan Green".
+- **Version Determination:** QR matrix version is determined dynamically by payload length, error correction level, and required physical size rather than artificially locked.
+- **Error Correction Policy:**
+  - **Recommended Standard:** **Level Q (25% damage recovery)**. Ensures the code remains scannable if outdoor stickers accumulate dirt, water droplets, or superficial surface scratches.
+  - **Fallback:** **Level M (15% recovery)** if space constraints dictate a denser physical card.
+- **Optimization Priority:**
+  $$\textbf{SCANABILITY} > \textbf{PHYSICAL ROBUSTNESS} > \textbf{LOW PAYLOAD DENSITY}$$
+- **Quiet Zone:** Exactly 4 module widths of clean, high-contrast white space around all four sides. Zero decorative elements or borders invading the quiet zone.
 
 ---
 
-## 10. Digital Asset Links (`assetlinks.json`) Strategy
+## 9. QR Production Gate
 
-- **File Location**: Hosted on Firebase Hosting at `https://bubakangreen.web.app/.well-known/assetlinks.json`.
-- **Payload Schema**:
-  ```json
-  [
-    {
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "id.bubakangreen.app",
-        "sha256_cert_fingerprints": [
-          "SHA256_DEBUG_KEYSTORE_FINGERPRINT",
-          "SHA256_RELEASE_KEYSTORE_FINGERPRINT"
-        ]
-      }
-    }
-  ]
-  ```
-- **Deployment Process**: Deployed alongside Firebase Hosting assets; verified using Google Digital Asset Links tester.
+No production QR code will be generated or printed unless all of the following conditions are met:
+- [ ] Specimen physically identified and inspected in Kelurahan Bubakan.
+- [ ] Verification taxonomy confirmed as `FIELD-VERIFIED`.
+- [ ] Immutable Stable ID assigned.
+- [ ] Record status is `PUBLISHED` in Firestore.
+- [ ] Canonical URL returns HTTP 200 on `bubakangreen.web.app`.
+- [ ] Destination screen verified via local software simulation.
+
+*Development and testing QR codes must be watermarked with `TEST_ONLY` and barred from garden deployment.*
 
 ---
 
-## 11. Web Fallback Architecture
+## 10. Android App Links & Digital Asset Links Validation
 
-- **Role**: Lightweight, instant-loading botanical viewer for users who do not have the native Android app installed (including iOS users and desktop visitors).
-- **Core Content Displayed**:
-  - Bubakan Green header with Kelurahan Bubakan civic identity.
-  - High-resolution botanical photography.
-  - Trilingual botanical nomenclature (Indonesian Common, Latin Italic, Mandarin Hanzi & Pinyin).
+- **Manifest Declaration:**
+  Configured in [`app/src/main/AndroidManifest.xml`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/AndroidManifest.xml) with `android:autoVerify="true"` on `https://bubakangreen.web.app` for paths `/plant/` and `/location/`.
+- **Validation Reality:**
+  `android:autoVerify="true"` is **NOT** treated as proof of verification. Verification requires:
+  $$\text{Real Android Hardware} + \text{Installed Signed APK} + \text{Reachable HTTPS Domain} + \text{Valid assetlinks.json} + \text{Matching SHA-256 Fingerprint}$$
+- **assetlinks.json Specification:**
+  - URL: `https://bubakangreen.web.app/.well-known/assetlinks.json`
+  - HTTP Status: `200 OK` (Zero redirects).
+  - Content-Type: `application/json`.
+  - Detailed audit in [`APP_LINK_VERIFICATION.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/APP_LINK_VERIFICATION.md).
+
+---
+
+## 11. Debug vs Release Signing Architecture
+
+- **Debug Keystore:**
+  - Used strictly for local Android Studio development and emulator testing.
+  - Fingerprint generated locally: `~/.android/debug.keystore`.
+- **Release Keystore (Production):**
+  - Production signing key generated securely for Kelurahan Bubakan.
+  - SHA-256 fingerprint extracted and populated into production `assetlinks.json`.
+  - Keystore file itself is **NEVER** committed to Git.
+- **Current Status:** Release key is **NOT YET AVAILABLE**. App Links status remains **READY / NOT TESTED ON PRODUCTION DOMAIN**.
+
+---
+
+## 12. Domain, Hosting & Administrative Ownership
+
+- **Canonical Hosting Domain:** `bubakangreen.web.app` (Firebase Hosting).
+- **Secondary Domain (Future):** `bubakangreen.app` (if acquired by Kelurahan).
+- **Administrative Handover Governance:**
+  - The Firebase project must be owned by an official administrative Google Account (e.g. `kelurahan.bubakan@...` or official urban farming committee), NOT tied permanently to an individual developer's personal email.
+  - Project handover documentation must outline role ownership, project recovery, and billing safety ($0 cap).
+  - Zero passwords, API service keys, or tokens may be stored in Git.
+
+---
+
+## 13. Firebase Hosting Configuration & Rewrite Protection
+
+In [`web/firebase.json`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/web/firebase.json):
+1. **Critical Ignore Rule Revision:**
+   - Default `"ignore": ["**/.*"]` will mistakenly cause Firebase CLI to skip `.well-known/assetlinks.json` during deployment!
+   - Must ensure `.well-known` is explicitly preserved during deploy:
+     ```json
+     "ignore": [
+       "firebase.json",
+       "**/node_modules/**",
+       "!**/.well-known/**"
+     ]
+     ```
+2. **Rewrite Precedence:**
+   - Static files in `public/` take precedence over SPA rewrites.
+   - Verified that `/.well-known/assetlinks.json` is served directly with HTTP 200 and not rewritten to `index.html`.
+
+---
+
+## 14. Web Fallback Architecture & Content
+
+- **Role:** Supporting viewer for citizens without the native app installed, iOS visitors, and desktop browsers.
+- **Payload & Performance:**
+  - Vanilla HTML5 + CSS3 (`style.css`).
+  - Total payload $<50\text{KB}$ for near-instant rendering on 3G mobile connections.
+  - Zero heavy JavaScript frameworks, zero tracking pixels.
+- **Information Architecture:**
+  - Header: `BUBAKAN GREEN` • `Kelurahan Bubakan, Semarang`
+  - Hero Botanical Photo (responsive aspect ratio).
+  - Trilingual Botanical Nomenclature: Common Indonesian, Botanical Latin (italic), Mandarin Hanzi + Pinyin.
   - Medicinal properties and herbal usage breakdown.
-  - Call-to-Action (CTA): *"📲 Buka di Aplikasi BUBAKAN GREEN"* (routes to Google Play / direct APK download).
-- **Technology**: Vanilla HTML5 + CSS3 (`style.css`), zero heavy JavaScript frameworks, zero external tracking scripts, $<50\text{KB}$ total payload for near-instant rendering on 3G mobile connections.
+  - Call-to-Action (CTA): *"📲 Buka di Aplikasi BUBAKAN GREEN"* guiding users to the APK download.
 
 ---
 
-## 12. In-App Deep Link Routing & Navigation Flow
+## 15. Web Data Security & Public Read Boundaries
 
-- **Entry Point**: `MainActivity.kt` $\longrightarrow$ `BubakanAppNavHost.kt`.
-- **Route Matching**:
-  - `Screen.PlantDetail.route = "plant_detail/{plantId}"`
-  - `Screen.LocationDetail.route = "location_detail/{locationId}"`
-- **State Handling**:
-  - `UiState.Loading`: Renders `ShimmerBox` placeholders while fetching document from Firestore/cache.
-  - `UiState.Success`: Renders botanical card or garden plot overview.
-  - `UiState.Empty`: Renders `StateEmptyView` ("Tanaman Tidak Ditemukan" or "Lokasi Belum Terbit").
-  - `UiState.Error`: Renders `StateErrorView` with retry button.
-- **Backstack Safety**: `onNavigateBack` pops the backstack; if opened cold from external scanner (empty backstack), automatically falls back to `Screen.Home` to preserve normal app exploration.
+The web fallback fetches data strictly via public unauthenticated read rules:
+- **Public Visibility:** Only records with `status == 'PUBLISHED'` are accessible.
+- **Strict Data Hiding:** Web fallback **NEVER** displays:
+  - Unpublished or pending location plots.
+  - Private PIC contact numbers, officer emails, or user IDs.
+  - Civic audit logs or internal timestamps.
+  - Administrative management controls.
 
 ---
 
-## 13. Firestore Data Dependency
+## 16. In-App Deep Link Routing & Navigation Flow
 
-QR codes resolve records from two collections in Cloud Firestore:
-1. `/master_plants/{plantId}`:
-   - Must have `nameId`, `nameLatin`, `description`.
-   - Optional: `nameMandarin`, `pinyin`, `primaryPhotoUrl`, `mandarinAudioUrl`.
-2. `/locations/{locationId}`:
-   - Must have `name`, `type`, `rw`, `address`, `status == 'PUBLISHED'`.
-   - Security rule enforces that unauthenticated public scans cannot view locations in `DRAFT` or `PENDING_APPROVAL` status.
-
----
-
-## 14. Production Data Dependency & Verification Workflow
-
-Production QR codes must strictly follow the data dependency pipeline:
-$$\text{FIELD INVENTORY} \longrightarrow \text{BOTANICAL VALIDATION} \longrightarrow \text{ADMIN APPROVAL} \longrightarrow \text{ASSIGN STABLE ID} \longrightarrow \text{GENERATE QR} \longrightarrow \text{FIELD DEPLOYMENT}$$
-
-Every record is explicitly categorized:
-- `DOCUMENT-VERIFIED`: Confirmed against authoritative botanical catalog.
-- `FIELD-VERIFIED`: Inspected and verified on physical ground in Bubakan.
-- `NEEDS-FIELD-VALIDATION`: Plot or specimen pending physical boundary / species confirmation.
-- `TEST_ONLY`: Mock development fixtures barred from production printing.
+- **Entry Point:** `MainActivity.kt` handles `ACTION_VIEW` intent $\longrightarrow$ dispatches to `BubakanAppNavHost.kt`.
+- **Deep Link Navigation Handling:**
+  - **Cold Start:** App launches directly into `PlantDetailScreen` (or `LocationDetailScreen`). Tapping Back button smoothly pops back to `Screen.Home` to allow full app exploration without app closure.
+  - **Warm Start / Duplicate Intent:** Reuses existing backstack; replaces top destination if already viewing a plant (`launchSingleTop = true`).
+  - **Unknown / Inactive ID:** ViewModel detects empty query result $\longrightarrow$ emits `UiState.Empty` $\longrightarrow$ displays `StateEmptyView` with return-to-catalog button.
+  - **Malformed URL:** Falls back safely to `Screen.Home` without unhandled crash.
 
 ---
 
-## 15. QR Generation Approach
+## 17. Recommended Physical Print Specification
 
-- **Generation Engine**: Standards-compliant QR matrix generation (using `qrcode` or Python `qrcode` utility during label compilation).
-- **Parameters**:
-  - Error Correction: Level M (15% redundancy) or Level Q (25% redundancy) to withstand minor physical abrasion or outdoor weathering.
-  - Resolution: Minimum $1000 \times 1000\text{px}$ export for crisp 300 DPI print fidelity.
-  - Clean Quiet Zone: Exactly 4 module widths of clean whitespace around the data matrix.
-
----
-
-## 16. Physical QR Label Specification
-
-- **Dimensions**: $60\text{mm} \times 90\text{mm}$ (portrait card) or $70\text{mm} \times 70\text{mm}$ (square stake).
-- **Visual Design (Planta-Inspired, Bubakan-Owned)**:
-  - Header: `BUBAKAN GREEN` (14pt Bold, `PrimaryForest` `#1B4332`).
-  - Subheader: `Taman Toga & Urban Farming Kelurahan Bubakan` (10pt Regular, `SecondarySage` `#40916C`).
-  - Center: High-contrast black QR matrix on pure white card ($45\text{mm} \times 45\text{mm}$).
-  - Specimen Label: Indonesian Common Name (14pt Bold) + Botanical Latin (11pt Italic).
-  - Micro-Instruction: *"Scan menggunakan kamera ponsel untuk informasi tanaman & khasiat"* (9pt Muted).
-- **Substrate**: Waterproof outdoor matte vinyl sticker with UV-protective lamination mounted on weather-resistant acrylic / aluminium stakes.
+- **Substrate Material:** Outdoor Matte Synthetic Vinyl or Polypropylene (PP).
+- **Protective Coating:** Matte UV-protective lamination (prevents direct sunlight specular glare).
+- **Physical QR Matrix Size:** Minimum $35\text{mm} \times 35\text{mm}$ (Recommended: $45\text{mm} \times 45\text{mm}$).
+- **Card Size:** $60\text{mm} \times 90\text{mm}$ (Portrait) or $70\text{mm} \times 70\text{mm}$ (Square).
+- **Mounting:** $3\text{mm}$ acrylic garden stake angled at $30^\circ - 45^\circ$, elevated $30\text{cm} - 60\text{cm}$ above ground.
 
 ---
 
-## 17. Security Architecture
+## 18. QR Label Design Principles (Bubakan-Owned)
 
-1. **Authorization Protection**: QR URLs identify public resources. Scanning a QR grants **zero** elevated permissions, zero admin tokens, and zero access to unpublished records.
-2. **Access Control**: Public Firestore rules prevent retrieval of unpublished (`PENDING_APPROVAL` or `DRAFT`) plots.
-3. **Data Sanitization**: Stable IDs are strictly alphanumeric slugs with hyphens (`[a-z0-9-]+`); prevents path traversal or injection attacks.
-
----
-
-## 18. Offline Behavior
-
-- **Native App**:
-  - If user previously opened the app or synced catalog, Firestore offline persistence serves the botanical record instantly from local disk cache.
-  - If completely offline and uncached, `OfflineStatusBar` notifies the user and displays cached partial information or an offline retry prompt.
-- **Web Fallback**:
-  - Requires standard browser connectivity; if offline, browser displays standard network connection error without corrupting cached state.
+- Header: `BUBAKAN GREEN`
+- Subheader: `Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang`
+- Plant / Plot Name in high-contrast typography.
+- Scannable QR code with clean 4-module quiet zone.
+- Scanning instruction: *"Pindai dengan kamera ponsel untuk khasiat & informasi"*
+- **Zero** copied Planta branding; **zero** invented government slogans or logos.
 
 ---
 
-## 19. Performance Standards
+## 19. Real-Data Verification Taxonomy
 
-| Phase 5 Interaction | Performance Target | Measurement Strategy |
+1. **`FIELD-VERIFIED`**: Physical plant inspected on-site by agricultural team. Mandatory for production QR.
+2. **`DOCUMENT-VERIFIED`**: Verified from Kelurahan botanical catalog; awaiting physical bed location check.
+3. **`NEEDS-FIELD-VALIDATION`**: PIC submission pending admin review and field verification.
+4. **`TEST_ONLY`**: Internal testing fixtures; barred from physical print.
+5. **`UNKNOWN`**: Unverified.
+
+---
+
+## 20. Performance Measurement Breakdown
+
+| Interaction Step | Target Latency | Measurement Boundary |
 |---|---|---|
-| **App Link Handoff to Native App** | $\le 300\text{ms}$ (UI feedback) | Measure from Intent dispatch to Activity compose first frame. |
-| **Deep Link In-App Navigation** | $\le 100\text{ms}$ | Measure NavHost route resolution to `PlantDetailScreen` composition. |
-| **Local Cache Render** | $\le 200\text{ms}$ | Document load from Room/Firestore disk cache. |
-| **First Contentful Paint (Web Fallback)** | $\le 800\text{ms}$ on 4G | Vanilla HTML/CSS on Firebase CDN without blocking scripts. |
-| **Network Document Fetch** | Separately measured | Network latency ($200 - 600\text{ms}$) reported transparently. |
+| **Camera Scanner Decode** | $100 - 300\text{ms}$ | Native OS Camera / Google Lens barcode engine |
+| **OS App Link Resolution** | $50 - 150\text{ms}$ | Android OS package manager handoff |
+| **App Process Resume / Launch** | $150 - 350\text{ms}$ | Activity `onCreate` and Compose composition |
+| **NavHost Route Parsing** | $\le 50\text{ms}$ | Parameter extraction in Compose |
+| **Local Cache Retrieval** | $\le 100\text{ms}$ | Firestore / Room local disk cache |
+| **Network Retrieval (if uncached)**| $250 - 650\text{ms}$ | Cloud Firestore round-trip over 4G cellular |
+| **Web Fallback First Contentful Paint** | $\le 800\text{ms}$ on 4G | Vanilla HTML/CSS on Firebase CDN |
+
+*The entire end-to-end user journey is bounded by camera autofocus and network conditions. Local controlled UI transitions strictly satisfy the $\le 300\text{ms}$ target.*
 
 ---
 
-## 20. Responsive Web Behavior
+## 21. Cost & Free-Tier Guarantees
 
-The web fallback (`plant.html` and `index.html`) is audited across four breakpoints:
-- **Mobile Narrow ($320\text{px} - 375\text{px}$)**: Single-column botanical card, full-width photo, text wrap without overflow.
-- **Standard Mobile ($390\text{px} - 430\text{px}$)**: Optimal readability, $16\text{px}$ body font, $48\text{px}$ touch targets.
-- **Tablet ($768\text{px} - 1024\text{px}$)**: Centered container ($\max 680\text{px}$), balanced whitespace.
-- **Desktop ($>1024\text{px}$)**: Elegant standalone botanical card with subtle border and QR verification context.
-
----
-
-## 21. Field Testing Procedure
-
-Governed strictly by [`FIELD_QR_TEST_PROTOCOL.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/FIELD_QR_TEST_PROTOCOL.md):
-- Physical site identification $\longrightarrow$ Specimen identity check $\longrightarrow$ Digital record validation $\longrightarrow$ Label printing $\longrightarrow$ Physical attachment $\longrightarrow$ Multi-device camera scan $\longrightarrow$ Native App Link test $\longrightarrow$ Web fallback test $\longrightarrow$ Logging into [`FIELD_QR_TEST_RESULTS.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/FIELD_QR_TEST_RESULTS.md).
+- **Firebase Hosting:** Free tier (10 GB storage, 360 MB/day transfer).
+- **Cloud Firestore:** Free tier (50,000 reads/day, 20,000 writes/day).
+- **Paid Storage / External Services:** **ZERO**. No Firebase Storage, no paid APIs.
+- **Total Project Running Cost:** **Rp 0,- (Zero Cost)**.
 
 ---
 
-## 22. Acceptance Criteria
+## 22. Field Verification Protocol
 
-1. [ ] Canonical QR URLs resolve to valid HTTP 200 endpoints on `bubakangreen.web.app`.
-2. [ ] Scanning QR with external camera on a phone with Bubakan Green installed seamlessly opens `PlantDetailScreen` or `LocationDetailScreen` without disambiguation dialog.
-3. [ ] Scanning QR on a phone without the app installed opens the lightweight, responsive botanical web fallback.
-4. [ ] `assetlinks.json` is properly formatted, deployed, and validated against the app package and signing key.
-5. [ ] Back navigation from deep-linked screens smoothly leads to the main public catalog/home without crashing.
-6. [ ] Zero fake production data used in final QR deployment.
-7. [ ] Physical scan tests verified on at least two distinct mobile devices in real outdoor lighting conditions.
+Governed by [`FIELD_QR_TEST_PROTOCOL.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/FIELD_QR_TEST_PROTOCOL.md) and logged in [`FIELD_QR_TEST_RESULTS.md`](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/docs/phase-5/FIELD_QR_TEST_RESULTS.md).
+All physical tests require on-site validation across distances (15–50cm), angles ($30^\circ - 45^\circ$), and daylight conditions (sunlight, canopy shade, dusk).
+
+---
+
+## 23. Acceptance Criteria
+
+1. [ ] Canonical HTTPS QR URLs resolve to HTTP 200 on `bubakangreen.web.app`.
+2. [ ] External camera scan on device with app installed opens native detail screen via App Links without browser prompt.
+3. [ ] External camera scan on device without app opens lightweight botanical web fallback.
+4. [ ] `assetlinks.json` deployed at `/.well-known/assetlinks.json` without redirect.
+5. [ ] Back navigation from deep link safely preserves app navigation.
+6. [ ] Zero dummy or unverified records printed for physical field deployment.
+7. [ ] Physical scan tests verified on actual mobile hardware in outdoor conditions.
 8. [ ] Zero git pushes executed.
 
 ---
 
-## 23. Risks & Mitigations
+## 24. Implementation Files to Change
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| **Outdoor Weathering of Stickers** | QR unreadable after rain/sun | Use UV-resistant outdoor vinyl with matte laminate; error correction Level Q. |
-| **Android OS Domain Verification Delay** | Prompts browser choice dialog | Ensure `android:autoVerify="true"` and properly formatted `assetlinks.json` on HTTPS. |
-| **Weak Cellular Signal at Garden Plot** | Slow document load | Leverage Firestore local persistence; web fallback $<50\text{KB}$ payload. |
-| **Changed Botanical Nomenclature** | Discrepancy with physical plant | Database update updates digital display instantly — **zero QR reprint needed**. |
-
----
-
-## 24. Dependencies
-
-- **Firebase Hosting**: For serving `assetlinks.json`, `plant.html`, and `index.html`.
-- **Cloud Firestore**: For authoritative botanical and location collections.
-- **Android Gradle Plugin & SDK**: For building and signing `id.bubakangreen.app`.
-- **Physical Field Coordination**: Kelurahan Bubakan & RW agricultural cadres for physical sticker placement.
-
----
-
-## 25. Cost & Free-Tier Impact
-
-- **Firebase Hosting**: Free tier includes 10 GB storage and 360 MB/day transfer (Web fallback uses $<50\text{KB}$ per scan $\implies >7,000$ scans/day completely free).
-- **Firebase Firestore**: Free tier includes 50,000 reads/day.
-- **Paid Storage / Services**: **ZERO**. No paid cloud storage, no third-party paid APIs.
-- **Total Project Cost**: **Rp 0,- (Zero Cost)**.
-
----
-
-## 26. Expected Files to Modify / Create
-
-1. `web/public/.well-known/assetlinks.json` (Populate production SHA-256 fingerprint).
-2. `web/public/plant.html` (Polish trilingual layout & dynamic Firestore client-side fetch).
-3. `web/public/index.html` (Polish location fallback & app install CTA).
+1. `web/firebase.json` (Exclude `!**/.well-known/**` from ignore list).
+2. `web/public/.well-known/assetlinks.json` (Configure release SHA-256).
+3. `web/public/plant.html` & `web/public/index.html` (Polish trilingual layout and error handling).
 4. `web/public/style.css` (Palette Alam Bubakan tokens).
-5. `app/src/main/AndroidManifest.xml` (Ensure autoVerify intent filters are complete).
-6. `app/src/main/java/id/bubakangreen/app/navigation/BubakanNavHost.kt` (Verify deep link URI patterns and backstack resilience).
-7. Label templates & vector QR assets in `web/public/labels/` or `docs/phase-5/assets/`.
-
----
-
-## 27. Explicitly Rejected Features
-
-- ❌ In-app camera barcode scanner (Redundant; modern smartphone camera apps handle this natively).
-- ❌ Third-party URL shorteners like bit.ly / tinyurl (Security risk, URL fragility, unbranded).
-- ❌ Firebase Dynamic Links (Deprecated by Google; replaced by standard Android App Links).
-- ❌ Embedding entire plant descriptions inside QR raw text (Causes dense, unscannable QR codes).
-- ❌ Web Admin CMS / Web PIC Login (Out of scope; administrative work is strictly native Android).
+5. `app/src/main/AndroidManifest.xml` (Verify intent filters).
+6. `app/src/main/java/id/bubakangreen/app/navigation/BubakanNavHost.kt` (Verify deep link URI patterns & backstack).
+7. Label print templates in `web/public/labels/`.

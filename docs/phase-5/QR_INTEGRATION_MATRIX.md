@@ -2,47 +2,80 @@
 **Product:** BUBAKAN GREEN  
 **Sub-title:** Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan  
 **Phase:** Phase 5 — QR & Field Integration  
-**Governance:** Zero dummy data for production QR. Physical scan tests marked strictly according to actual verification state.  
+**Governance:** Zero dummy data for production QR. Production QR requires `FIELD-VERIFIED` status. No QR code may be claimed as verified without physical hardware testing.  
 **Date:** 2026-09-27  
+**Revision:** Final Pre-Execution Revision  
 
 ---
 
-## 1. Architectural URL & Stable ID Specification
+## 1. Architectural URL & Stable ID Principles
 
-- **Domain:** `https://bubakangreen.web.app` (Primary Firebase Hosting HTTPS URL)
-- **Secondary Domain (if provisioned):** `https://bubakangreen.app`
-- **Stable ID Scheme:**
-  - **Botanical Species (MasterPlant):** `pl-<kebab-case-indonesian-name>` (e.g. `pl-jahe-merah`, `pl-kumis-kucing`)
-  - **Garden Plot (Location):** `loc-<type>-<rw>-<slug>` (e.g. `loc-toga-rw03-bersemi`, `loc-farm-rw01-lestari`)
-- **QR URL Format:**
-  - Plant: `https://bubakangreen.web.app/plant/{stableId}`
-  - Location: `https://bubakangreen.web.app/location/{stableId}`
-- **QR Code Content:** Strictly the HTTPS destination URL. Zero raw JSON or botanical records embedded in QR.
-- **Data Update vs QR Reprint Rule:** Updating photo, description, care tips, or quantity in Firestore requires **ZERO QR REPRINT**. The printed physical QR remains permanently valid.
+### A. The Canonical HTTPS Payload Contract
+- **Payload Guarantee:** Physical QR codes contain strictly the canonical HTTPS destination URL (e.g. `https://bubakangreen.web.app/plant/<stable-id>`).
+- **Zero Raw Data Embedding:** Complete botanical records, descriptions, and images are **never** embedded directly in the QR matrix.
+- **Validity Contract:**
+  > *"QR remains valid as long as the canonical URL and underlying stable resource remain active and published in the system."*
+- **Database Update Independence:**
+  $$\text{Botanical Description / Photo / Benefit Update} \implies \text{\textbf{ZERO}} \text{ Physical Sticker Reprint}$$
+  Updates made in Firestore reflect immediately on next scan.
+- **Inactive / Deleted Resource Handling:**
+  If a botanical species or garden plot is unpublished, archived, or deleted:
+  - Native App displays `StateEmptyView` ("Tanaman Tidak Tersedia" or "Lokasi Belum Terbit").
+  - Web fallback displays a polite civic notice that the record is inactive with a link to browse active public gardens.
 
 ---
 
-## 2. QR Integration Matrix
+### B. Opaque Stable Identity Strategy
 
-| Resource Type | Stable ID | Verification Category | QR URL | QR Generated | HTTPS Valid | App Link Path | App Routing | Web Fallback | Published State | Security Check | Physical Scan Test | Final Status |
+| Strategy Dimension | Botanical Species (`MasterPlant`) | Garden Plot (`Location`) |
+|---|---|---|
+| **Identity Creator** | System-generated upon Admin creation | System-generated upon initial creation |
+| **Creation Trigger** | Admin publishes botanical entry | PIC registers plot in `PENDING_APPROVAL` |
+| **Mutability** | **IMMUTABLE** (Never changes once created) | **IMMUTABLE** (Never changes once created) |
+| **Display Name Change** | Stable ID remains unchanged; only `nameId` is updated in DB | Stable ID remains unchanged; only `name` is updated in DB |
+| **Plot Relocation** | N/A (Master species is location-agnostic) | GPS coordinates updated in DB; Stable ID remains unchanged |
+| **Plant Bed Move** | `LocationPlant` junction updated; MasterPlant ID unchanged | MasterPlant ID remains unchanged; zero QR reprint |
+| **Unpublished State** | Displays "Tanaman Belum Diterbitkan" | Displays "Lokasi Sedang Ditinjau / Tidak Aktif" |
+| **Deleted State** | Displays "Tanaman Tidak Ditemukan" | Displays "Lokasi Tidak Ditemukan" |
+| **Naming Pattern** | Opaque alphanumeric slug: `pl-[a-z0-9]{6,12}` (e.g. `pl-jhem-01`) | Opaque alphanumeric slug: `loc-[a-z0-9]{6,12}` (e.g. `loc-tg03-01`) |
+| **Dependency Rule** | **MUST NOT** depend on botanical name, Latin name, or RW text | **MUST NOT** depend on plot name, RW number, or temporary order |
+
+---
+
+## 2. Real-Data Verification Taxonomy
+
+1. **`FIELD-VERIFIED`**: Physical specimen inspected on-site in Bubakan by agricultural team and confirmed against digital record. **Mandatory prerequisite for production QR printing.**
+2. **`DOCUMENT-VERIFIED`**: Verified against Kelurahan botanical literature; pending physical bed confirmation.
+3. **`NEEDS-FIELD-VALIDATION`**: Garden plot or planting record submitted by PIC; awaiting on-site GPS and specimen verification.
+4. **`TEST_ONLY`**: Development fixtures and diagnostic records; permanently barred from production printing.
+5. **`UNKNOWN`**: Field status not yet established.
+
+---
+
+## 3. QR Integration Matrix
+
+| Resource Type | Stable ID | Verification Category | Canonical QR URL | QR Spec Status | HTTPS Endpoint | App Link Path | App Routing | Web Fallback | Firestore State | Security Rule | Physical Hardware Test | Production Status |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Plant (Species)** | `pl-jahe-merah` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-jahe-merah` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-jahe-merah` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-kumis-kucing` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-kumis-kucing` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-kumis-kucing` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-temulawak` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-temulawak` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-temulawak` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-lidah-buaya` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-lidah-buaya` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-lidah-buaya` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-serai-wangi` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-serai-wangi` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-serai-wangi` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-pegagan` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-pegagan` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-pegagan` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-kunyit` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-kunyit` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-kunyit` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Plant (Species)** | `pl-sambiloto` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-sambiloto` | READY (Spec approved) | PASS (Hosting configured) | `/plant/pl-sambiloto` | PASS (NavHost deepLink configured) | PASS (`plant.html` configured) | PUBLISHED | PASS (Public read permitted) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Location (Plot)** | `loc-toga-rw03-bersemi` | `NEEDS-FIELD-VALIDATION` | `https://bubakangreen.web.app/location/loc-toga-rw03-bersemi` | READY (Spec approved) | PASS (Hosting configured) | `/location/loc-toga-rw03-bersemi` | PASS (NavHost deepLink configured) | PASS (`index.html` configured) | PENDING_APPROVAL | PASS (Security enforces approval) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Location (Plot)** | `loc-farm-rw01-makmur` | `NEEDS-FIELD-VALIDATION` | `https://bubakangreen.web.app/location/loc-farm-rw01-makmur` | READY (Spec approved) | PASS (Hosting configured) | `/location/loc-farm-rw01-makmur` | PASS (NavHost deepLink configured) | PASS (`index.html` configured) | PENDING_APPROVAL | PASS (Security enforces approval) | UNKNOWN (Awaiting physical print) | **PLANNED** |
-| **Test Fixture (Dev)** | `test-plant-sample` | `TEST_ONLY` | `https://bubakangreen.web.app/plant/test-plant-sample` | TEST_ONLY | PASS | `/plant/test-plant-sample` | PASS | PASS | DRAFT | PASS | SIMULATED_ONLY | **TEST_ONLY** |
+| **Plant (Master)** | `pl-jhem-01` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-jhem-01` | READY | READY | `/plant/pl-jhem-01` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-kmkc-02` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-kmkc-02` | READY | READY | `/plant/pl-kmkc-02` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-tmlw-03` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-tmlw-03` | READY | READY | `/plant/pl-tmlw-03` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-ldby-04` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-ldby-04` | READY | READY | `/plant/pl-ldby-04` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-srwg-05` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-srwg-05` | READY | READY | `/plant/pl-srwg-05` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-pggn-06` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-pggn-06` | READY | READY | `/plant/pl-pggn-06` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-knyt-07` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-knyt-07` | READY | READY | `/plant/pl-knyt-07` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Plant (Master)** | `pl-smbl-08` | `DOCUMENT-VERIFIED` | `https://bubakangreen.web.app/plant/pl-smbl-08` | READY | READY | `/plant/pl-smbl-08` | READY | READY | PUBLISHED | PASS (Public Read) | NOT TESTED | **PLANNED (AWAITING FIELD VERIFICATION)** |
+| **Location (Plot)**| `loc-tg03-01` | `NEEDS-FIELD-VALIDATION` | `https://bubakangreen.web.app/location/loc-tg03-01` | READY | READY | `/location/loc-tg03-01` | READY | READY | PENDING_APPROVAL | PASS (Restricted) | NOT TESTED | **PLANNED (AWAITING FIELD APPROVAL)** |
+| **Location (Plot)**| `loc-uf01-02` | `NEEDS-FIELD-VALIDATION` | `https://bubakangreen.web.app/location/loc-uf01-02` | READY | READY | `/location/loc-uf01-02` | READY | READY | PENDING_APPROVAL | PASS (Restricted) | NOT TESTED | **PLANNED (AWAITING FIELD APPROVAL)** |
+| **Test Diagnostic**| `test-fixture-01` | `TEST_ONLY` | `https://bubakangreen.web.app/plant/test-fixture-01` | TEST_ONLY | READY | `/plant/test-fixture-01` | READY | READY | DRAFT | PASS | SIMULATED ONLY | **TEST_ONLY (NEVER PRINT FOR FIELD)** |
 
 ---
 
-## 3. Data Integrity & Verification Standard
+## 4. Production QR Generation Gate
 
-1. **DOCUMENT-VERIFIED**: Plant records cataloged from approved trilingual botanical manuscripts of Kelurahan Bubakan.
-2. **NEEDS-FIELD-VALIDATION**: Physical garden plots submitted by PIC officers whose exact boundary and single-shot GPS accuracy must be confirmed in the field prior to physical sticker placement.
-3. **TEST_ONLY**: Internal diagnostic mock IDs used strictly for local automated tests and Android Studio previews; barred from production QR printing.
-4. **Physical Scan Test**: No QR code may be claimed as `VERIFIED` until a physical printed sticker has been scanned with a real mobile camera on both Android (with and without the app installed).
+Before any QR code is sent to print:
+- [ ] Real physical specimen / garden plot identified on ground in Kelurahan Bubakan.
+- [ ] Verification category marked `FIELD-VERIFIED`.
+- [ ] Immutable Stable ID assigned.
+- [ ] Record status is `PUBLISHED` in Firestore.
+- [ ] Canonical URL verified returning HTTP 200.
+- [ ] Destination screen verified via local simulation.
