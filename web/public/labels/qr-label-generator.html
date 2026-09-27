@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUBAKAN GREEN — QR Label Generator</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&display=swap');
+
+    :root {
+      --primary-forest: #1B4332;
+      --primary-mint: #D8F3DC;
+      --secondary-sage: #40916C;
+      --bg-light: #F8F9FA;
+      --text-dark: #1B4332;
+      --text-muted: #6B7F75;
+      --border-grey: #E5E7EB;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      padding: 32px;
+      color: var(--text-dark);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--primary-forest);
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .controls {
+      background: white;
+      border: 1px solid var(--border-grey);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      max-width: 600px;
+    }
+
+    .controls label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+      margin-top: 14px;
+    }
+
+    .controls label:first-child { margin-top: 0; }
+
+    .controls input, .controls select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border-grey);
+      border-radius: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .controls button {
+      margin-top: 18px;
+      padding: 12px 24px;
+      background-color: var(--primary-forest);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .controls button:hover {
+      background-color: #163A2B;
+    }
+
+    .print-btn {
+      background-color: var(--secondary-sage) !important;
+      margin-left: 8px;
+    }
+
+    /* ---- LABEL PREVIEW ---- */
+    .label-preview-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+    }
+
+    .label-card {
+      width: 300px;
+      border: 2px solid var(--primary-forest);
+      border-radius: 16px;
+      overflow: hidden;
+      background: white;
+      page-break-inside: avoid;
+    }
+
+    .label-header {
+      background: var(--primary-forest);
+      color: white;
+      padding: 10px 14px;
+      text-align: center;
+    }
+
+    .label-header h2 {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .label-header .label-subtitle {
+      font-size: 10px;
+      font-weight: 400;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    .label-body {
+      padding: 16px;
+      text-align: center;
+    }
+
+    .label-plant-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-forest);
+      margin-bottom: 2px;
+    }
+
+    .label-plant-latin {
+      font-size: 13px;
+      font-style: italic;
+      color: var(--secondary-sage);
+      margin-bottom: 4px;
+    }
+
+    .label-mandarin {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-forest);
+    }
+
+    .label-pinyin {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .label-qr-container {
+      display: flex;
+      justify-content: center;
+      margin: 12px 0;
+    }
+
+    .label-qr-container canvas {
+      border-radius: 8px;
+    }
+
+    .label-scan-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    .label-footer {
+      background: var(--primary-mint);
+      padding: 8px 14px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--primary-forest);
+      font-weight: 500;
+    }
+
+    .label-id {
+      font-size: 10px;
+      font-family: monospace;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* ---- PRINT STYLES ---- */
+    @media print {
+      body { background: white; padding: 0; }
+      .controls, h1, .page-subtitle, .print-btn { display: none !important; }
+      .label-card {
+        border-width: 1.5pt;
+        width: 70mm;
+        margin: 4mm;
+      }
+    }
+
+    .warning-box {
+      background: #FFF3CD;
+      border: 1px solid #FFE69C;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+      max-width: 600px;
+    }
+  </style>
+</head>
+<body>
+  <h1>BUBAKAN GREEN — QR Label Generator</h1>
+  <p class="page-subtitle">Buat label QR untuk tanaman fisik di Kelurahan Bubakan. Label ini ditempel pada tiang penanda di kebun.</p>
+
+  <div class="warning-box">
+    ⚠️ <strong>PERHATIAN:</strong> Label hanya boleh dicetak untuk tanaman berstatus <code>FIELD-VERIFIED</code>.
+    Label yang dicetak untuk data uji (<code>TEST_ONLY</code>) tidak boleh ditempelkan di lapangan.
+  </div>
+
+  <div class="controls">
+    <label for="stable-id">Stable ID</label>
+    <input type="text" id="stable-id" placeholder="pl-jhem-01" value="pl-jhem-01">
+
+    <label for="plant-name">Nama Indonesia</label>
+    <input type="text" id="plant-name" placeholder="Jahe Merah" value="Jahe Merah">
+
+    <label for="plant-latin">Nama Latin</label>
+    <input type="text" id="plant-latin" placeholder="Zingiber officinale var. rubrum" value="Zingiber officinale var. rubrum">
+
+    <label for="plant-mandarin">Nama Mandarin</label>
+    <input type="text" id="plant-mandarin" placeholder="红姜" value="红姜">
+
+    <label for="plant-pinyin">Pinyin</label>
+    <input type="text" id="plant-pinyin" placeholder="hóng jiāng" value="hóng jiāng">
+
+    <label for="label-type">Tipe</label>
+    <select id="label-type">
+      <option value="plant">Tanaman (plant/)</option>
+      <option value="location">Lokasi Kebun (location/)</option>
+    </select>
+
+    <div>
+      <button onclick="generateLabel()">Buat Label</button>
+      <button class="print-btn" onclick="window.print()">🖨️ Cetak</button>
+    </div>
+  </div>
+
+  <div class="label-preview-area" id="label-area"></div>
+
+  <!-- QR Code Generator (qrcode.min.js CDN — MIT License) -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+  <script>
+    function generateLabel() {
+      var stableId = document.getElementById('stable-id').value.trim();
+      var plantName = document.getElementById('plant-name').value.trim();
+      var plantLatin = document.getElementById('plant-latin').value.trim();
+      var plantMandarin = document.getElementById('plant-mandarin').value.trim();
+      var plantPinyin = document.getElementById('plant-pinyin').value.trim();
+      var labelType = document.getElementById('label-type').value;
+
+      if (!stableId || !plantName) {
+        alert('Stable ID dan Nama Indonesia wajib diisi.');
+        return;
+      }
+
+      var canonicalUrl = 'https://bubakangreen.web.app/' + labelType + '/' + stableId;
+
+      // Generate QR
+      var qr = qrcode(0, 'M');
+      qr.addData(canonicalUrl);
+      qr.make();
+
+      var labelHtml = `
+        <div class="label-card">
+          <div class="label-header">
+            <h2>Bubakan Green</h2>
+            <div class="label-subtitle">Taman Toga & Urban Farming · Kel. Bubakan</div>
+          </div>
+          <div class="label-body">
+            <div class="label-plant-name">${escapeHtml(plantName)}</div>
+            ${plantLatin ? '<div class="label-plant-latin">' + escapeHtml(plantLatin) + '</div>' : ''}
+            ${plantMandarin ? '<div class="label-mandarin">' + escapeHtml(plantMandarin) + '</div>' : ''}
+            ${plantPinyin ? '<div class="label-pinyin">' + escapeHtml(plantPinyin) + '</div>' : ''}
+            <div class="label-qr-container">
+              ${qr.createImgTag(4, 8)}
+            </div>
+            <div class="label-scan-text">Pindai untuk info lengkap & audio</div>
+            <div class="label-id">${escapeHtml(stableId)}</div>
+          </div>
+          <div class="label-footer">
+            Kelurahan Bubakan · Kecamatan Mijen · Kota Semarang
+          </div>
+        </div>
+      `;
+
+      document.getElementById('label-area').insertAdjacentHTML('beforeend', labelHtml);
+    }
+
+    function escapeHtml(str) {
+      var div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>
