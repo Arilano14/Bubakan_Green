@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BUBAKAN GREEN — Interactive Android UI Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-forest: #2D6A4F;
+      --primary-mint: #D8F3DC;
+      --secondary-sage: #52796F;
+      --text-dark: #1B4332;
+      --text-muted: #5B7065;
+      --bg-light: #F8F9FA;
+      --surface-white: #FFFFFF;
+      --border-grey: #D0DBCE;
+      --status-orange: #E09F3E;
+      --status-green: #2D6A4F;
+      --error-red: #BA1A1A;
+      --radius-card: 16px;
+      --radius-btn: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background: #1B2B23; color: #FFFFFF; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px; }
+
+    .header-banner { text-align: center; margin-bottom: 20px; }
+    .header-banner h1 { font-size: 24px; font-weight: 800; color: #D8F3DC; letter-spacing: 0.5px; }
+    .header-banner p { font-size: 14px; color: #B7E4C7; margin-top: 4px; }
+    .phase-badge { display: inline-block; background: #2D6A4F; color: #D8F3DC; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; margin-top: 8px; border: 1px solid #52796F; }
+
+    /* Screen Selector Pill Bar */
+    .screen-pill-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 24px; max-width: 900px; }
+    .screen-pill { background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #E8EFE9; font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 20px; cursor: pointer; transition: all 0.2s ease; }
+    .screen-pill:hover, .screen-pill.active { background: #D8F3DC; color: #1B4332; border-color: #D8F3DC; font-weight: 700; }
+
+    /* Main Stage */
+    .simulator-stage { display: flex; justify-content: center; align-items: flex-start; gap: 32px; width: 100%; max-width: 1000px; }
+
+    /* Phone Device Frame */
+    .phone-device {
+      width: 390px;
+      height: 800px;
+      background: #000;
+      border-radius: 46px;
+      padding: 12px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 2px #3E5A4B;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .phone-notch {
+      width: 130px;
+      height: 24px;
+      background: #000;
+      border-radius: 0 0 16px 16px;
+      position: absolute;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .phone-camera { width: 10px; height: 10px; background: #1B2B23; border-radius: 50%; }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--bg-light);
+      border-radius: 36px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* Screen Top App Bar */
+    .app-topbar {
+      background: var(--surface-white);
+      padding: 38px 18px 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-grey);
+      flex-shrink: 0;
+    }
+    .topbar-info h2 { font-size: 16px; font-weight: 800; color: var(--primary-forest); letter-spacing: 0.5px; }
+    .topbar-info p { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+    .topbar-actions { display: flex; align-items: center; gap: 8px; }
+    .icon-btn { background: none; border: none; font-size: 18px; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--primary-forest); transition: background 0.15s; }
+    .icon-btn:hover { background: var(--primary-mint); }
+
+    /* Screen Scrollable Body */
+    .app-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: var(--text-dark);
+    }
+    .app-body::-webkit-scrollbar { width: 4px; }
+    .app-body::-webkit-scrollbar-thumb { background: var(--border-grey); border-radius: 4px; }
+
+    /* Screen Bottom Navigation Bar */
+    .app-bottomnav {
+      background: var(--surface-white);
+      border-top: 1px solid var(--border-grey);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 10px 0 16px 0;
+      flex-shrink: 0;
+    }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 11px; font-weight: 600; padding: 4px 16px; border-radius: 12px; transition: all 0.2s; }
+    .nav-item .icon { font-size: 20px; }
+    .nav-item.active { color: var(--primary-forest); font-weight: 800; }
+    .nav-item.active .icon-pill { background: var(--primary-mint); border-radius: 16px; padding: 2px 14px; }
+
+    /* Card Components */
+    .ui-card {
+      background: var(--surface-white);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      border: 1px solid var(--border-grey);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .card-title { font-size: 16px; font-weight: 700; color: var(--text-dark); }
+    .card-subtitle { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+    /* Hero Banner */
+    .hero-banner {
+      background: linear-gradient(135deg, var(--primary-forest) 0%, #1B4332 100%);
+      color: #FFFFFF;
+      border-radius: var(--radius-card);
+      padding: 18px;
+    }
+    .hero-banner h3 { font-size: 16px; font-weight: 800; }
+    .hero-banner p { font-size: 12px; color: #D8F3DC; margin-top: 4px; line-height: 1.4; }
+
+    /* Badges */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+    .badge-mint { background: var(--primary-mint); color: var(--primary-forest); }
+    .badge-orange { background: #FFF3CD; color: #856404; }
+    .badge-grey { background: #E9ECEF; color: #495057; }
+
+    /* Form Fields */
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 12px; font-weight: 700; color: var(--text-dark); }
+    .form-input {
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-grey);
+      font-size: 13px;
+      color: var(--text-dark);
+      background: var(--surface-white);
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--primary-forest); }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-radius: var(--radius-btn);
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-decoration: none;
+    }
+    .btn-primary { background: var(--primary-forest); color: #FFF; }
+    .btn-primary:hover { background: #21513C; }
+    .btn-outline { background: var(--surface-white); border: 1px solid var(--border-grey); color: var(--primary-forest); }
+    .btn-outline:hover { background: var(--primary-mint); }
+    .btn-danger-outline { background: var(--surface-white); border: 1px solid var(--error-red); color: var(--error-red); }
+
+    /* Side Panel Info */
+    .side-panel {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .side-panel h3 { font-size: 18px; font-weight: 800; color: #D8F3DC; }
+    .side-panel p { font-size: 13px; color: #C5D6CC; line-height: 1.5; }
+    .guide-box { background: rgba(0, 0, 0, 0.3); border-radius: 12px; padding: 14px; border-left: 4px solid var(--primary-forest); }
+    .guide-box h4 { font-size: 13px; font-weight: 700; color: #B7E4C7; margin-bottom: 4px; }
+    .guide-box p { font-size: 12px; color: #E8EFE9; margin: 0; }
+  </style>
+</head>
+<body>
+
+  <div class="header-banner">
+    <h1>🌿 BUBAKAN GREEN</h1>
+    <p>Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan, Mijen</p>
+    <div class="phase-badge">Phase 4 Certified — PIC & Admin Management Live Preview</div>
+  </div>
+
+  <!-- Screen Navigation Quick Switcher -->
+  <div class="screen-pill-container">
+    <div class="screen-pill active" onclick="switchScreen('home')">🏠 1. Beranda Publik</div>
+    <div class="screen-pill" onclick="switchScreen('locations')">📍 2. Lokasi & Peta</div>
+    <div class="screen-pill" onclick="switchScreen('catalog')">📖 3. Katalog Toga</div>
+    <div class="screen-pill" onclick="switchScreen('plant_detail')">🌿 4. Detail Tanaman</div>
+    <div class="screen-pill" onclick="switchScreen('login')">🔒 5. Login Petugas</div>
+    <div class="screen-pill" onclick="switchScreen('pic_dash')">👨‍🌾 6. Dashboard PIC</div>
+    <div class="screen-pill" onclick="switchScreen('loc_form')">📝 7. Form Kebun (GPS)</div>
+    <div class="screen-pill" onclick="switchScreen('plant_form')">🌱 8. Tambah Tanaman Plot</div>
+    <div class="screen-pill" onclick="switchScreen('admin_dash')">🏛️ 9. Dashboard Admin</div>
+    <div class="screen-pill" onclick="switchScreen('approval')">⚖️ 10. Antrean Persetujuan</div>
+    <div class="screen-pill" onclick="switchScreen('master_form')">📚 11. Master Tanaman</div>
+  </div>
+
+  <div class="simulator-stage">
+    <!-- Smartphone Container -->
+    <div class="phone-device">
+      <div class="phone-notch"><div class="phone-camera"></div></div>
+
+      <div class="phone-screen">
+        <!-- Dynamic Top Bar -->
+        <div class="app-topbar" id="appTopbar">
+          <div class="topbar-info">
+            <h2 id="topbarTitle">BUBAKAN GREEN</h2>
+            <p id="topbarSubtitle">Kelurahan Bubakan, Mijen</p>
+          </div>
+          <div class="topbar-actions" id="topbarActions">
+            <button class="icon-btn" title="Masuk Petugas" onclick="switchScreen('login')">🔒</button>
+            <button class="icon-btn" title="Info Aplikasi" onclick="alert('BUBAKAN GREEN: Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan')">ℹ️</button>
+          </div>
+        </div>
+
+        <!-- Dynamic Content Body -->
+        <div class="app-body" id="appBody">
+          <!-- Rendered via JS -->
+        </div>
+
+        <!-- Bottom Navigation -->
+        <div class="app-bottomnav" id="appBottomNav">
+          <button class="nav-item active" id="navHome" onclick="switchScreen('home')">
+            <div class="icon-pill"><span class="icon">🏠</span></div>
+            <span>Beranda</span>
+          </button>
+          <button class="nav-item" id="navLoc" onclick="switchScreen('locations')">
+            <div class="icon-pill"><span class="icon">📍</span></div>
+            <span>Lokasi</span>
+          </button>
+          <button class="nav-item" id="navCat" onclick="switchScreen('catalog')">
+            <div class="icon-pill"><span class="icon">🌿</span></div>
+            <span>Katalog</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Side Guide & Controls -->
+    <div class="side-panel">
+      <h3>Panduan Peninjauan UI (Phase 1–4)</h3>
+      <p>Simulator ini merefleksikan arsitektur Android Jetpack Compose resmi dengan tema <strong>Palette Alam Bubakan</strong> (anti-slop, kontras WCAG AA, dan tata letak botani jernih).</p>
+
+      <div class="guide-box">
+        <h4>🔐 Pengujian Akses Role (Phase 4)</h4>
+        <p>Gunakan tombol <strong>"5. Login Petugas"</strong> atau klik gembok 🔒 di pojok kanan atas layar ponsel untuk masuk sebagai <strong>PIC Lapangan</strong> atau <strong>Admin Kelurahan</strong>.</p>
+      </div>
+
+      <div class="guide-box">
+        <h4>📍 Single-Shot GPS & Toleransi</h4>
+        <p>Buka <strong>"7. Form Kebun (GPS)"</strong> dan klik tombol <strong>"Kunci Titik Lokasi GPS"</strong> untuk mensimulasikan pengukuran satelit dengan akurasi meter real-time.</p>
+      </div>
+
+      <div class="guide-box">
+        <h4>🏛️ Alur Persetujuan Kelurahan</h4>
+        <p>Buka <strong>"10. Antrean Persetujuan"</strong> untuk melihat bagaimana Admin dapat menyetujui (status PUBLISHED) atau menolak pengajuan dengan catatan revisi.</p>
+      </div>
+
+      <div class="guide-box">
+        <h4>📲 Menjalankan Versi Native di Android Studio</h4>
+        <p>Buka folder project ini di <strong>Android Studio</strong>, lalu tekan tombol hijau <strong>▶ Run</strong> (Shift+F10) untuk menjalankan APK native di Emulator atau HP fisik Anda.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // In-Memory Mock State
+    const state = {
+      role: 'PUBLIC', // 'PUBLIC', 'PIC', 'ADMIN'
+      locations: [
+        { id: 'LOC_01', name: 'Urban Farming Kelurahan', rw: '01', type: 'URBAN_FARMING', address: 'Jl. Raya Bubakan No. 1', status: 'PUBLISHED', accuracy: 12 },
+        { id: 'LOC_02', name: 'Taman Toga RW 03', rw: '03', type: 'TAMAN_TOGA', address: 'Lingkungan RW 03 RT 02', status: 'PUBLISHED', accuracy: 15 },
+        { id: 'LOC_03', name: 'Kebun Hidroponik RW 05', rw: '05', type: 'URBAN_FARMING', address: 'Pekarangan Warga RW 05', status: 'PENDING_APPROVAL', accuracy: 18 }
+      ],
+      plants: [
+        { id: 'P01', nameId: 'Jahe Merah', nameLatin: 'Zingiber officinale var. rubrum', hanzi: '红姜', pinyin: 'hóng jiāng', desc: 'Rimpang berkhasiat menghangatkan tubuh, antioksidan kuat, dan imunostimulan.' },
+        { id: 'P02', nameId: 'Kencur', nameLatin: 'Kaempferia galanga', hanzi: '山柰', pinyin: 'shān nài', desc: 'Mengatasi batuk, melegakan tenggorokan, dan bahan baku jamu beras kencur.' },
+        { id: 'P03', nameId: 'Kunyit', nameLatin: 'Curcuma longa', hanzi: '姜黄', pinyin: 'jiāng huáng', desc: 'Kaya kurkuminoid, menjaga kesehatan lambung, hepatoprotektor alami.' }
+      ],
+      gpsLocked: false,
+      gpsAccuracy: 12
+    };
+
+    let currentScreenId = 'home';
+
+    function switchScreen(screenId) {
+      currentScreenId = screenId;
+      document.querySelectorAll('.screen-pill').forEach(p => p.classList.remove('active'));
+      const activePill = Array.from(document.querySelectorAll('.screen-pill')).find(p => p.getAttribute('onclick')?.includes(screenId));
+      if (activePill) activePill.classList.add('active');
+
+      const body = document.getElementById('appBody');
+      const topTitle = document.getElementById('topbarTitle');
+      const topSub = document.getElementById('topbarSubtitle');
+      const bottomNav = document.getElementById('appBottomNav');
+      const topActions = document.getElementById('topbarActions');
+
+      // Update Nav highlighting
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      if (screenId === 'home') document.getElementById('navHome')?.classList.add('active');
+      if (screenId === 'locations') document.getElementById('navLoc')?.classList.add('active');
+      if (screenId === 'catalog') document.getElementById('navCat')?.classList.add('active');
+
+      // Show/Hide bottom nav based on route
+      const isPublicRoot = ['home', 'locations', 'catalog'].includes(screenId);
+      bottomNav.style.display = isPublicRoot ? 'flex' : 'none';
+
+      // Render Screen Content
+      switch (screenId) {
+        case 'home':
+          topTitle.textContent = 'BUBAKAN GREEN';
+          topSub.textContent = 'Kelurahan Bubakan, Mijen';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('login')">🔒</button><button class="icon-btn" onclick="alert('Aplikasi Bubakan Green')">ℹ️</button>`;
+          body.innerHTML = `
+            <div class="hero-banner">
+              <span class="badge badge-mint" style="margin-bottom: 6px;">Kebun Unggulan</span>
+              <h3>Urban Farming Kelurahan</h3>
+              <p>Sentra percontohan budidaya sayuran dan pangan mandiri binaan Kelurahan Bubakan.</p>
+              <button class="btn btn-outline" style="margin-top: 12px; width: 100%;" onclick="switchScreen('locations')">Jelajahi Kebun Ini →</button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="ui-card" style="cursor: pointer;" onclick="switchScreen('locations')">
+                <span style="font-size: 24px;">🌱</span>
+                <div class="card-title" style="font-size: 14px;">Urban Farming</div>
+                <div class="card-subtitle">Budidaya Pangan</div>
+              </div>
+              <div class="ui-card" style="cursor: pointer;" onclick="switchScreen('locations')">
+                <span style="font-size: 24px;">🌿</span>
+                <div class="card-title" style="font-size: 14px;">Taman Toga</div>
+                <div class="card-subtitle">Tanaman Obat</div>
+              </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
+              <div style="font-size: 15px; font-weight: 800; color: var(--text-dark);">Tanaman Populer</div>
+              <a href="javascript:void(0)" onclick="switchScreen('catalog')" style="font-size: 12px; color: var(--primary-forest); font-weight: 700; text-decoration: none;">Lihat Semua</a>
+            </div>
+
+            ${state.plants.map(p => `
+              <div class="ui-card" style="cursor: pointer;" onclick="switchScreen('plant_detail')">
+                <div style="display: flex; justify-content: space-between;">
+                  <div>
+                    <div class="card-title">${p.nameId}</div>
+                    <div class="card-subtitle" style="font-style: italic;">${p.nameLatin}</div>
+                  </div>
+                  <span class="badge badge-mint">${p.hanzi}</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">${p.desc}</div>
+              </div>
+            `).join('')}
+          `;
+          break;
+
+        case 'locations':
+          topTitle.textContent = 'Lokasi & Peta';
+          topSub.textContent = 'Sebaran Kebun RW Bubakan';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">←</button>`;
+          body.innerHTML = `
+            <div style="display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;">
+              <span class="badge badge-mint" style="cursor: pointer;">Semua RW</span>
+              <span class="badge badge-grey" style="cursor: pointer;">RW 01</span>
+              <span class="badge badge-grey" style="cursor: pointer;">RW 03</span>
+              <span class="badge badge-grey" style="cursor: pointer;">RW 05</span>
+            </div>
+            ${state.locations.map(loc => `
+              <div class="ui-card">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span class="badge badge-mint">${loc.type === 'URBAN_FARMING' ? 'Urban Farming' : 'Taman Toga'}</span>
+                  <span class="badge ${loc.status === 'PUBLISHED' ? 'badge-mint' : 'badge-orange'}">${loc.status === 'PUBLISHED' ? '✅ Terverifikasi' : '⏳ Review'}</span>
+                </div>
+                <div class="card-title">${loc.name}</div>
+                <div class="card-subtitle">📍 ${loc.address} (RW ${loc.rw})</div>
+                <button class="btn btn-outline" style="width: 100%;" onclick="alert('Membuka Google Maps untuk ${loc.name}...')">📍 Buka Rute Google Maps</button>
+              </div>
+            `).join('')}
+          `;
+          break;
+
+        case 'catalog':
+          topTitle.textContent = 'Katalog Toga';
+          topSub.textContent = 'Ensiklopedia Tanaman Obat';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">←</button>`;
+          body.innerHTML = `
+            <input type="text" class="form-input" placeholder="🔍 Cari tanaman atau khasiat..." style="width: 100%;">
+            ${state.plants.map(p => `
+              <div class="ui-card" style="cursor: pointer;" onclick="switchScreen('plant_detail')">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <div class="card-title">${p.nameId}</div>
+                    <div class="card-subtitle" style="font-style: italic;">${p.nameLatin}</div>
+                  </div>
+                  <span class="badge badge-mint" style="font-size: 13px;">${p.hanzi}</span>
+                </div>
+                <div style="font-size: 12px; color: var(--text-muted);">${p.desc}</div>
+              </div>
+            `).join('')}
+          `;
+          break;
+
+        case 'plant_detail':
+          topTitle.textContent = 'Detail Tanaman';
+          topSub.textContent = 'Informasi Botani Lengkap';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('catalog')">←</button>`;
+          body.innerHTML = `
+            <div style="height: 180px; background: var(--primary-mint); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 54px;">
+              🌿
+            </div>
+            <div class="ui-card">
+              <div class="card-title" style="font-size: 20px;">Jahe Merah</div>
+              <div class="card-subtitle" style="font-style: italic; font-size: 14px;">Zingiber officinale var. rubrum</div>
+              
+              <div style="background: var(--primary-mint); padding: 12px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 20px; font-weight: 800; color: var(--primary-forest);">红姜</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">hóng jiāng</div>
+                </div>
+                <button class="btn btn-primary" style="padding: 8px 12px;" onclick="alert('Memutar pelafalan audio Mandarin: hóng jiāng 🔊')">🔊 Putar Audio</button>
+              </div>
+
+              <div class="form-label" style="margin-top: 8px;">Khasiat & Manfaat Herbal:</div>
+              <div style="font-size: 13px; color: var(--text-dark); line-height: 1.5;">
+                Rimpang jahe merah berkhasiat menghangatkan badan, meredakan peradangan sendi, melancarkan peredaran darah, serta meningkatkan imunitas tubuh warga.
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'login':
+          topTitle.textContent = 'Masuk Petugas';
+          topSub.textContent = 'Portal Khusus Kelurahan';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">←</button>`;
+          body.innerHTML = `
+            <div style="text-align: center; padding: 10px 0;">
+              <div style="font-size: 38px;">🔒</div>
+              <h3 style="font-size: 18px; color: var(--primary-forest); margin-top: 6px;">BUBAKAN GREEN</h3>
+              <p style="font-size: 12px; color: var(--text-muted);">Masuk menggunakan kredensial resmi</p>
+            </div>
+
+            <div class="ui-card">
+              <div class="form-group">
+                <label class="form-label">Email Petugas</label>
+                <input type="text" class="form-input" id="loginEmail" value="pic.kebun@bubakan.id">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kata Sandi</label>
+                <input type="password" class="form-input" value="••••••••">
+              </div>
+              <button class="btn btn-primary" onclick="loginAs('PIC')">Masuk ke Sistem</button>
+            </div>
+
+            <div class="ui-card" style="background: #F0F7F2; border-style: dashed;">
+              <div class="form-label" style="text-align: center;">⚡ Akses Cepat Demo (Pengujian):</div>
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <button class="btn btn-outline" style="flex: 1;" onclick="loginAs('PIC')">👨‍🌾 Sebagai PIC</button>
+                <button class="btn btn-outline" style="flex: 1;" onclick="loginAs('ADMIN')">🏛️ Sebagai Admin</button>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'pic_dash':
+          topTitle.textContent = 'Dashboard Petugas';
+          topSub.textContent = 'Petugas Lapangan RW 01';
+          topActions.innerHTML = `<button class="icon-btn" title="Keluar" onclick="switchScreen('home')">🚪</button>`;
+          body.innerHTML = `
+            <div class="hero-banner">
+              <h3>Kelola Kebun Warga</h3>
+              <p>Daftarkan kebun baru atau perbarui tanaman di kebun binaan Anda.</p>
+              <button class="btn btn-outline" style="margin-top: 10px; width: 100%;" onclick="switchScreen('loc_form')">+ Daftarkan Kebun Baru</button>
+            </div>
+
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">Kebun Binaan Anda (3)</div>
+            ${state.locations.map(loc => `
+              <div class="ui-card">
+                <div style="display: flex; justify-content: space-between;">
+                  <span class="badge badge-mint">RW ${loc.rw}</span>
+                  <span class="badge ${loc.status === 'PUBLISHED' ? 'badge-mint' : 'badge-orange'}">${loc.status === 'PUBLISHED' ? '✅ Terbit' : '⏳ Menunggu Review'}</span>
+                </div>
+                <div class="card-title">${loc.name}</div>
+                <div class="card-subtitle">📍 ${loc.address}</div>
+                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                  <button class="btn btn-outline" style="flex: 1;" onclick="switchScreen('loc_form')">Edit Profil</button>
+                  <button class="btn btn-primary" style="flex: 1.2;" onclick="switchScreen('plant_form')">Kelola Tanaman</button>
+                </div>
+              </div>
+            `).join('')}
+          `;
+          break;
+
+        case 'loc_form':
+          topTitle.textContent = 'Form Kebun Baru';
+          topSub.textContent = 'Registrasi dengan GPS';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('pic_dash')">←</button>`;
+          body.innerHTML = `
+            <div class="ui-card">
+              <div class="form-group">
+                <label class="form-label">Nama Kebun</label>
+                <input type="text" class="form-input" id="gardenName" value="Kebun Toga RW 04">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Kategori</label>
+                <div style="display: flex; gap: 8px;">
+                  <span class="badge badge-mint" style="padding: 8px 12px; cursor: pointer;">🌿 Taman Toga</span>
+                  <span class="badge badge-grey" style="padding: 8px 12px; cursor: pointer;">🌱 Urban Farming</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Wilayah RW</label>
+                <input type="text" class="form-input" value="RW 04">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Alamat / Patokan</label>
+                <input type="text" class="form-input" value="Samping Balai RW 04, RT 01">
+              </div>
+            </div>
+
+            <!-- GPS Box -->
+            <div class="ui-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="form-label">Titik Koordinat GPS</div>
+                <span class="badge ${state.gpsLocked ? 'badge-mint' : 'badge-grey'}">${state.gpsLocked ? `Akurasi: ±${state.gpsAccuracy}m` : 'Belum Terkunci'}</span>
+              </div>
+              <div style="font-size: 12px; color: var(--text-muted);">
+                Ambil titik koordinat saat berada di lokasi kebun.
+              </div>
+              ${state.gpsLocked ? `
+                <div style="background: var(--bg-light); padding: 8px; border-radius: 8px; font-size: 12px;">
+                  <strong>Lat:</strong> -7.06810, <strong>Long:</strong> 110.32890<br>
+                  <span style="color: var(--status-green); font-weight: 600;">Sesuai ambang batas operasional (<= 25m)</span>
+                </div>
+              ` : ''}
+              <button class="btn btn-outline" onclick="lockGps()">${state.gpsLocked ? '🔄 Perbarui Titik GPS' : '📍 Kunci Titik Lokasi GPS'}</button>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitGarden()">Kirim Pengajuan Kebun</button>
+          `;
+          break;
+
+        case 'plant_form':
+          topTitle.textContent = 'Kelola Tanaman Plot';
+          topSub.textContent = 'Taman Toga RW 03';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('pic_dash')">←</button>`;
+          body.innerHTML = `
+            <div class="ui-card">
+              <div class="card-title" style="font-size: 15px;">Tambah Tanaman ke Plot Ini</div>
+              <div class="form-group">
+                <label class="form-label">Pilih Spesies Ensiklopedia</label>
+                <select class="form-input">
+                  <option>Jahe Merah (Zingiber officinale)</option>
+                  <option>Kencur (Kaempferia galanga)</option>
+                  <option>Kunyit (Curcuma longa)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Catatan Bedengan</label>
+                <input type="text" class="form-input" placeholder="Contoh: Bedengan B-01, 15 Polybag">
+              </div>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 12px; font-weight: 600;">Rekomendasi Label QR (Phase 5)</span>
+                <input type="checkbox" checked style="width: 18px; height: 18px;">
+              </div>
+              <button class="btn btn-primary" onclick="alert('Tanaman berhasil ditambahkan ke plot kebun!')">+ Tambahkan ke Plot</button>
+            </div>
+
+            <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">Tanaman Terdaftar di Plot Ini (2)</div>
+            <div class="ui-card">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div class="card-title" style="font-size: 14px;">Jahe Merah</div>
+                  <div class="card-subtitle">Bedengan Depan • 12 Polybag</div>
+                </div>
+                <button class="btn btn-danger-outline" style="padding: 6px 10px; font-size: 11px;" onclick="alert('Tanaman dihapus dari plot.')">Hapus</button>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'admin_dash':
+          topTitle.textContent = 'Admin Kelurahan';
+          topSub.textContent = 'Pemerintah Kelurahan Bubakan';
+          topActions.innerHTML = `<button class="icon-btn" title="Keluar" onclick="switchScreen('home')">🚪</button>`;
+          body.innerHTML = `
+            <div class="hero-banner">
+              <h3>Panel Tata Kelola Pertanian Urban</h3>
+              <p>Tinjau pengajuan kebun, verifikasi titik GPS, dan kelola ensiklopedia toga kelurahan.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div class="ui-card" style="text-align: center; padding: 10px;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--status-orange);">1</div>
+                <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">Menunggu</div>
+              </div>
+              <div class="ui-card" style="text-align: center; padding: 10px;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--status-green);">2</div>
+                <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">Kebun Terbit</div>
+              </div>
+              <div class="ui-card" style="text-align: center; padding: 10px;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary-forest);">3</div>
+                <div style="font-size: 10px; color: var(--text-muted); font-weight: 700;">Master Toga</div>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="switchScreen('approval')">⚖️ Tinjau Pengajuan Kebun (1 Baru)</button>
+            <button class="btn btn-outline" onclick="switchScreen('master_form')">📚 Tambah Master Tanaman</button>
+          `;
+          break;
+
+        case 'approval':
+          topTitle.textContent = 'Antrean Persetujuan';
+          topSub.textContent = 'Verifikasi Lapangan';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('admin_dash')">←</button>`;
+          body.innerHTML = `
+            <div class="ui-card">
+              <div style="display: flex; justify-content: space-between;">
+                <span class="badge badge-mint">Urban Farming</span>
+                <span class="badge badge-orange">⏳ Menunggu Review</span>
+              </div>
+              <div class="card-title">Kebun Hidroponik RW 05</div>
+              <div class="card-subtitle">📍 Pekarangan Warga RW 05</div>
+              
+              <div style="background: var(--bg-light); padding: 8px; border-radius: 8px; font-size: 11px;">
+                📍 <strong>Koordinat:</strong> -7.07100, 110.33400<br>
+                📡 <strong>Akurasi GPS:</strong> ±18m (Valid <= 25m)
+              </div>
+
+              <div style="display: flex; gap: 8px; margin-top: 6px;">
+                <button class="btn btn-danger-outline" style="flex: 1;" onclick="promptReject()">Tolak Revisi</button>
+                <button class="btn btn-primary" style="flex: 1.3;" onclick="approveGarden()">Setujui & Terbitkan</button>
+              </div>
+            </div>
+          `;
+          break;
+
+        case 'master_form':
+          topTitle.textContent = 'Master Tanaman';
+          topSub.textContent = 'Ensiklopedia Resmi';
+          topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('admin_dash')">←</button>`;
+          body.innerHTML = `
+            <div class="ui-card">
+              <div class="form-group">
+                <label class="form-label">Nama Tanaman (Indonesia) *</label>
+                <input type="text" class="form-input" value="Temulawak">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Nama Latin (Binomial) *</label>
+                <input type="text" class="form-input" value="Curcuma xanthorrhiza">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Hanzi & Pinyin</label>
+                <input type="text" class="form-input" value="姜黄属 • jiāng huáng shǔ">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Khasiat Herbal *</label>
+                <textarea class="form-input" rows="3">Menjaga kesehatan fungsi hati, meningkatkan nafsu makan, dan mengatasi peradangan.</textarea>
+              </div>
+              <button class="btn btn-primary" onclick="alert('Spesies master tanaman berhasil disimpan ke ensiklopedia!')">Simpan ke Ensiklopedia</button>
+            </div>
+          `;
+          break;
+      }
+    }
+
+    function loginAs(role) {
+      state.role = role;
+      if (role === 'PIC') switchScreen('pic_dash');
+      else switchScreen('admin_dash');
+    }
+
+    function lockGps() {
+      state.gpsLocked = true;
+      state.gpsAccuracy = 12;
+      switchScreen('loc_form');
+    }
+
+    function submitGarden() {
+      alert('Pengajuan kebun berhasil dikirim ke antrean review Kelurahan Bubakan!');
+      switchScreen('pic_dash');
+    }
+
+    function approveGarden() {
+      alert('Kebun disetujui! Status berubah menjadi PUBLISHED (Terbit) dan titik koordinat VERIFIED.');
+      switchScreen('admin_dash');
+    }
+
+    function promptReject() {
+      const note = prompt('Masukkan catatan revisi untuk petugas lapangan:');
+      if (note) {
+        alert('Pengajuan ditolak dengan catatan: ' + note);
+        switchScreen('admin_dash');
+      }
+    }
+
+    // Init
+    switchScreen('home');
+  </script>
+</body>
+</html>
