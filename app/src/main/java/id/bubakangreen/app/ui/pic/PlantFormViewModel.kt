@@ -124,6 +124,9 @@ class PlantFormViewModel(
                         )
                     }
                 }
+                is Result.Loading -> {
+                    _formState.update { it.copy(isSaving = true) }
+                }
             }
         }
     }
@@ -145,6 +148,7 @@ class PlantFormViewModel(
                     loadData()
                 }
                 is Result.Error -> {}
+                is Result.Loading -> {}
             }
         }
     }

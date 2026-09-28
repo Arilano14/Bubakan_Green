@@ -131,6 +131,9 @@ class MasterPlantViewModel(
                         )
                     }
                 }
+                is Result.Loading -> {
+                    _state.update { it.copy(isSaving = true) }
+                }
             }
         }
     }

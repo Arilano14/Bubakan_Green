@@ -27,7 +27,7 @@ class FirestoreLocationRepository(
             .whereEqualTo("status", LocationStatus.PUBLISHED.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() })
+                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
@@ -38,7 +38,7 @@ class FirestoreLocationRepository(
             .whereEqualTo("featured", true)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() })
+                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
@@ -49,14 +49,14 @@ class FirestoreLocationRepository(
             .whereEqualTo("type", type.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() })
+                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
     override fun getLocationById(locationId: String): Flow<Result<Location?>> {
         return collection.document(locationId).snapshots().map { snapshot ->
-            Result.Success(snapshot.toLocation())
+            Result.Success(snapshot.toLocation()) as Result<Location?>
         }.catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
@@ -91,6 +91,8 @@ class FirestoreLocationRepository(
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)
         }
+    }
+
     override suspend fun getPendingLocations(): Result<List<Location>> {
         return try {
             val snapshot = collection.whereEqualTo("status", LocationStatus.PENDING_APPROVAL.name).get().await()

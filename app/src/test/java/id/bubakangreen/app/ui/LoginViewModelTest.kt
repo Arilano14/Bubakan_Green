@@ -37,7 +37,8 @@ class LoginViewModelTest {
 
         override suspend fun signInWithEmail(email: String, password: String): Result<UserSession> {
             if (shouldFail) {
-                return Result.Error(Exception("Email atau kata sandi salah."))
+                val errorMsg = "Email atau kata sandi salah."
+                return Result.Error(Exception(errorMsg), errorMsg)
             }
             val role = when {
                 email.contains("admin", ignoreCase = true) -> UserRole.ADMIN

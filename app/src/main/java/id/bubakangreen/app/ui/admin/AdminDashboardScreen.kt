@@ -19,9 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -196,7 +196,7 @@ fun AdminDashboardScreen(
                         StatCard(
                             label = "Master Toga",
                             value = "${data.totalMasterPlants}",
-                            icon = Icons.Default.Eco,
+                            icon = Icons.Default.Star,
                             tint = PrimaryForest,
                             modifier = Modifier.weight(1f)
                         )

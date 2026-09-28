@@ -20,9 +20,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -295,7 +295,7 @@ private fun PicLocationItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = if (isPublished) Icons.Default.CheckCircle else Icons.Default.Schedule,
+                            imageVector = if (isPublished) Icons.Default.CheckCircle else Icons.Default.DateRange,
                             contentDescription = null,
                             tint = if (isPublished) StatusVerifiedGreen else StatusPendingOrange,
                             modifier = Modifier.size(12.dp)

@@ -42,6 +42,9 @@ class LocationApprovalViewModel(
                 is Result.Error -> {
                     _uiState.value = UiState.Error(result.message ?: "Gagal memuat antrean persetujuan.")
                 }
+                is Result.Loading -> {
+                    _uiState.value = UiState.Loading
+                }
             }
         }
     }
@@ -70,6 +73,7 @@ class LocationApprovalViewModel(
                     loadPendingLocations()
                 }
                 is Result.Error -> {}
+                is Result.Loading -> {}
             }
         }
     }
@@ -97,6 +101,7 @@ class LocationApprovalViewModel(
                     loadPendingLocations()
                 }
                 is Result.Error -> {}
+                is Result.Loading -> {}
             }
         }
     }

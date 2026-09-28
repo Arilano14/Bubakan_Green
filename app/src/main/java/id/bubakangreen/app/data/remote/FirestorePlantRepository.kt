@@ -29,14 +29,14 @@ class FirestorePlantRepository(
         return masterPlantsCollection
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toMasterPlant() })
+                Result.Success(snapshot.documents.mapNotNull { it.toMasterPlant() }) as Result<List<MasterPlant>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
     override fun getMasterPlantById(plantId: String): Flow<Result<MasterPlant?>> {
         return masterPlantsCollection.document(plantId).snapshots().map { snapshot ->
-            Result.Success(snapshot.toMasterPlant())
+            Result.Success(snapshot.toMasterPlant()) as Result<MasterPlant?>
         }.catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
@@ -46,7 +46,7 @@ class FirestorePlantRepository(
             .whereEqualTo("status", PlantStatus.ACTIVE.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocationPlant() })
+                Result.Success(snapshot.documents.mapNotNull { it.toLocationPlant() }) as Result<List<LocationPlant>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
@@ -76,6 +76,15 @@ class FirestorePlantRepository(
             val finalPlant = locationPlant.copy(id = docRef.id)
             docRef.set(finalPlant.toMap()).await()
             Result.Success(docRef.id)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> {
+        return try {
+            locationPlantsCollection.document(locationPlant.id).set(locationPlant.toMap()).await()
+            Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)
         }

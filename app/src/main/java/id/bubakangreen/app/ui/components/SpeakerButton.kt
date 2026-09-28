@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.VolumeUp
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -84,7 +84,7 @@ fun MandarinSpeakerButton(
             }
             else -> {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Filled.VolumeUp,
+                    imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
                     tint = OnPrimaryWhite,
                     modifier = Modifier.size(24.dp)

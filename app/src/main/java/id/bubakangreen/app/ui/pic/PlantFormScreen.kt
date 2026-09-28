@@ -23,8 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Eco
-import androidx.compose.material.icons.filled.QrCode
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -368,7 +367,7 @@ fun PlantFormScreen(
                                             ) {
                                                 Box(contentAlignment = Alignment.Center) {
                                                     Icon(
-                                                        imageVector = Icons.Default.Eco,
+                                                        imageVector = Icons.Default.Star,
                                                         contentDescription = null,
                                                         tint = PrimaryForest,
                                                         modifier = Modifier.size(20.dp)

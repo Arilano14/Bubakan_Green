@@ -88,9 +88,12 @@ class LoginViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = result.message ?: "Gagal masuk. Periksa kembali email dan kata sandi Anda."
+                            errorMessage = result.message ?: result.exception.message ?: "Gagal masuk. Periksa kembali email dan kata sandi Anda."
                         )
                     }
+                }
+                is Result.Loading -> {
+                    _uiState.update { it.copy(isLoading = true) }
                 }
             }
         }

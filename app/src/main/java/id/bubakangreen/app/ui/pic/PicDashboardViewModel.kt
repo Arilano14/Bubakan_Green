@@ -46,6 +46,9 @@ class PicDashboardViewModel(
                     is Result.Error -> {
                         _uiState.value = UiState.Error(result.message ?: "Gagal memuat daftar kebun binaan.")
                     }
+                    is Result.Loading -> {
+                        _uiState.value = UiState.Loading
+                    }
                 }
             }
         }

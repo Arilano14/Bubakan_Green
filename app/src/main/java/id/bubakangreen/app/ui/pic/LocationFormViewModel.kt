@@ -89,9 +89,11 @@ class LocationFormViewModel(
                 is Result.Success -> {
                     val coords = result.data
                     val accuracy = coords.accuracyMeters
-                    val warning = if (accuracy > 25f) {
-                        "Akurasi GPS saat ini ${accuracy.toInt()}m (>25m). Disarankan mencoba kembali di area terbuka."
-                    } else null
+                    val warning = when {
+                        accuracy == null -> "Informasi akurasi GPS tidak tersedia. Disarankan mencoba kembali di area terbuka."
+                        accuracy > 25f -> "Akurasi GPS saat ini ${accuracy.toInt()}m (>25m). Disarankan mencoba kembali di area terbuka."
+                        else -> null
+                    }
 
                     _state.update {
                         it.copy(
@@ -112,6 +114,9 @@ class LocationFormViewModel(
                             gpsWarning = "Gagal mengunci titik koordinat GPS. Pastikan izin lokasi aktif dan berada di tempat terbuka."
                         )
                     }
+                }
+                is Result.Loading -> {
+                    _state.update { it.copy(isGpsLoading = true) }
                 }
             }
         }
@@ -186,6 +191,9 @@ class LocationFormViewModel(
                             validationError = saveResult.message ?: "Gagal menyimpan pengajuan kebun."
                         )
                     }
+                }
+                is Result.Loading -> {
+                    _state.update { it.copy(isSaving = true) }
                 }
             }
         }

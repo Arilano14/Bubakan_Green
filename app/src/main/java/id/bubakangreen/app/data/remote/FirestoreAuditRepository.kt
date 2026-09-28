@@ -40,7 +40,7 @@ class FirestoreAuditRepository(
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toAuditLog() })
+                Result.Success(snapshot.documents.mapNotNull { it.toAuditLog() }) as Result<List<AuditLog>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
