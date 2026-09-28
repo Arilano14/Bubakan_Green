@@ -2,6 +2,7 @@ package id.bubakangreen.app.ui.catalog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,20 +53,30 @@ import id.bubakangreen.app.ui.components.StateEmptyView
 import id.bubakangreen.app.ui.components.StateErrorView
 import id.bubakangreen.app.ui.theme.AccentDewContainer
 import id.bubakangreen.app.ui.theme.AccentDewTeal
+import id.bubakangreen.app.ui.theme.AccentSunnyContainer
+import id.bubakangreen.app.ui.theme.AccentSunnyGold
 import id.bubakangreen.app.ui.theme.BackgroundVanilla
+import id.bubakangreen.app.ui.theme.OnAccentGoldDark
 import id.bubakangreen.app.ui.theme.OnDewTealDark
 import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
 import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
 import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
 import id.bubakangreen.app.ui.theme.PrimaryForestDark
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SecondarySage
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * PlantDetailScreen: Bite-sized Botanical Lesson.
- * Combines high-resolution photography, scientific Latin binomials,
- * Mandarin Hanzi/Pinyin with interactive audio listener feedback, and herbal benefits.
+ * PlantDetailScreen: Interactive Mini Botanical Lesson.
+ * Structure:
+ * 1. LARGE PLANT IMAGE (organic 28dp bottom curvature)
+ * 2. Plant name + Latin scientific name
+ * 3. Mandarin Discovery Pod (Hanzi, Pinyin, 🔊 audio with companion listener mascot)
+ * 4. "Kenali Tanaman Ini"
+ * 5. "Manfaat & Khasiat Herbal"
+ * 6. "Yang Perlu Kamu Tahu"
+ * 7. "Tanaman Ini Ada di..."
  */
 @Composable
 fun PlantDetailScreen(
@@ -92,8 +103,8 @@ fun PlantDetailScreen(
     Scaffold(
         topBar = {
             BubakanTopBar(
-                title = "Detail Tanaman",
-                subtitle = "Ensiklopedi Botani Bubakan",
+                title = "Pelajaran Botani",
+                subtitle = "Ensiklopedi Tanaman Bubakan",
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack,
                 onInfoClick = onInfoClick
@@ -121,13 +132,13 @@ fun PlantDetailScreen(
                         ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(240.dp),
-                            cornerRadius = 24.dp
+                                .height(260.dp),
+                            cornerRadius = 28.dp
                         )
                         ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(88.dp),
+                                .height(90.dp),
                             cornerRadius = 20.dp
                         )
                         ShimmerBox(
@@ -148,12 +159,12 @@ fun PlantDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                     ) {
-                        // Hero Photograph with rounded bottom corners (16:10)
+                        // 1. LARGE PLANT IMAGE (Organic 28dp bottom curvature)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 10f)
-                                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                                .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                                 .background(PrimaryContainerMint)
                         ) {
                             if (!plant.primaryPhotoUrl.isNullOrBlank()) {
@@ -176,13 +187,13 @@ fun PlantDetailScreen(
                             }
                         }
 
-                        // Botanical Content Lesson
+                        // Lesson Content Container
                         Column(modifier = Modifier.padding(16.dp)) {
-                            // Section 1: Nomenclature Header
+                            // 2. NOMENCLATURE: Plant name + Latin name
                             Text(
                                 text = plant.nameId,
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold,
+                                style = MaterialTheme.typography.headlineLarge,
+                                fontWeight = FontWeight.ExtraBold,
                                 color = OnSurfaceForestDark
                             )
 
@@ -196,11 +207,11 @@ fun PlantDetailScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(18.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // Section 2: Mandarin Discovery Pod (with Audio & Mascot Listener Reaction)
+                            // 3. MANDARIN DISCOVERY POD: Hanzi, Pinyin, 🔊 Audio, and Companion Listener Feedback
                             if (!plant.nameMandarin.isNullOrBlank() || !plant.pinyin.isNullOrBlank()) {
-                                MandarinDiscoveryPod(
+                                MandarinLessonPod(
                                     hanzi = plant.nameMandarin.orEmpty(),
                                     pinyin = plant.pinyin.orEmpty(),
                                     audioState = uiState.audioState,
@@ -211,21 +222,37 @@ fun PlantDetailScreen(
                                 Spacer(modifier = Modifier.height(20.dp))
                             }
 
-                            // Section 3: Khasiat & Manfaat Herbal
-                            BotanicalSectionCard(
-                                title = "Khasiat & Manfaat Sehat",
+                            // 4. "Kenali Tanaman Ini"
+                            LessonSectionCard(
+                                title = "Kenali Tanaman Ini",
+                                icon = "📖",
+                                content = plant.description.ifBlank {
+                                    "Tanaman ini merupakan salah satu flora unggulan yang dikembangkan di lingkungan Kelurahan Bubakan untuk apotek hidup mandiri warga."
+                                }
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // 5. "Manfaat & Khasiat Herbal"
+                            LessonSectionCard(
+                                title = "Manfaat & Khasiat Sehat",
                                 icon = "🌿",
                                 content = plant.description
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Section 4: Informasi Budidaya di Bubakan
-                            BotanicalSectionCard(
-                                title = "Budidaya di Kebun Bubakan",
-                                icon = "🌱",
-                                content = "Tanaman ini dirawat oleh warga Kelurahan Bubakan sebagai bagian dari program ketahanan pangan mandiri dan apotek hidup keluarga."
+                            // 6. "Yang Perlu Kamu Tahu" (Edukasi Perawatan & Budidaya)
+                            LessonSectionCard(
+                                title = "Yang Perlu Kamu Tahu",
+                                icon = "💡",
+                                content = "Tanaman ini dirawat secara alami oleh warga Bubakan dengan pupuk kompos organik tanpa pestisida kimia untuk menjaga kemurnian khasiat herbal."
                             )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // 7. "Tanaman Ini Ada di..." (Koneksi ke Kebun Nyata Bubakan)
+                            GardenPresenceCard()
 
                             Spacer(modifier = Modifier.height(32.dp))
                         }
@@ -253,11 +280,11 @@ fun PlantDetailScreen(
 }
 
 /**
- * Mandarin interactive learning pod with Hanzi, Pinyin, audio playback,
- * and playful listener mascot reaction.
+ * Mandarin interactive pronunciation pod with Hanzi, Pinyin, audio playback,
+ * and live listener mascot reaction.
  */
 @Composable
-private fun MandarinDiscoveryPod(
+private fun MandarinLessonPod(
     hanzi: String,
     pinyin: String,
     audioState: AudioState,
@@ -266,9 +293,9 @@ private fun MandarinDiscoveryPod(
     onPlayAudio: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = AccentDewContainer),
-        border = BorderStroke(1.5.dp, AccentDewTeal.copy(alpha = 0.45f)),
+        border = BorderStroke(1.5.dp, AccentDewTeal.copy(alpha = 0.5f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -282,12 +309,12 @@ private fun MandarinDiscoveryPod(
             Column(modifier = Modifier.weight(1f)) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
-                    color = AccentDewTeal.copy(alpha = 0.15f)
+                    color = AccentDewTeal.copy(alpha = 0.18f)
                 ) {
                     Text(
-                        text = "BELAJAR NAMA MANDARIN",
+                        text = "PELAFALAN BAHASA MANDARIN",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = OnDewTealDark,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                     )
@@ -299,8 +326,8 @@ private fun MandarinDiscoveryPod(
                     if (hanzi.isNotBlank()) {
                         Text(
                             text = hanzi,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.ExtraBold,
                             color = OnDewTealDark
                         )
                         Spacer(modifier = Modifier.width(10.dp))
@@ -309,18 +336,18 @@ private fun MandarinDiscoveryPod(
                         Text(
                             text = pinyin,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
+                            fontWeight = FontWeight.Bold,
                             color = SecondarySage
                         )
                     }
                 }
             }
 
-            // If audio is playing, companion mascot perks up into listening mode!
+            // Interactive Companion Mascot Reaction while audio is playing
             if (isAudioPlaying) {
                 BubaMascot(
                     state = BubaState.LISTENING,
-                    size = 56.dp,
+                    size = 58.dp,
                     modifier = Modifier.padding(end = 8.dp)
                 )
             }
@@ -335,17 +362,17 @@ private fun MandarinDiscoveryPod(
 }
 
 /**
- * Tactile botanical lesson content card.
+ * Bite-sized modular lesson card.
  */
 @Composable
-private fun BotanicalSectionCard(
+private fun LessonSectionCard(
     title: String,
     icon: String,
     content: String,
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
         border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -353,12 +380,12 @@ private fun BotanicalSectionCard(
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = icon, fontSize = 20.sp)
+                Text(text = icon, fontSize = 22.sp)
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.ExtraBold,
                     color = OnSurfaceForestDark
                 )
             }
@@ -367,7 +394,44 @@ private fun BotanicalSectionCard(
                 text = content,
                 style = MaterialTheme.typography.bodyLarge,
                 color = OnSurfaceForestDark,
-                lineHeight = 24.sp
+                lineHeight = 23.sp
+            )
+        }
+    }
+}
+
+/**
+ * "Tanaman Ini Ada di..." Physical Garden Presence Card.
+ */
+@Composable
+private fun GardenPresenceCard(
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = AccentSunnyContainer),
+        border = BorderStroke(1.5.dp, AccentSunnyGold.copy(alpha = 0.45f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(18.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "📍", fontSize = 22.sp)
+                Spacer(modifier = Modifier.width(10.dp))
+                Text(
+                    text = "Tanaman Ini Ada di Kebun Bubakan",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = OnAccentGoldDark
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Dapat ditemukan dan dipelajari langsung di Taman Toga RW 03 dan Kebun Percontohan Kelurahan Bubakan.",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFF3D2A00),
+                lineHeight = 20.sp
             )
         }
     }

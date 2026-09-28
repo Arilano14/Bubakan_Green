@@ -85,50 +85,57 @@ fun BubakanAppNavHost(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(
-                    containerColor = SurfaceWhite,
-                    tonalElevation = 0.dp,
-                    modifier = Modifier.border(BorderStroke(1.dp, OutlineGrey))
+                androidx.compose.material3.Surface(
+                    shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+                    border = BorderStroke(1.5.dp, id.bubakangreen.app.ui.theme.OutlineOrganic),
+                    color = id.bubakangreen.app.ui.theme.SurfaceCardWhite,
+                    tonalElevation = 0.dp
                 ) {
-                    bottomNavigationItems.forEach { item ->
-                        val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                navController.navigate(item.screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                    NavigationBar(
+                        containerColor = id.bubakangreen.app.ui.theme.SurfaceCardWhite,
+                        tonalElevation = 0.dp
+                    ) {
+                        bottomNavigationItems.forEach { item ->
+                            val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
+                            NavigationBarItem(
+                                selected = isSelected,
+                                onClick = {
+                                    navController.navigate(item.screen.route) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            },
-                            icon = {
-                                val iconVector = when (item.screen) {
-                                    Screen.Home -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
-                                    Screen.Locations -> if (isSelected) Icons.Filled.Place else Icons.Outlined.Place
-                                    Screen.Catalog -> if (isSelected) Icons.Filled.Search else Icons.Outlined.Search
-                                    else -> Icons.Filled.Home
-                                }
-                                Icon(
-                                    imageVector = iconVector,
-                                    contentDescription = item.label
+                                },
+                                icon = {
+                                    val iconVector = when (item.screen) {
+                                        Screen.Home -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
+                                        Screen.Locations -> if (isSelected) Icons.Filled.Place else Icons.Outlined.Place
+                                        Screen.Catalog -> if (isSelected) Icons.Filled.Search else Icons.Outlined.Search
+                                        else -> Icons.Filled.Home
+                                    }
+                                    Icon(
+                                        imageVector = iconVector,
+                                        contentDescription = item.label
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = item.label,
+                                        fontWeight = if (isSelected) androidx.compose.ui.text.font.FontWeight.ExtraBold else androidx.compose.ui.text.font.FontWeight.SemiBold,
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                },
+                                colors = NavigationBarItemDefaults.colors(
+                                    selectedIconColor = id.bubakangreen.app.ui.theme.PrimarySeedlingGreen,
+                                    selectedTextColor = id.bubakangreen.app.ui.theme.PrimarySeedlingGreen,
+                                    indicatorColor = id.bubakangreen.app.ui.theme.PrimaryContainerMint,
+                                    unselectedIconColor = id.bubakangreen.app.ui.theme.OnSurfaceSageMuted,
+                                    unselectedTextColor = id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
                                 )
-                            },
-                            label = {
-                                Text(
-                                    text = item.label,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = PrimaryForest,
-                                selectedTextColor = PrimaryForest,
-                                indicatorColor = PrimaryContainerMint,
-                                unselectedIconColor = OnSurfaceVariant,
-                                unselectedTextColor = OnSurfaceVariant
                             )
-                        )
+                        }
                     }
                 }
             }

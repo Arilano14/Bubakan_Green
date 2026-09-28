@@ -2,7 +2,6 @@ package id.bubakangreen.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,7 +35,6 @@ import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.ui.theme.AccentSunnyContainer
 import id.bubakangreen.app.ui.theme.AccentSunnyGold
 import id.bubakangreen.app.ui.theme.OnAccentGoldDark
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
 import id.bubakangreen.app.ui.theme.OnPrimaryWhite
 import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
 import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
@@ -46,8 +45,8 @@ import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * Tactile botanical location card representing a community garden plot in Kelurahan Bubakan.
- * Designed with 20dp rounded corners, category-based color badges, and clear exploration triggers.
+ * Chunky tactical botanical location card representing a community garden plot in Kelurahan Bubakan.
+ * Designed with 22dp rounded corners, category-based thematic badges, and clear exploration triggers.
  */
 @Composable
 fun LocationCard(
@@ -57,7 +56,7 @@ fun LocationCard(
     plantCount: Int? = null
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
         border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -90,8 +89,8 @@ fun LocationCard(
                     ) {
                         Text(
                             text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
                             color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
                         )
                     }
@@ -105,12 +104,12 @@ fun LocationCard(
                 Surface(
                     shape = RoundedCornerShape(10.dp),
                     color = badgeBg,
-                    modifier = Modifier.padding(12.dp)
+                    modifier = Modifier.padding(14.dp)
                 ) {
                     Text(
                         text = badgeText,
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = badgeTextColor,
                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
@@ -127,8 +126,9 @@ fun LocationCard(
                     Text(
                         text = location.name,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = OnSurfaceForestDark,
+                        fontSize = 17.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -142,7 +142,7 @@ fun LocationCard(
                         Text(
                             text = "RW ${location.rw}",
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.ExtraBold,
                             color = PrimaryForestDark,
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
@@ -156,7 +156,8 @@ fun LocationCard(
                         style = MaterialTheme.typography.bodyMedium,
                         color = OnSurfaceSageMuted,
                         maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 18.sp
                     )
                 }
 
@@ -178,7 +179,7 @@ fun LocationCard(
                     Text(
                         text = "Jelajahi Kebun →",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = PrimarySeedlingGreen,
                         fontSize = 13.sp
                     )

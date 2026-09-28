@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
@@ -34,7 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.ui.common.UiState
 import id.bubakangreen.app.ui.components.BubaMascot
 import id.bubakangreen.app.ui.components.BubaState
@@ -59,8 +62,14 @@ import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * HomeScreen: Botanical Learning & Discovery Hub of Kelurahan Bubakan.
- * Duolingo-inspired playful educational experience with original Bubakan botanical identity.
+ * HomeScreen: Playful Botanical Education Discovery Hub.
+ * Structure:
+ * 1. TOP: BUBAKAN GREEN identity + friendly mascot greeting speech bubble.
+ * 2. HERO: "Yuk, kenalan dengan tanaman Bubakan" interactive educational hero.
+ * 3. PRIMARY DISCOVERY: Urban Farming & Taman Toga dual tactile chunky cards.
+ * 4. FEATURED PLANTS: Botanical highlights with collectible bilingual badge styling.
+ * 5. EDUCATIONAL DISCOVERY: "💡 Tahukah Kamu?" verified botanical fact card with mascot.
+ * 6. EXPLORE BUBAKAN LOCATIONS: Flagship garden showcase.
  */
 @Composable
 fun HomeScreen(
@@ -102,104 +111,83 @@ fun HomeScreen(
                     .verticalScroll(scrollState)
                     .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
-                // Section 1: Si Buba Companion Greeting Hero Banner
-                BubaGreetingBanner()
+                // 1. TOP: Mascot Greeting Header
+                MascotGreetingSpeechCard()
 
-                Spacer(modifier = Modifier.height(18.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                // Section 2: Flagship Garden Spotlight
-                when (val featured = uiState.featuredLocations) {
-                    is UiState.Loading -> {
-                        ShimmerBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(260.dp),
-                            cornerRadius = 20.dp
-                        )
-                    }
-                    is UiState.Success -> {
-                        val primaryFeatured = featured.data.firstOrNull()
-                        if (primaryFeatured != null) {
-                            FeaturedLocationBanner(
-                                location = primaryFeatured,
-                                onClick = { onLocationClick(primaryFeatured.id) }
-                            )
-                        }
-                    }
-                    is UiState.Empty -> {
-                        // Handled cleanly
-                    }
-                    is UiState.Error -> {
-                        StateErrorView(
-                            message = featured.message,
-                            onRetry = { viewModel.loadData() }
-                        )
-                    }
-                }
+                // 2. HERO: "Yuk, kenalan dengan tanaman Bubakan"
+                HeroEducationalBanner(
+                    onExploreClick = onNavigateToCatalog
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Section 3: Exploration Categories (Tactile Chunky Cards)
+                // 3. PRIMARY DISCOVERY: Urban Farming vs Taman Toga
                 Text(
                     text = "Jelajahi Program Kebun",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
                     color = OnSurfaceForestDark
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
-                    CategoryTactileCard(
+                    ChunkyProgramModule(
                         title = "Urban Farming",
-                        subtitle = "Budidaya Pangan",
+                        subtitle = "Sayur & Pangan Mandiri",
                         icon = "🌱",
-                        accentColor = PrimarySeedlingGreen,
+                        badgeText = "PANGAN",
                         containerColor = PrimaryContainerMint,
+                        accentColor = PrimarySeedlingGreen,
                         onClick = { onNavigateToLocations(LocationType.URBAN_FARMING) },
                         modifier = Modifier.weight(1f)
                     )
-                    CategoryTactileCard(
+                    ChunkyProgramModule(
                         title = "Taman Toga",
-                        subtitle = "Tanaman Obat Sehat",
+                        subtitle = "Apotek Hidup Herbal",
                         icon = "🌿",
-                        accentColor = AccentSunnyGold,
+                        badgeText = "HERBAL",
                         containerColor = AccentSunnyContainer,
+                        accentColor = AccentSunnyGold,
                         onClick = { onNavigateToLocations(LocationType.TAMAN_TOGA) },
                         modifier = Modifier.weight(1f)
                     )
                 }
 
-                Spacer(modifier = Modifier.height(22.dp))
-
-                // Section 4: "Tahukah Kamu?" Educational Fact Card
-                BotanicalFactCard()
-
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Section 5: Botanical Highlights (Plant Cards)
+                // 4. FEATURED PLANTS: Koleksi Tanaman Pilihan
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Column {
+                        Text(
+                            text = "Koleksi Tanaman Pilihan",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = OnSurfaceForestDark
+                        )
+                        Text(
+                            text = "Pelajari nama, latin, dan khasiat herbalnya",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = OnSurfaceSageMuted
+                        )
+                    }
                     Text(
-                        text = "Koleksi Tanaman Pilihan",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = OnSurfaceForestDark
-                    )
-                    Text(
-                        text = "Semua Tanaman →",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        text = "Perpustakaan →",
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.ExtraBold,
                         color = PrimarySeedlingGreen,
                         modifier = Modifier.clickable { onNavigateToCatalog() }
                     )
                 }
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
 
                 when (val plants = uiState.popularPlants) {
                     is UiState.Loading -> {
@@ -224,64 +212,81 @@ fun HomeScreen(
                         }
                     }
                     is UiState.Empty -> {
-                        // Empty state handled gracefully
+                        // Handled cleanly
                     }
                     is UiState.Error -> {
                         Text(
                             text = plants.message,
-                            style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                            color = OnSurfaceSageMuted
-                        )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // Section 6: About Bubakan Green Community Card
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = PrimaryContainerMint.copy(alpha = 0.5f)),
-                    border = BorderStroke(1.5.dp, PrimarySeedlingGreen.copy(alpha = 0.2f)),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onInfoClick() }
-                ) {
-                    Column(modifier = Modifier.padding(18.dp)) {
-                        Text(
-                            text = "Tentang Bubakan Green",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = OnSurfaceForestDark
-                        )
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text = "Inisiatif kemandirian pangan dan apotek hidup herbal warga Kelurahan Bubakan, Mijen, Kota Semarang.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = OnSurfaceSageMuted
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = "Pelajari Selengkapnya →",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimarySeedlingGreen
-                        )
                     }
                 }
 
                 Spacer(modifier = Modifier.height(24.dp))
+
+                // 5. EDUCATIONAL DISCOVERY: "💡 Tahukah Kamu?" Trivia Section
+                EducationalTriviaFactCard()
+
+                Spacer(modifier = Modifier.height(26.dp))
+
+                // 6. EXPLORE BUBAKAN LOCATIONS: Flagship Garden Showcase
+                Text(
+                    text = "Jelajahi Kebun di Bubakan",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = OnSurfaceForestDark
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Kunjungi langsung kebun binaan warga di wilayah RW Bubakan",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = OnSurfaceSageMuted
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+
+                when (val featured = uiState.featuredLocations) {
+                    is UiState.Loading -> {
+                        ShimmerBox(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(260.dp),
+                            cornerRadius = 20.dp
+                        )
+                    }
+                    is UiState.Success -> {
+                        val primaryFeatured = featured.data.firstOrNull()
+                        if (primaryFeatured != null) {
+                            FeaturedLocationBanner(
+                                location = primaryFeatured,
+                                onClick = { onLocationClick(primaryFeatured.id) }
+                            )
+                        }
+                    }
+                    is UiState.Empty -> {
+                        // Empty fallback
+                    }
+                    is UiState.Error -> {
+                        StateErrorView(
+                            message = featured.message,
+                            onRetry = { viewModel.loadData() }
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(28.dp))
             }
         }
     }
 }
 
 /**
- * Playful welcoming banner featuring Si Buba, the botanical guide of Kelurahan Bubakan.
+ * Welcoming speech bubble card from companion mascot Si Buba.
  */
 @Composable
-private fun BubaGreetingBanner() {
+private fun MascotGreetingSpeechCard() {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
         border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -290,13 +295,12 @@ private fun BubaGreetingBanner() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Animated Mascot in Greeting state
             BubaMascot(
                 state = BubaState.GREETING,
-                size = 72.dp
+                size = 76.dp
             )
 
             Spacer(modifier = Modifier.width(14.dp))
@@ -310,7 +314,7 @@ private fun BubaGreetingBanner() {
                     Text(
                         text = "PANDUAN BOTANI",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = PrimaryForestDark,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
                     )
@@ -319,9 +323,9 @@ private fun BubaGreetingBanner() {
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "Halo! Yuk, jelajahi tanaman hijau & toga di Bubakan hari ini!",
+                    text = "Halo! Aku Si Buba. Yuk, kenalan dengan tanaman herbal & kebun hijau di Bubakan hari ini!",
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     color = OnSurfaceForestDark,
                     lineHeight = 20.sp
                 )
@@ -331,61 +335,139 @@ private fun BubaGreetingBanner() {
 }
 
 /**
- * Tactile category card with chunky icon and vibrant accents.
+ * Educational Hero Banner: "Yuk, kenalan dengan tanaman Bubakan"
  */
 @Composable
-private fun CategoryTactileCard(
-    title: String,
-    subtitle: String,
-    icon: String,
-    accentColor: Color,
-    containerColor: Color,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+private fun HeroEducationalBanner(
+    onExploreClick: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
-        border = BorderStroke(1.5.dp, OutlineOrganic),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = PrimaryContainerMint),
+        border = BorderStroke(1.5.dp, PrimarySeedlingGreen.copy(alpha = 0.35f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = modifier.clickable(onClick = onClick)
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Box(
-                modifier = Modifier
-                    .size(46.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(containerColor),
-                contentAlignment = Alignment.Center
+        Column(modifier = Modifier.padding(18.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = icon, fontSize = 22.sp)
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Yuk, Kenalan dengan Tanaman Bubakan! 🌿",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = PrimaryForestDark,
+                        lineHeight = 28.sp
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "Temukan khasiat herbal alami dan sayuran segar langsung dari kebun warga.",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = OnSurfaceForestDark,
+                        lineHeight = 20.sp
+                    )
+                }
             }
-            Spacer(modifier = Modifier.height(10.dp))
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = OnSurfaceForestDark
-            )
-            Spacer(modifier = Modifier.height(2.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.labelSmall,
-                color = OnSurfaceSageMuted
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            TactileButton(
+                text = "Mulai Belajar Sekarang 🚀",
+                onClick = onExploreClick,
+                style = TactileButtonStyle.PRIMARY,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }
 }
 
 /**
- * Educational bite-sized botanical trivia card.
+ * Chunky interactive program module card (Urban Farming / Taman Toga).
  */
 @Composable
-private fun BotanicalFactCard() {
+private fun ChunkyProgramModule(
+    title: String,
+    subtitle: String,
+    icon: String,
+    badgeText: String,
+    containerColor: Color,
+    accentColor: Color,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = modifier.clickable(onClick = onClick)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(containerColor),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = icon, fontSize = 24.sp)
+                }
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = containerColor
+                ) {
+                    Text(
+                        text = badgeText,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = OnSurfaceForestDark,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = OnSurfaceForestDark
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
+                color = OnSurfaceSageMuted,
+                lineHeight = 16.sp
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = "Lihat Kebun →",
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.ExtraBold,
+                color = PrimarySeedlingGreen
+            )
+        }
+    }
+}
+
+/**
+ * Educational bite-sized botanical trivia fact card with mascot thinking posture.
+ */
+@Composable
+private fun EducationalTriviaFactCard() {
+    Card(
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = AccentSunnyContainer),
-        border = BorderStroke(1.5.dp, AccentSunnyGold.copy(alpha = 0.4f)),
+        border = BorderStroke(1.5.dp, AccentSunnyGold.copy(alpha = 0.45f)),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -397,25 +479,26 @@ private fun BotanicalFactCard() {
         ) {
             BubaMascot(
                 state = BubaState.THINKING,
-                size = 54.dp
+                size = 64.dp
             )
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "💡 Tahukah Kamu?",
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = OnAccentGoldDark
+                    text = "💡 TAHUKAH KAMU?",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = OnAccentGoldDark,
+                    letterSpacing = 0.5.sp
                 )
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Jahe Merah dan Temulawak di kebun Bubakan dirawat tanpa pestisida kimia untuk menjaga khasiat herbal alami!",
-                    style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
+                    text = "Jahe Merah dan Temulawak di kebun Bubakan dirawat tanpa pestisida kimia untuk menjaga khasiat alami!",
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
                     color = Color(0xFF3D2A00),
-                    lineHeight = 17.sp
+                    lineHeight = 19.sp
                 )
             }
         }

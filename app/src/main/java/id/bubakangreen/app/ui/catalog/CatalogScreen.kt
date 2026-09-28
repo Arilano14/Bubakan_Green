@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,7 +25,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.bubakangreen.app.ui.common.UiState
 import id.bubakangreen.app.ui.components.BubakanTopBar
@@ -41,8 +44,8 @@ import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * CatalogScreen: Botanical Learning Library of Kelurahan Bubakan.
- * Duolingo-inspired friendly search and tactile plant discovery.
+ * CatalogScreen: Perpustakaan Tanaman (Botanical Learning Library).
+ * Designed for effortless scanning, large botanical photography, and bilingual discovery.
  */
 @Composable
 fun CatalogScreen(
@@ -56,8 +59,8 @@ fun CatalogScreen(
     Scaffold(
         topBar = {
             BubakanTopBar(
-                title = "Katalog Tanaman",
-                subtitle = "Ensiklopedi Botani Bubakan",
+                title = "Perpustakaan Botani",
+                subtitle = "Ensiklopedi Tanaman Bubakan",
                 canNavigateBack = false,
                 onInfoClick = onInfoClick
             )
@@ -78,7 +81,7 @@ fun CatalogScreen(
                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                 placeholder = {
                     Text(
-                        text = "Cari jahe, kunyit, bayam, toga...",
+                        text = "Cari jahe, temulawak, kencur, toga...",
                         style = MaterialTheme.typography.bodyMedium,
                         color = OnSurfaceSageMuted
                     )
@@ -101,7 +104,7 @@ fun CatalogScreen(
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(16.dp),
+                shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = SurfaceCardWhite,
                     unfocusedContainerColor = SurfaceCardWhite,
@@ -128,8 +131,8 @@ fun CatalogScreen(
                             ShimmerBox(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(104.dp),
-                                cornerRadius = 20.dp
+                                    .height(108.dp),
+                                cornerRadius = 22.dp
                             )
                         }
                     }
@@ -145,6 +148,16 @@ fun CatalogScreen(
                         ),
                         verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
+                        item {
+                            Text(
+                                text = "Koleksi Ensiklopedia (${plantsState.data.size} Tanaman)",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = OnSurfaceForestDark,
+                                modifier = Modifier.padding(vertical = 4.dp)
+                            )
+                        }
+
                         items(plantsState.data, key = { it.id }) { plant ->
                             PlantCard(
                                 plant = plant,

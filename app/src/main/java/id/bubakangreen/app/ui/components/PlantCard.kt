@@ -39,12 +39,14 @@ import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
 import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
 import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
+import id.bubakangreen.app.ui.theme.PrimaryForestDark
 import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
+import id.bubakangreen.app.ui.theme.SecondarySage
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * Tactile botanical learning card.
- * Prioritizes playful educational discovery, bilingual taxonomy, and rich botanical photography.
+ * Chunky tactile botanical collectible learning card.
+ * Prioritizes prominent photography, bilingual nomenclature, and clear educational discovery cues.
  */
 @Composable
 fun PlantCard(
@@ -53,7 +55,7 @@ fun PlantCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
         border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
@@ -67,11 +69,11 @@ fun PlantCard(
                 .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botanical Photo Thumbnail (Rounded 16dp)
+            // Large Botanical Photo Thumbnail (Rounded 18dp)
             Box(
                 modifier = Modifier
-                    .size(84.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .size(92.dp)
+                    .clip(RoundedCornerShape(18.dp))
                     .background(PrimaryContainerMint),
                 contentAlignment = Alignment.Center
             ) {
@@ -85,14 +87,14 @@ fun PlantCard(
                 } else {
                     Text(
                         text = "🌱",
-                        style = MaterialTheme.typography.headlineMedium
+                        style = MaterialTheme.typography.displaySmall
                     )
                 }
             }
 
             Spacer(modifier = Modifier.width(14.dp))
 
-            // Botanical Nomenclature & Details
+            // Botanical Nomenclature & Learning Badges
             Column(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center
@@ -105,8 +107,9 @@ fun PlantCard(
                     Text(
                         text = plant.nameId,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = OnSurfaceForestDark,
+                        fontSize = 17.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -117,14 +120,14 @@ fun PlantCard(
                         Surface(
                             shape = RoundedCornerShape(8.dp),
                             color = AccentDewContainer,
-                            border = BorderStroke(1.dp, AccentDewTeal.copy(alpha = 0.3f))
+                            border = BorderStroke(1.dp, AccentDewTeal.copy(alpha = 0.4f))
                         ) {
                             Text(
                                 text = plant.nameMandarin,
                                 style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.SemiBold,
+                                fontWeight = FontWeight.Bold,
                                 color = OnDewTealDark,
-                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                             )
                         }
                     }
@@ -136,7 +139,8 @@ fun PlantCard(
                         text = plant.nameLatin,
                         style = MaterialTheme.typography.bodyMedium,
                         fontStyle = FontStyle.Italic,
-                        color = OnSurfaceSageMuted,
+                        fontWeight = FontWeight.Medium,
+                        color = SecondarySage,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -149,19 +153,35 @@ fun PlantCard(
                         style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
                         color = OnSurfaceSageMuted,
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        lineHeight = 16.sp
                     )
                 }
 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Surface(
+                        shape = RoundedCornerShape(6.dp),
+                        color = PrimaryContainerMint
+                    ) {
+                        Text(
+                            text = "BOTANI",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = PrimaryForestDark,
+                            fontSize = 9.sp,
+                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                        )
+                    }
+
                     Text(
-                        text = "Pelajari →",
+                        text = "Pelajari Tanaman →",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = PrimarySeedlingGreen,
                         fontSize = 12.sp
                     )
