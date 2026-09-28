@@ -10,6 +10,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -58,20 +59,19 @@ import id.bubakangreen.app.ui.components.OfflineStatusBar
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateEmptyView
 import id.bubakangreen.app.ui.components.StateErrorView
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
+import id.bubakangreen.app.ui.theme.BackgroundVanilla
 import id.bubakangreen.app.ui.theme.OnPrimaryWhite
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * LocationsScreen (SCR-PUB-02): Directory and map view for all community gardens.
- * Features segmented switch ([Daftar] vs [Peta]), category filter chips, and Google Maps intent integration.
+ * LocationsScreen: Garden Exploration Guide for Kelurahan Bubakan.
+ * Features segmented switch ([Daftar] vs [Peta]), tactile filter chips, and Google Maps integration.
  */
 @Composable
 fun LocationsScreen(
@@ -99,7 +99,7 @@ fun LocationsScreen(
                 onInfoClick = onInfoClick
             )
         },
-        containerColor = BackgroundLight,
+        containerColor = BackgroundVanilla,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -109,19 +109,19 @@ fun LocationsScreen(
         ) {
             OfflineStatusBar(isOffline = uiState.isOffline)
 
-            // Segmented Switch: [ Daftar ] | [ Peta ]
+            // Segmented Switch: [ Daftar Kebun ] | [ Peta Sebaran ]
             Surface(
-                color = SurfaceWhite,
-                border = BorderStroke(1.dp, OutlineGrey)
+                color = SurfaceCardWhite,
+                border = BorderStroke(1.dp, OutlineOrganic)
             ) {
                 TabRow(
                     selectedTabIndex = uiState.viewMode.ordinal,
-                    containerColor = SurfaceWhite,
-                    contentColor = PrimaryForest,
+                    containerColor = SurfaceCardWhite,
+                    contentColor = PrimarySeedlingGreen,
                     indicator = { tabPositions ->
                         TabRowDefaults.SecondaryIndicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[uiState.viewMode.ordinal]),
-                            color = PrimaryForest
+                            color = PrimarySeedlingGreen
                         )
                     }
                 ) {
@@ -157,7 +157,7 @@ fun LocationsScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 CategoryFilterChip(
-                    label = "Semua",
+                    label = "Semua Kebun",
                     selected = uiState.selectedType == null,
                     onClick = { viewModel.setCategoryFilter(null) }
                 )
@@ -187,7 +187,7 @@ fun LocationsScreen(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp),
-                                cornerRadius = 16.dp
+                                cornerRadius = 20.dp
                             )
                         }
                     }
@@ -197,7 +197,7 @@ fun LocationsScreen(
                     if (uiState.viewMode == ViewMode.LIST) {
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
-                            contentPadding = androidx.compose.foundation.layout.PaddingValues(
+                            contentPadding = PaddingValues(
                                 start = 16.dp,
                                 end = 16.dp,
                                 bottom = 24.dp
@@ -245,7 +245,7 @@ fun LocationsScreen(
 
 /**
  * Provider-agnostic visual map container.
- * Displays garden pins across Kelurahan Bubakan and a floating profile card.
+ * Displays garden pins across Kelurahan Bubakan and an elevated preview card.
  */
 @Composable
 private fun MapVisualContainer(
@@ -272,8 +272,8 @@ private fun MapVisualContainer(
                 Text(
                     text = "Pilih Titik Kebun di Wilayah Bubakan:",
                     style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = OnSurfaceDark,
+                    fontWeight = FontWeight.Bold,
+                    color = OnSurfaceForestDark,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
@@ -281,13 +281,13 @@ private fun MapVisualContainer(
             items(locations, key = { it.id }) { loc ->
                 val isSelected = loc.id == selectedLocation?.id
                 Card(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) PrimaryContainerMint else SurfaceWhite
+                        containerColor = if (isSelected) PrimaryContainerMint else SurfaceCardWhite
                     ),
                     border = BorderStroke(
                         width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) PrimaryForest else OutlineGrey
+                        color = if (isSelected) PrimarySeedlingGreen else OutlineOrganic
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -301,9 +301,9 @@ private fun MapVisualContainer(
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(36.dp)
+                                .size(38.dp)
                                 .clip(CircleShape)
-                                .background(if (loc.type == LocationType.URBAN_FARMING) PrimaryForest else SecondarySage),
+                                .background(if (loc.type == LocationType.URBAN_FARMING) PrimarySeedlingGreen else SecondarySage),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
@@ -317,14 +317,14 @@ private fun MapVisualContainer(
                                 text = loc.name,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = OnSurfaceDark,
+                                color = OnSurfaceForestDark,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = "RW ${loc.rw} • ${loc.latitude}, ${loc.longitude}",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = OnSurfaceVariant
+                                color = OnSurfaceSageMuted
                             )
                         }
                     }
@@ -341,8 +341,8 @@ private fun MapVisualContainer(
         if (selectedLocation != null) {
             Card(
                 shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, OutlineGrey),
+                colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+                border = BorderStroke(1.5.dp, OutlineOrganic),
                 elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -350,53 +350,46 @@ private fun MapVisualContainer(
                     .padding(16.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = selectedLocation.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = OnSurfaceDark,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = "RW ${selectedLocation.rw} • ${selectedLocation.address}",
-                                style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                                color = OnSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
+                    Text(
+                        text = selectedLocation.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurfaceForestDark,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = "RW ${selectedLocation.rw} • ${selectedLocation.address}",
+                        style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
+                        color = OnSurfaceSageMuted,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
 
                     Spacer(modifier = Modifier.height(14.dp))
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         OutlinedButton(
                             onClick = { onOpenExternalMap(selectedLocation) },
                             shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.5.dp, PrimarySeedlingGreen),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("📍 Buka Maps", style = MaterialTheme.typography.labelMedium)
+                            Text("📍 Peta Maps", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.SemiBold, color = PrimarySeedlingGreen)
                         }
                         Button(
                             onClick = { onOpenDetail(selectedLocation) },
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = PrimaryForest,
+                                containerColor = PrimarySeedlingGreen,
                                 contentColor = OnPrimaryWhite
                             ),
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text("Detail Kebun", style = MaterialTheme.typography.labelMedium)
+                            Text("Detail Kebun", style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -413,7 +406,6 @@ private fun launchGoogleMaps(context: Context, location: Location) {
         }
         context.startActivity(intent)
     } catch (_: Exception) {
-        // Fallback to browser Google Maps if native map app not available
         val browserUri = Uri.parse("https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}")
         val browserIntent = Intent(Intent.ACTION_VIEW, browserUri).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK

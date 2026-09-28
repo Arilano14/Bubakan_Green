@@ -19,8 +19,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +31,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -49,20 +48,25 @@ import id.bubakangreen.app.ui.components.PlantCard
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateEmptyView
 import id.bubakangreen.app.ui.components.StateErrorView
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
+import id.bubakangreen.app.ui.components.TactileButton
+import id.bubakangreen.app.ui.components.TactileButtonStyle
+import id.bubakangreen.app.ui.theme.AccentSunnyContainer
+import id.bubakangreen.app.ui.theme.AccentSunnyGold
+import id.bubakangreen.app.ui.theme.BackgroundVanilla
+import id.bubakangreen.app.ui.theme.OnAccentGoldDark
 import id.bubakangreen.app.ui.theme.OnPrimaryWhite
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
+import id.bubakangreen.app.ui.theme.PrimaryForestDark
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
 import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * LocationDetailScreen (SCR-PUB-03): Comprehensive profile of a physical garden.
- * Displays garden identity, RW context, GPS coordinates, external directions CTA, and on-site botanical inventory.
+ * LocationDetailScreen: Detailed Garden Exploration Profile.
+ * Displays garden identity, RW context, verified GPS coordinates, directions, and botanical inventory.
  */
 @Composable
 fun LocationDetailScreen(
@@ -91,7 +95,7 @@ fun LocationDetailScreen(
                 onInfoClick = onInfoClick
             )
         },
-        containerColor = BackgroundLight,
+        containerColor = BackgroundVanilla,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -113,30 +117,33 @@ fun LocationDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(220.dp),
-                            cornerRadius = 16.dp
+                            cornerRadius = 24.dp
                         )
                         ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(120.dp),
-                            cornerRadius = 16.dp
+                            cornerRadius = 20.dp
                         )
                     }
                 }
 
                 is UiState.Success -> {
                     val location = locState.data
+                    val isUrbanFarming = location.type == LocationType.URBAN_FARMING
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                     ) {
-                        // Hero Photograph (16:9)
+                        // Hero Photograph with rounded bottom corners (16:9)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 9f)
-                                .background(PrimaryContainerMint)
+                                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
+                                .background(if (isUrbanFarming) PrimaryContainerMint else AccentSunnyContainer)
                         ) {
                             if (!location.photoUrl.isNullOrBlank()) {
                                 AsyncImage(
@@ -147,30 +154,29 @@ fun LocationDetailScreen(
                                 )
                             } else {
                                 Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(PrimaryContainerMint),
+                                    modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = if (location.type == LocationType.URBAN_FARMING) "🌱 Urban Farming" else "🌿 Taman Toga",
+                                        text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = PrimaryForest
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
                                     )
                                 }
                             }
 
                             // Category badge
                             Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (location.type == LocationType.URBAN_FARMING) PrimaryForest else SecondarySage,
+                                shape = RoundedCornerShape(10.dp),
+                                color = if (isUrbanFarming) PrimarySeedlingGreen else AccentSunnyGold,
                                 modifier = Modifier.padding(16.dp)
                             ) {
                                 Text(
-                                    text = if (location.type == LocationType.URBAN_FARMING) "Urban Farming" else "Taman Toga",
+                                    text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = OnPrimaryWhite,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isUrbanFarming) OnPrimaryWhite else androidx.compose.ui.graphics.Color(0xFF2E1C00),
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                                 )
                             }
@@ -187,19 +193,20 @@ fun LocationDetailScreen(
                                     text = location.name,
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = OnSurfaceDark,
+                                    color = OnSurfaceForestDark,
                                     modifier = Modifier.weight(1f)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Surface(
                                     shape = RoundedCornerShape(8.dp),
-                                    color = PrimaryContainerMint
+                                    color = PrimaryContainerMint,
+                                    border = BorderStroke(1.dp, PrimarySeedlingGreen.copy(alpha = 0.25f))
                                 ) {
                                     Text(
                                         text = "RW ${location.rw}",
                                         style = MaterialTheme.typography.labelMedium,
                                         fontWeight = FontWeight.Bold,
-                                        color = OnPrimaryContainerDark,
+                                        color = PrimaryForestDark,
                                         modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                                     )
                                 }
@@ -209,7 +216,7 @@ fun LocationDetailScreen(
                             Text(
                                 text = "📍 ${location.address}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = OnSurfaceVariant
+                                color = OnSurfaceSageMuted
                             )
 
                             if (location.description.isNotBlank()) {
@@ -217,20 +224,20 @@ fun LocationDetailScreen(
                                 Text(
                                     text = location.description,
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = OnSurfaceDark
+                                    color = OnSurfaceForestDark
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(18.dp))
 
                             // Coordinates & Map Direction CTA
                             Card(
-                                shape = RoundedCornerShape(14.dp),
-                                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                                border = BorderStroke(1.dp, OutlineGrey),
+                                shape = RoundedCornerShape(20.dp),
+                                colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+                                border = BorderStroke(1.5.dp, OutlineOrganic),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Column(modifier = Modifier.padding(14.dp)) {
+                                Column(modifier = Modifier.padding(16.dp)) {
                                     Row(
                                         modifier = Modifier.fillMaxWidth(),
                                         horizontalArrangement = Arrangement.SpaceBetween,
@@ -239,33 +246,29 @@ fun LocationDetailScreen(
                                         Text(
                                             text = "Titik Koordinat:",
                                             style = MaterialTheme.typography.labelMedium,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = OnSurfaceDark
+                                            fontWeight = FontWeight.Bold,
+                                            color = OnSurfaceForestDark
                                         )
                                         Text(
                                             text = if (location.coordinatesStatus == CoordinatesStatus.VERIFIED) "✅ Terverifikasi" else "⏳ Belum Valid",
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = if (location.coordinatesStatus == CoordinatesStatus.VERIFIED) PrimaryForest else SecondarySage
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = if (location.coordinatesStatus == CoordinatesStatus.VERIFIED) PrimarySeedlingGreen else SecondarySage
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(4.dp))
                                     Text(
                                         text = "${location.latitude}, ${location.longitude}",
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = OnSurfaceVariant
+                                        color = OnSurfaceSageMuted
                                     )
-                                    Spacer(modifier = Modifier.height(12.dp))
-                                    Button(
+                                    Spacer(modifier = Modifier.height(14.dp))
+                                    TactileButton(
+                                        text = "📍 Petunjuk Arah ke Kebun Ini",
                                         onClick = { launchExternalMap(context, location) },
-                                        shape = RoundedCornerShape(10.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = PrimaryForest,
-                                            contentColor = OnPrimaryWhite
-                                        ),
+                                        style = TactileButtonStyle.PRIMARY,
                                         modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Text("📍 Petunjuk Arah ke Kebun Ini", style = MaterialTheme.typography.labelMedium)
-                                    }
+                                    )
                                 }
                             }
 
@@ -276,7 +279,7 @@ fun LocationDetailScreen(
                                 text = "Koleksi Tanaman di Kebun Ini",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = OnSurfaceDark
+                                color = OnSurfaceForestDark
                             )
                             Spacer(modifier = Modifier.height(12.dp))
 
@@ -286,14 +289,14 @@ fun LocationDetailScreen(
                                         ShimmerBox(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .height(96.dp)
+                                                .height(104.dp)
                                                 .padding(vertical = 4.dp),
-                                            cornerRadius = 16.dp
+                                            cornerRadius = 20.dp
                                         )
                                     }
                                 }
                                 is UiState.Success -> {
-                                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                         plantsState.data.forEach { plant ->
                                             PlantCard(
                                                 plant = plant,
@@ -306,7 +309,7 @@ fun LocationDetailScreen(
                                     Text(
                                         text = plantsState.message,
                                         style = MaterialTheme.typography.bodyMedium,
-                                        color = OnSurfaceVariant,
+                                        color = OnSurfaceSageMuted,
                                         modifier = Modifier.padding(vertical = 12.dp)
                                     )
                                 }
@@ -314,7 +317,7 @@ fun LocationDetailScreen(
                                     Text(
                                         text = plantsState.message,
                                         style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                                        color = OnSurfaceVariant
+                                        color = OnSurfaceSageMuted
                                     )
                                 }
                             }

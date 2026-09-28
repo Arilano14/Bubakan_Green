@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.ui.common.UiState
 import id.bubakangreen.app.ui.components.BubakanTopBar
 import id.bubakangreen.app.ui.components.OfflineStatusBar
@@ -34,15 +33,16 @@ import id.bubakangreen.app.ui.components.PlantCard
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateEmptyView
 import id.bubakangreen.app.ui.components.StateErrorView
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.BackgroundVanilla
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * CatalogScreen (SCR-PUB-04): Botanical catalog with real-time debounced search.
+ * CatalogScreen: Botanical Learning Library of Kelurahan Bubakan.
+ * Duolingo-inspired friendly search and tactile plant discovery.
  */
 @Composable
 fun CatalogScreen(
@@ -62,7 +62,7 @@ fun CatalogScreen(
                 onInfoClick = onInfoClick
             )
         },
-        containerColor = BackgroundLight,
+        containerColor = BackgroundVanilla,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -72,22 +72,22 @@ fun CatalogScreen(
         ) {
             OfflineStatusBar(isOffline = uiState.isOffline)
 
-            // Search Bar Input
+            // Chunky Rounded Search Bar
             OutlinedTextField(
                 value = uiState.searchQuery,
                 onValueChange = { viewModel.onSearchQueryChanged(it) },
                 placeholder = {
                     Text(
-                        text = "Cari nama tanaman, latin, atau khasiat...",
+                        text = "Cari jahe, kunyit, bayam, toga...",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant
+                        color = OnSurfaceSageMuted
                     )
                 },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = "Ikon Cari",
-                        tint = PrimaryForest
+                        tint = PrimarySeedlingGreen
                     )
                 },
                 trailingIcon = {
@@ -95,20 +95,20 @@ fun CatalogScreen(
                         Icon(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = "Hapus Pencarian",
-                            tint = OnSurfaceVariant,
+                            tint = OnSurfaceSageMuted,
                             modifier = Modifier.clickable { viewModel.resetSearch() }
                         )
                     }
                 },
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite,
-                    focusedBorderColor = PrimaryForest,
-                    unfocusedBorderColor = OutlineGrey,
-                    focusedTextColor = OnSurfaceDark,
-                    unfocusedTextColor = OnSurfaceDark
+                    focusedContainerColor = SurfaceCardWhite,
+                    unfocusedContainerColor = SurfaceCardWhite,
+                    focusedBorderColor = PrimarySeedlingGreen,
+                    unfocusedBorderColor = OutlineOrganic,
+                    focusedTextColor = OnSurfaceForestDark,
+                    unfocusedTextColor = OnSurfaceForestDark
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
@@ -128,8 +128,8 @@ fun CatalogScreen(
                             ShimmerBox(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .height(96.dp),
-                                cornerRadius = 16.dp
+                                    .height(104.dp),
+                                cornerRadius = 20.dp
                             )
                         }
                     }
@@ -143,7 +143,7 @@ fun CatalogScreen(
                             end = 16.dp,
                             bottom = 24.dp
                         ),
-                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
                         items(plantsState.data, key = { it.id }) { plant ->
                             PlantCard(
@@ -156,7 +156,7 @@ fun CatalogScreen(
 
                 is UiState.Empty -> {
                     StateEmptyView(
-                        title = "Tidak Ada Tanaman Cocok",
+                        title = "Tanaman Belum Ditemukan",
                         message = plantsState.message,
                         actionLabel = if (uiState.searchQuery.isNotBlank()) "Reset Pencarian" else null,
                         onActionClick = { viewModel.resetSearch() }

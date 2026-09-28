@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,6 +32,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,26 +42,30 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import id.bubakangreen.app.core.audio.AudioState
 import id.bubakangreen.app.ui.common.UiState
+import id.bubakangreen.app.ui.components.BubaMascot
+import id.bubakangreen.app.ui.components.BubaState
 import id.bubakangreen.app.ui.components.BubakanTopBar
 import id.bubakangreen.app.ui.components.MandarinSpeakerButton
 import id.bubakangreen.app.ui.components.OfflineStatusBar
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateEmptyView
 import id.bubakangreen.app.ui.components.StateErrorView
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.AccentDewContainer
+import id.bubakangreen.app.ui.theme.AccentDewTeal
+import id.bubakangreen.app.ui.theme.BackgroundVanilla
+import id.bubakangreen.app.ui.theme.OnDewTealDark
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
+import id.bubakangreen.app.ui.theme.PrimaryForestDark
 import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * PlantDetailScreen (SCR-PUB-05): Authoritative botanical encyclopedia card.
- * Integrates Indonesian common name, italic scientific Latin, Mandarin Hanzi/Pinyin,
- * user-triggered audio pronunciation, and medicinal benefit breakdown.
+ * PlantDetailScreen: Bite-sized Botanical Lesson.
+ * Combines high-resolution photography, scientific Latin binomials,
+ * Mandarin Hanzi/Pinyin with interactive audio listener feedback, and herbal benefits.
  */
 @Composable
 fun PlantDetailScreen(
@@ -94,7 +100,7 @@ fun PlantDetailScreen(
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        containerColor = BackgroundLight,
+        containerColor = BackgroundVanilla,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -116,35 +122,38 @@ fun PlantDetailScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(240.dp),
-                            cornerRadius = 16.dp
+                            cornerRadius = 24.dp
                         )
                         ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(80.dp),
-                            cornerRadius = 16.dp
+                                .height(88.dp),
+                            cornerRadius = 20.dp
                         )
                         ShimmerBox(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(160.dp),
-                            cornerRadius = 16.dp
+                            cornerRadius = 20.dp
                         )
                     }
                 }
 
                 is UiState.Success -> {
                     val plant = plantState.data
+                    val isAudioPlaying = uiState.audioState is AudioState.Playing
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                     ) {
-                        // Hero Photograph (16:10)
+                        // Hero Photograph with rounded bottom corners (16:10)
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .aspectRatio(16f / 10f)
+                                .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                                 .background(PrimaryContainerMint)
                         ) {
                             if (!plant.primaryPhotoUrl.isNullOrBlank()) {
@@ -167,13 +176,14 @@ fun PlantDetailScreen(
                             }
                         }
 
-                        // Botanical Identity & Nomenclature
+                        // Botanical Content Lesson
                         Column(modifier = Modifier.padding(16.dp)) {
+                            // Section 1: Nomenclature Header
                             Text(
                                 text = plant.nameId,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = OnSurfaceDark
+                                color = OnSurfaceForestDark
                             )
 
                             if (plant.nameLatin.isNotBlank()) {
@@ -186,74 +196,35 @@ fun PlantDetailScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(18.dp))
 
-                            // Mandarin Knowledge & Pronunciation Card
+                            // Section 2: Mandarin Discovery Pod (with Audio & Mascot Listener Reaction)
                             if (!plant.nameMandarin.isNullOrBlank() || !plant.pinyin.isNullOrBlank()) {
-                                Card(
-                                    shape = RoundedCornerShape(16.dp),
-                                    colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                                    border = BorderStroke(1.dp, OutlineGrey),
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(16.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column {
-                                            Text(
-                                                text = "Pelafalan Bahasa Mandarin:",
-                                                style = MaterialTheme.typography.labelSmall,
-                                                color = OnSurfaceVariant
-                                            )
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Row(verticalAlignment = Alignment.Bottom) {
-                                                if (!plant.nameMandarin.isNullOrBlank()) {
-                                                    Text(
-                                                        text = plant.nameMandarin,
-                                                        fontSize = 26.sp,
-                                                        fontWeight = FontWeight.Bold,
-                                                        color = PrimaryForest
-                                                    )
-                                                    Spacer(modifier = Modifier.width(8.dp))
-                                                }
-                                                if (!plant.pinyin.isNullOrBlank()) {
-                                                    Text(
-                                                        text = plant.pinyin,
-                                                        style = MaterialTheme.typography.titleSmall,
-                                                        color = SecondarySage
-                                                    )
-                                                }
-                                            }
-                                        }
-
-                                        MandarinSpeakerButton(
-                                            audioState = uiState.audioState,
-                                            onClick = { viewModel.playMandarinAudio() },
-                                            enabled = !plant.mandarinAudioUrl.isNullOrBlank()
-                                        )
-                                    }
-                                }
+                                MandarinDiscoveryPod(
+                                    hanzi = plant.nameMandarin.orEmpty(),
+                                    pinyin = plant.pinyin.orEmpty(),
+                                    audioState = uiState.audioState,
+                                    hasAudio = !plant.mandarinAudioUrl.isNullOrBlank(),
+                                    isAudioPlaying = isAudioPlaying,
+                                    onPlayAudio = { viewModel.playMandarinAudio() }
+                                )
                                 Spacer(modifier = Modifier.height(20.dp))
                             }
 
-                            // Knowledge Section 1: Manfaat & Khasiat
-                            KnowledgeSectionCard(
-                                title = "Khasiat & Manfaat Herbal",
+                            // Section 3: Khasiat & Manfaat Herbal
+                            BotanicalSectionCard(
+                                title = "Khasiat & Manfaat Sehat",
                                 icon = "🌿",
                                 content = plant.description
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Knowledge Section 2: Edukasi Budidaya
-                            KnowledgeSectionCard(
-                                title = "Informasi Budidaya & Tanaman",
+                            // Section 4: Informasi Budidaya di Bubakan
+                            BotanicalSectionCard(
+                                title = "Budidaya di Kebun Bubakan",
                                 icon = "🌱",
-                                content = "Tanaman ini dibudidayakan di kebun percontohan Kelurahan Bubakan sebagai bagian dari program ketahanan pangan mandiri dan apotek hidup keluarga."
+                                content = "Tanaman ini dirawat oleh warga Kelurahan Bubakan sebagai bagian dari program ketahanan pangan mandiri dan apotek hidup keluarga."
                             )
 
                             Spacer(modifier = Modifier.height(32.dp))
@@ -281,37 +252,122 @@ fun PlantDetailScreen(
     }
 }
 
+/**
+ * Mandarin interactive learning pod with Hanzi, Pinyin, audio playback,
+ * and playful listener mascot reaction.
+ */
 @Composable
-private fun KnowledgeSectionCard(
+private fun MandarinDiscoveryPod(
+    hanzi: String,
+    pinyin: String,
+    audioState: AudioState,
+    hasAudio: Boolean,
+    isAudioPlaying: Boolean,
+    onPlayAudio: () -> Unit
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = AccentDewContainer),
+        border = BorderStroke(1.5.dp, AccentDewTeal.copy(alpha = 0.45f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = AccentDewTeal.copy(alpha = 0.15f)
+                ) {
+                    Text(
+                        text = "BELAJAR NAMA MANDARIN",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = OnDewTealDark,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.Bottom) {
+                    if (hanzi.isNotBlank()) {
+                        Text(
+                            text = hanzi,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = OnDewTealDark
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                    }
+                    if (pinyin.isNotBlank()) {
+                        Text(
+                            text = pinyin,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.SemiBold,
+                            color = SecondarySage
+                        )
+                    }
+                }
+            }
+
+            // If audio is playing, companion mascot perks up into listening mode!
+            if (isAudioPlaying) {
+                BubaMascot(
+                    state = BubaState.LISTENING,
+                    size = 56.dp,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+            }
+
+            MandarinSpeakerButton(
+                audioState = audioState,
+                onClick = onPlayAudio,
+                enabled = hasAudio
+            )
+        }
+    }
+}
+
+/**
+ * Tactile botanical lesson content card.
+ */
+@Composable
+private fun BotanicalSectionCard(
     title: String,
     icon: String,
     content: String,
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-        border = BorderStroke(1.dp, OutlineGrey),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = icon, style = MaterialTheme.typography.titleMedium)
-                Spacer(modifier = Modifier.width(8.dp))
+                Text(text = icon, fontSize = 20.sp)
+                Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = OnSurfaceDark
+                    color = OnSurfaceForestDark
                 )
             }
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = content,
                 style = MaterialTheme.typography.bodyLarge,
-                color = OnSurfaceDark,
-                lineHeight = 22.sp
+                color = OnSurfaceForestDark,
+                lineHeight = 24.sp
             )
         }
     }

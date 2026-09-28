@@ -281,11 +281,11 @@ private fun DrawScope.drawFace(
             // Calm sleeping/peaceful curved arches: ^^
             val leftArch = Path().apply {
                 moveTo(centerX - eyeSpacing - 4f * scale, eyeY + 1f * scale)
-                quadraticBezierTo(centerX - eyeSpacing, eyeY - 3f * scale, centerX - eyeSpacing + 4f * scale, eyeY + 1f * scale)
+                quadraticTo(centerX - eyeSpacing, eyeY - 3f * scale, centerX - eyeSpacing + 4f * scale, eyeY + 1f * scale)
             }
             val rightArch = Path().apply {
                 moveTo(centerX + eyeSpacing - 4f * scale, eyeY + 1f * scale)
-                quadraticBezierTo(centerX + eyeSpacing, eyeY - 3f * scale, centerX + eyeSpacing + 4f * scale, eyeY + 1f * scale)
+                quadraticTo(centerX + eyeSpacing, eyeY - 3f * scale, centerX + eyeSpacing + 4f * scale, eyeY + 1f * scale)
             }
             drawPath(leftArch, Color(0xFF0F3B20), style = Stroke(width = 2f * scale, cap = StrokeCap.Round))
             drawPath(rightArch, Color(0xFF0F3B20), style = Stroke(width = 2f * scale, cap = StrokeCap.Round))
@@ -312,7 +312,7 @@ private fun DrawScope.drawFace(
             // Wide happy smile
             val mouthPath = Path().apply {
                 moveTo(centerX - 4.5f * scale, faceY + 6f * scale)
-                quadraticBezierTo(centerX, faceY + 11f * scale, centerX + 4.5f * scale, faceY + 6f * scale)
+                quadraticTo(centerX, faceY + 11f * scale, centerX + 4.5f * scale, faceY + 6f * scale)
             }
             drawPath(mouthPath, Color(0xFF0F3B20), style = Stroke(width = 1.8f * scale, cap = StrokeCap.Round))
         }
@@ -329,7 +329,7 @@ private fun DrawScope.drawFace(
             // Gentle curve smile
             val mouthPath = Path().apply {
                 moveTo(centerX - 3.5f * scale, faceY + 7f * scale)
-                quadraticBezierTo(centerX, faceY + 9.5f * scale, centerX + 3.5f * scale, faceY + 7f * scale)
+                quadraticTo(centerX, faceY + 9.5f * scale, centerX + 3.5f * scale, faceY + 7f * scale)
             }
             drawPath(mouthPath, Color(0xFF0F3B20), style = Stroke(width = 1.6f * scale, cap = StrokeCap.Round))
         }
@@ -339,7 +339,7 @@ private fun DrawScope.drawFace(
 private fun DrawScope.drawEyeArc(centerX: Float, centerY: Float, scale: Float) {
     val path = Path().apply {
         moveTo(centerX - 3f * scale, centerY + 2f * scale)
-        quadraticBezierTo(centerX, centerY - 2.5f * scale, centerX + 3f * scale, centerY + 2f * scale)
+        quadraticTo(centerX, centerY - 2.5f * scale, centerX + 3f * scale, centerY + 2f * scale)
     }
     drawPath(path, Color(0xFF0F3B20), style = Stroke(width = 2f * scale, cap = StrokeCap.Round))
 }
@@ -361,7 +361,7 @@ private fun DrawScope.drawStateAccents(
             // Little sprout hand waving on the right
             val waveHand = Path().apply {
                 moveTo(centerX + 20f * scale, height * 0.52f)
-                quadraticBezierTo(
+                quadraticTo(
                     centerX + 30f * scale,
                     height * 0.44f + (sway * 3f * scale),
                     centerX + 26f * scale,
@@ -377,14 +377,14 @@ private fun DrawScope.drawStateAccents(
             // Left sound ripple
             val leftSound = Path().apply {
                 moveTo(centerX - 24f * scale, audioY - 4f * scale)
-                quadraticBezierTo(centerX - 28f * scale, audioY, centerX - 24f * scale, audioY + 4f * scale)
+                quadraticTo(centerX - 28f * scale, audioY, centerX - 24f * scale, audioY + 4f * scale)
             }
             drawPath(leftSound, rippleColor, style = Stroke(width = 2f * scale, cap = StrokeCap.Round))
 
             // Right sound ripple
             val rightSound = Path().apply {
                 moveTo(centerX + 24f * scale, audioY - 4f * scale)
-                quadraticBezierTo(centerX + 28f * scale, audioY, centerX + 24f * scale, audioY + 4f * scale)
+                quadraticTo(centerX + 28f * scale, audioY, centerX + 24f * scale, audioY + 4f * scale)
             }
             drawPath(rightSound, rippleColor, style = Stroke(width = 2f * scale, cap = StrokeCap.Round))
         }
