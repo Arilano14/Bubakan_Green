@@ -2,6 +2,7 @@ package id.bubakangreen.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,22 +28,26 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.ui.theme.AccentSunnyContainer
+import id.bubakangreen.app.ui.theme.AccentSunnyGold
+import id.bubakangreen.app.ui.theme.OnAccentGoldDark
 import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
 import id.bubakangreen.app.ui.theme.OnPrimaryWhite
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.PrimaryForestDark
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * Botanical card representing a physical community garden in Kelurahan Bubakan.
- * Designed with 16dp rounded corners, flat surface, 1dp outline, and zero drop shadow.
+ * Tactile botanical location card representing a community garden plot in Kelurahan Bubakan.
+ * Designed with 20dp rounded corners, category-based color badges, and clear exploration triggers.
  */
 @Composable
 fun LocationCard(
@@ -52,9 +57,9 @@ fun LocationCard(
     plantCount: Int? = null
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-        border = BorderStroke(1.dp, OutlineGrey),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
@@ -62,11 +67,14 @@ fun LocationCard(
     ) {
         Column {
             // Photo Container (16:9)
+            val isUrbanFarming = location.type == LocationType.URBAN_FARMING
+            val containerColor = if (isUrbanFarming) PrimaryContainerMint else AccentSunnyContainer
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(16f / 9f)
-                    .background(PrimaryContainerMint)
+                    .background(containerColor)
             ) {
                 if (!location.photoUrl.isNullOrBlank()) {
                     AsyncImage(
@@ -77,37 +85,34 @@ fun LocationCard(
                     )
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(PrimaryContainerMint),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = if (location.type == LocationType.URBAN_FARMING) "🌱 Urban Farming" else "🌿 Taman Toga",
+                            text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = PrimaryForest
+                            fontWeight = FontWeight.Bold,
+                            color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
                         )
                     }
                 }
 
-                // Category Badge (Overlay top-left)
-                val (badgeBg, badgeText) = if (location.type == LocationType.URBAN_FARMING) {
-                    PrimaryForest to "Urban Farming"
-                } else {
-                    SecondarySage to "Taman Toga"
-                }
+                // Thematic Category Badge (Overlay top-left)
+                val badgeBg = if (isUrbanFarming) PrimarySeedlingGreen else AccentSunnyGold
+                val badgeTextColor = if (isUrbanFarming) OnPrimaryWhite else Color(0xFF2E1C00)
+                val badgeText = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga"
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(10.dp),
                     color = badgeBg,
                     modifier = Modifier.padding(12.dp)
                 ) {
                     Text(
                         text = badgeText,
                         style = MaterialTheme.typography.labelSmall,
-                        color = OnPrimaryWhite,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        fontWeight = FontWeight.Bold,
+                        color = badgeTextColor,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
                 }
             }
@@ -123,22 +128,23 @@ fun LocationCard(
                         text = location.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = OnSurfaceDark,
+                        color = OnSurfaceForestDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = PrimaryContainerMint.copy(alpha = 0.6f)
+                        shape = RoundedCornerShape(8.dp),
+                        color = PrimaryContainerMint,
+                        border = BorderStroke(1.dp, PrimarySeedlingGreen.copy(alpha = 0.25f))
                     ) {
                         Text(
                             text = "RW ${location.rw}",
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = OnPrimaryContainerDark,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryForestDark,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
                     }
                 }
@@ -148,31 +154,33 @@ fun LocationCard(
                     Text(
                         text = location.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant,
+                        color = OnSurfaceSageMuted,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (plantCount != null) "🌿 $plantCount Koleksi Tanaman" else "📍 ${location.address}",
+                        text = if (plantCount != null) "🌿 $plantCount Tanaman Terdata" else "📍 ${location.address}",
                         style = MaterialTheme.typography.labelSmall,
-                        color = SecondarySage,
+                        fontWeight = FontWeight.Medium,
+                        color = OnSurfaceSageMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     Text(
-                        text = "Lihat Detail →",
+                        text = "Jelajahi Kebun →",
                         style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.SemiBold,
-                        color = PrimaryForest
+                        fontWeight = FontWeight.Bold,
+                        color = PrimarySeedlingGreen,
+                        fontSize = 13.sp
                     )
                 }
             }

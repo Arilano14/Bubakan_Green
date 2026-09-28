@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -30,19 +29,22 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import id.bubakangreen.app.domain.model.MasterPlant
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.AccentDewContainer
+import id.bubakangreen.app.ui.theme.AccentDewTeal
+import id.bubakangreen.app.ui.theme.OnDewTealDark
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
- * Botanical catalog plant card.
- * Prioritizes high-clarity photography, Indonesian common name, and italic Latin binomial name.
+ * Tactile botanical learning card.
+ * Prioritizes playful educational discovery, bilingual taxonomy, and rich botanical photography.
  */
 @Composable
 fun PlantCard(
@@ -51,9 +53,9 @@ fun PlantCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-        border = BorderStroke(1.dp, OutlineGrey),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
@@ -62,14 +64,14 @@ fun PlantCard(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Botanical Photo Thumbnail (1:1 aspect ratio)
+            // Botanical Photo Thumbnail (Rounded 16dp)
             Box(
                 modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(12.dp))
+                    .size(84.dp)
+                    .clip(RoundedCornerShape(16.dp))
                     .background(PrimaryContainerMint),
                 contentAlignment = Alignment.Center
             ) {
@@ -82,13 +84,13 @@ fun PlantCard(
                     )
                 } else {
                     Text(
-                        text = "🌿",
+                        text = "🌱",
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(14.dp))
 
             // Botanical Nomenclature & Details
             Column(
@@ -104,7 +106,7 @@ fun PlantCard(
                         text = plant.nameId,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = OnSurfaceDark,
+                        color = OnSurfaceForestDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
@@ -113,15 +115,16 @@ fun PlantCard(
                     if (!plant.nameMandarin.isNullOrBlank()) {
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
-                            shape = RoundedCornerShape(6.dp),
-                            color = PrimaryContainerMint.copy(alpha = 0.6f)
+                            shape = RoundedCornerShape(8.dp),
+                            color = AccentDewContainer,
+                            border = BorderStroke(1.dp, AccentDewTeal.copy(alpha = 0.3f))
                         ) {
                             Text(
                                 text = plant.nameMandarin,
                                 style = MaterialTheme.typography.labelSmall,
-                                fontWeight = FontWeight.Medium,
-                                color = OnPrimaryContainerDark,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                fontWeight = FontWeight.SemiBold,
+                                color = OnDewTealDark,
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 3.dp)
                             )
                         }
                     }
@@ -133,7 +136,7 @@ fun PlantCard(
                         text = plant.nameLatin,
                         style = MaterialTheme.typography.bodyMedium,
                         fontStyle = FontStyle.Italic,
-                        color = OnSurfaceVariant,
+                        color = OnSurfaceSageMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -144,9 +147,23 @@ fun PlantCard(
                     Text(
                         text = plant.description,
                         style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant,
+                        color = OnSurfaceSageMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Text(
+                        text = "Pelajari →",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimarySeedlingGreen,
+                        fontSize = 12.sp
                     )
                 }
             }

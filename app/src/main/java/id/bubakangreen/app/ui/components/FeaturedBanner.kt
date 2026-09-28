@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -32,18 +31,19 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.ui.theme.AccentSunnyGold
 import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
-import id.bubakangreen.app.ui.theme.OnPrimaryWhite
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.PrimaryForestDark
+import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 
 /**
  * Featured location hero banner displayed on the Home screen.
+ * Highlights Kelurahan Bubakan's flagship garden hubs with tactile presentation.
  */
 @Composable
 fun FeaturedLocationBanner(
@@ -52,9 +52,9 @@ fun FeaturedLocationBanner(
     modifier: Modifier = Modifier
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-        border = BorderStroke(1.dp, OutlineGrey),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()
@@ -84,23 +84,23 @@ fun FeaturedLocationBanner(
                         Text(
                             text = if (location.type == LocationType.URBAN_FARMING) "🌱 Urban Farming" else "🌿 Taman Toga",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            color = PrimaryForest
+                            fontWeight = FontWeight.Bold,
+                            color = PrimarySeedlingGreen
                         )
                     }
                 }
 
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PrimaryForest,
+                    shape = RoundedCornerShape(10.dp),
+                    color = AccentSunnyGold,
                     modifier = Modifier.padding(12.dp)
                 ) {
                     Text(
-                        text = "⭐ LOKASI UNGGULAN",
+                        text = "⭐ KEBUN UNGGULAN",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
-                        color = OnPrimaryWhite,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        color = Color(0xFF2E1C00),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                     )
                 }
             }
@@ -115,22 +115,23 @@ fun FeaturedLocationBanner(
                         text = location.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = OnSurfaceDark,
+                        color = OnSurfaceForestDark,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f, fill = false)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Surface(
-                        shape = RoundedCornerShape(6.dp),
-                        color = PrimaryContainerMint.copy(alpha = 0.6f)
+                        shape = RoundedCornerShape(8.dp),
+                        color = PrimaryContainerMint,
+                        border = BorderStroke(1.dp, PrimarySeedlingGreen.copy(alpha = 0.25f))
                     ) {
                         Text(
                             text = "RW ${location.rw}",
                             style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.SemiBold,
-                            color = OnPrimaryContainerDark,
-                            modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryForestDark,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                         )
                     }
                 }
@@ -140,28 +141,19 @@ fun FeaturedLocationBanner(
                     Text(
                         text = location.description,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant,
+                        color = OnSurfaceSageMuted,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis
                     )
                 }
 
-                Spacer(modifier = Modifier.height(14.dp))
-                Button(
+                Spacer(modifier = Modifier.height(16.dp))
+                TactileButton(
+                    text = "Jelajahi Kebun Ini →",
                     onClick = onClick,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = PrimaryForest,
-                        contentColor = OnPrimaryWhite
-                    ),
+                    style = TactileButtonStyle.PRIMARY,
                     modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Jelajahi Kebun Ini →",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                )
             }
         }
     }
