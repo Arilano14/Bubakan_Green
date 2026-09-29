@@ -56,9 +56,9 @@ fun LocationCard(
     plantCount: Int? = null
 ) {
     Card(
-        shape = RoundedCornerShape(22.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
-        border = BorderStroke(1.5.dp, OutlineOrganic),
+        border = BorderStroke(1.dp, OutlineOrganic),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         modifier = modifier
             .fillMaxWidth()

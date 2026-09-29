@@ -1,9 +1,8 @@
 package id.bubakangreen.app.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,8 +25,12 @@ import id.bubakangreen.app.ui.theme.TextPrimary
 import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
- * MascotCard: Reusable educational card guided by Bubakan Green Mascot.
- * Follows Section 6 (soft rounded surface 20-24dp, 16dp padding, no harsh clipping).
+ * MascotCard: Educational speech card where the mascot breaks out of the frame.
+ * Complies with Section 6:
+ * - Mascot visually floats above surface, tilted -2°
+ * - Subtle native breathing micro-motion
+ * - Card corner radius: 18dp (not over-rounded 24-32dp)
+ * - Zero nested card clutter
  */
 @Composable
 fun MascotCard(
@@ -39,46 +43,62 @@ fun MascotCard(
     borderColor: Color = BorderDivider,
     action: (@Composable () -> Unit)? = null
 ) {
-    Surface(
-        shape = RoundedCornerShape(24.dp),
-        border = BorderStroke(1.5.dp, borderColor),
-        color = containerColor,
-        tonalElevation = 0.dp,
-        modifier = modifier.fillMaxWidth()
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.TopCenter
     ) {
-        Column(
-            modifier = Modifier.padding(20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Friendly learning speech surface
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            border = BorderStroke(1.dp, borderColor),
+            color = containerColor,
+            tonalElevation = 0.dp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = mascotSize * 0.4f)
         ) {
-            Mascot(
-                type = mascotType,
-                size = mascotSize
-            )
+            Column(
+                modifier = Modifier.padding(
+                    start = 18.dp,
+                    top = (mascotSize * 0.45f) + 2.dp,
+                    end = 18.dp,
+                    bottom = 18.dp
+                ),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextPrimary,
+                    textAlign = TextAlign.Center
+                )
 
-            Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
-            Text(
-                text = title,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = TextPrimary
-            )
+                Text(
+                    text = body,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    lineHeight = 21.sp,
+                    color = TextSecondary,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
 
-            Spacer(modifier = Modifier.height(6.dp))
-
-            Text(
-                text = body,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                lineHeight = 20.sp,
-                color = TextSecondary,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            if (action != null) {
-                Spacer(modifier = Modifier.height(16.dp))
-                action()
+                if (action != null) {
+                    Spacer(modifier = Modifier.height(14.dp))
+                    action()
+                }
             }
         }
+
+        // Mascot breaking out of the card composition
+        Mascot(
+            type = mascotType,
+            size = mascotSize,
+            baseRotation = -2f,
+            animateIdle = true
+        )
     }
 }

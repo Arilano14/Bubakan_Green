@@ -3,6 +3,7 @@ package id.bubakangreen.app.ui.home
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,8 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -28,16 +27,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationType
-import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.ui.common.UiState
 import id.bubakangreen.app.ui.components.BubakanTopBar
-import id.bubakangreen.app.ui.components.FeaturedLocationBanner
 import id.bubakangreen.app.ui.components.LocationCard
 import id.bubakangreen.app.ui.components.Mascot
 import id.bubakangreen.app.ui.components.MascotCard
@@ -51,20 +49,22 @@ import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateErrorView
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.MascotYellow
 import id.bubakangreen.app.ui.theme.PrimaryGreen
 import id.bubakangreen.app.ui.theme.PrimaryGreenDark
 import id.bubakangreen.app.ui.theme.PrimaryGreenLight
+import id.bubakangreen.app.ui.theme.Surface
 import id.bubakangreen.app.ui.theme.TextPrimary
 import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
- * HomeScreen: Overhauled Eco-Green Visual Experience with Bubakan Green Mascot.
- * Structure adhering strictly to UX Laws & Specification:
- * 1. Top Hero: "Hai, teman Bubakan! Yuk, kenalan dengan tanaman di sekitar kita 🌱" + Mascot GREETING (180dp)
- * 2. Featured Location: "Urban Farming Bubakan"
- * 3. "Kenalan dengan Tanaman": Horizontal botanical discovery carousel
- * 4. "Jelajah Lokasi": Priority Urban Farming, Taman Toga RW 03, and backend community plots
- * 5. Educational Card: "Tahukah Kamu?" MascotCard with verified botanical facts
+ * HomeScreen: Overhauled Duolingo-inspired Educational Experience for Bubakan Green.
+ * Structure adhering strictly to Section 8 specifications:
+ * 1. Top Hero: Character-led welcome section with Mascot GREETING (~180dp) breaking out, tilted +2°
+ * 2. "Temukan Kebun Bubakan": 2 primary destinations (Urban Farming & Taman Toga)
+ * 3. "Kenalan dengan Tanaman": Horizontal botanical discovery
+ * 4. "Belajar Hari Ini": Small educational section with Mascot THINKING
+ * 5. "Jelajah Lokasi": Balanced community garden exploration without overcrowding
  */
 @Composable
 fun HomeScreen(
@@ -104,62 +104,78 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp, vertical = 12.dp)
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
             ) {
-                // 1. TOP HERO CARD (Section 11)
-                HomeHeroWelcomeCard(
-                    onActionClick = onNavigateToCatalog
+                // 1. TOP HERO: Character-led Welcome Section (Section 8)
+                HomeHeroSection(
+                    onMulaiJelajah = onNavigateToCatalog
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(26.dp))
 
-                // 2. FEATURED LOCATION (Section 11: "Urban Farming Bubakan")
-                when (val featured = uiState.featuredLocations) {
+                // 2. "Temukan Kebun Bubakan": 2 Primary Destinations (Section 8)
+                SectionHeader(
+                    title = "Temukan Kebun Bubakan",
+                    subtitle = "Dua destinasi kebun percontohan utama warga",
+                    actionLabel = "Lihat Semua",
+                    onActionClick = { onNavigateToLocations(null) }
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                when (val locationsState = uiState.featuredLocations) {
                     is UiState.Loading -> {
-                        ShimmerBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(220.dp),
-                            cornerRadius = 20.dp
-                        )
-                    }
-                    is UiState.Success -> {
-                        val featuredLocation = featured.data.find {
-                            it.name.contains("Urban Farming", ignoreCase = true)
-                        } ?: featured.data.firstOrNull()
-
-                        if (featuredLocation != null) {
-                            SectionHeader(
-                                title = "Kebun Unggulan",
-                                subtitle = "Pusat edukasi pertanian perkotaan Bubakan",
-                                actionLabel = "Lihat Semua",
-                                onActionClick = { onNavigateToLocations(null) }
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            ShimmerBox(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(160.dp),
+                                cornerRadius = 18.dp
                             )
-                            Spacer(modifier = Modifier.height(12.dp))
-                            FeaturedLocationBanner(
-                                location = featuredLocation,
-                                onClick = { onLocationClick(featuredLocation.id) }
+                            ShimmerBox(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .height(160.dp),
+                                cornerRadius = 18.dp
                             )
                         }
                     }
+                    is UiState.Success -> {
+                        val allLocations = locationsState.data
+                        val urbanFarming = allLocations.find {
+                            it.name.contains("Urban Farming", ignoreCase = true) || it.type == LocationType.URBAN_FARMING
+                        } ?: allLocations.firstOrNull()
+
+                        val tamanToga = allLocations.find {
+                            it.name.contains("Taman Toga", ignoreCase = true) || it.type == LocationType.TAMAN_TOGA
+                        } ?: allLocations.getOrNull(1)
+
+                        HomeTwoPrimaryDestinations(
+                            urbanFarmingLocation = urbanFarming,
+                            tamanTogaLocation = tamanToga,
+                            onLocationClick = onLocationClick
+                        )
+                    }
                     is UiState.Empty -> {
-                        // Clean empty fallback
+                        // Empty state handled cleanly
                     }
                     is UiState.Error -> {
                         StateErrorView(
-                            message = featured.message,
+                            message = locationsState.message,
                             onRetry = { viewModel.loadData() }
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                // 3. "Kenalan dengan Tanaman" (Section 11: Horizontal card/list)
+                // 3. "Kenalan dengan Tanaman": Horizontal Discovery (Section 8)
                 SectionHeader(
                     title = "Kenalan dengan Tanaman",
-                    subtitle = "Pelajari nama botani, latin, dan manfaat herbalnya",
-                    actionLabel = "Lihat Semua",
+                    subtitle = "Pelajari nama botani, latin, dan khasiat herbalnya",
+                    actionLabel = "Katalog Lengkap",
                     onActionClick = onNavigateToCatalog
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -174,8 +190,8 @@ fun HomeScreen(
                                 ShimmerBox(
                                     modifier = Modifier
                                         .width(200.dp)
-                                        .height(220.dp),
-                                    cornerRadius = 20.dp
+                                        .height(200.dp),
+                                    cornerRadius = 18.dp
                                 )
                             }
                         }
@@ -194,9 +210,7 @@ fun HomeScreen(
                             }
                         }
                     }
-                    is UiState.Empty -> {
-                        // Empty state handled
-                    }
+                    is UiState.Empty -> {}
                     is UiState.Error -> {
                         Text(
                             text = plants.message,
@@ -206,12 +220,37 @@ fun HomeScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(28.dp))
 
-                // 4. "Jelajah Lokasi" (Section 11: Urban Farming, Taman Toga RW 03, other locations)
+                // 4. "Belajar Hari Ini": Small Educational Section (Section 8)
+                SectionHeader(
+                    title = "Belajar Hari Ini",
+                    subtitle = "Wawasan edukasi pertanian organik ramah lingkungan"
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                MascotCard(
+                    title = "Tahukah Kamu?",
+                    body = "Kangkung, bayam, dan aneka tanaman toga di kebun Bubakan dirawat dengan metode organik ramah lingkungan tanpa pestisida kimia sintetis.",
+                    mascotType = MascotType.THINKING,
+                    mascotSize = 140.dp,
+                    containerColor = Surface,
+                    borderColor = BorderDivider,
+                    action = {
+                        SecondaryButton(
+                            text = "Jelajahi Katalog Tanaman 🌿",
+                            onClick = onNavigateToCatalog,
+                            height = 48.dp
+                        )
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // 5. "Jelajah Lokasi": Balanced list of community plots without overcrowding (Section 8)
                 SectionHeader(
                     title = "Jelajah Lokasi",
-                    subtitle = "Kunjungi kebun binaan warga di wilayah RW Bubakan",
+                    subtitle = "Petak kebun binaan warga di wilayah RW Bubakan",
                     actionLabel = "Peta Kebun",
                     onActionClick = { onNavigateToLocations(null) }
                 )
@@ -225,19 +264,18 @@ fun HomeScreen(
                                     .fillMaxWidth()
                                     .height(180.dp)
                                     .padding(vertical = 4.dp),
-                                cornerRadius = 20.dp
+                                cornerRadius = 18.dp
                             )
                         }
                     }
                     is UiState.Success -> {
-                        // Prioritize Urban Farming and Taman Toga RW 03, then others
-                        val sortedLocations = locations.data.sortedWith(
-                            compareByDescending<Location> { it.name.contains("Urban Farming", ignoreCase = true) }
-                                .thenByDescending { it.rw == "03" || it.name.contains("RW 03", ignoreCase = true) }
-                        )
+                        val otherLocations = locations.data.filter { loc ->
+                            !loc.name.contains("Urban Farming Kelurahan", ignoreCase = true) &&
+                            !loc.name.contains("Taman Toga RW 03", ignoreCase = true)
+                        }.ifEmpty { locations.data }
 
                         Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                            sortedLocations.take(3).forEach { location ->
+                            otherLocations.take(2).forEach { location ->
                                 LocationCard(
                                     location = location,
                                     onClick = { onLocationClick(location.id) }
@@ -245,32 +283,9 @@ fun HomeScreen(
                             }
                         }
                     }
-                    is UiState.Empty -> {
-                        // Clean empty
-                    }
-                    is UiState.Error -> {
-                        // Already surfaced in featured
-                    }
+                    is UiState.Empty -> {}
+                    is UiState.Error -> {}
                 }
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                // 5. EDUCATIONAL CARD: "Tahukah Kamu?" (Section 13)
-                MascotCard(
-                    title = "Tahukah Kamu?",
-                    body = "Kangkung, bayam, dan aneka tanaman toga di kebun Bubakan dirawat dengan metode organik ramah lingkungan tanpa pestisida kimia sintetis.",
-                    mascotType = MascotType.THINKING,
-                    mascotSize = 140.dp,
-                    containerColor = id.bubakangreen.app.ui.theme.Surface,
-                    borderColor = BorderDivider,
-                    action = {
-                        SecondaryButton(
-                            text = "Jelajahi Katalog Tanaman 🌿",
-                            onClick = onNavigateToCatalog,
-                            height = 48.dp
-                        )
-                    }
-                )
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -279,36 +294,38 @@ fun HomeScreen(
 }
 
 /**
- * Top Hero Welcome Card complying with Section 11 specifications:
- * Rounded 24dp, warm background, green accents, MascotType.GREETING (180dp).
+ * Section 8 Top Hero Section:
+ * Character-led welcome layout where the mascot visually breaks out of the card.
  */
 @Composable
-private fun HomeHeroWelcomeCard(
-    onActionClick: () -> Unit
+private fun HomeHeroSection(
+    onMulaiJelajah: () -> Unit
 ) {
-    Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = id.bubakangreen.app.ui.theme.Surface),
-        border = BorderStroke(1.5.dp, BorderDivider),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+    Box(
         modifier = Modifier.fillMaxWidth()
     ) {
-        Row(
+        // Welcoming Card surface
+        Surface(
+            shape = RoundedCornerShape(20.dp),
+            color = Surface,
+            border = BorderStroke(1.dp, BorderDivider),
+            tonalElevation = 0.dp,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 18.dp, top = 16.dp, end = 10.dp, bottom = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(top = 18.dp)
         ) {
             Column(
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 18.dp, top = 20.dp, end = 120.dp, bottom = 20.dp)
             ) {
                 Surface(
                     shape = RoundedCornerShape(8.dp),
                     color = PrimaryGreenLight,
-                    border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.35f))
+                    border = BorderStroke(0.8.dp, PrimaryGreen.copy(alpha = 0.35f))
                 ) {
                     Text(
-                        text = "BUBAKAN GREEN",
+                        text = "🌱 KELURAHAN BUBAKAN",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.ExtraBold,
                         color = PrimaryGreenDark,
@@ -317,18 +334,18 @@ private fun HomeHeroWelcomeCard(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
                     text = "Hai, teman Bubakan!",
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary,
-                    fontSize = 20.sp,
-                    lineHeight = 24.sp
+                    fontSize = 22.sp,
+                    lineHeight = 28.sp
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
                     text = "Yuk, kenalan dengan\ntanaman di sekitar kita 🌱",
@@ -338,24 +355,126 @@ private fun HomeHeroWelcomeCard(
                     lineHeight = 20.sp
                 )
 
-                Spacer(modifier = Modifier.height(14.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 PrimaryButton(
-                    text = "Mulai Belajar →",
-                    onClick = onActionClick,
-                    height = 48.dp,
+                    text = "Mulai Jelajah →",
+                    onClick = onMulaiJelajah,
+                    height = 50.dp,
                     shapeRadius = 14.dp,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        }
 
-            Spacer(modifier = Modifier.width(6.dp))
-
+        // Mascot GREETING (~180dp) breaking out of the card composition at top right
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 4.dp)
+        ) {
             Mascot(
                 type = MascotType.GREETING,
-                size = 170.dp,
-                modifier = Modifier.padding(vertical = 4.dp)
+                size = 180.dp,
+                baseRotation = 2f,
+                animateIdle = true
             )
+        }
+    }
+}
+
+/**
+ * Section 8 Two Primary Destinations:
+ * Strong solid color-blocked destinations for Urban Farming and Taman Toga.
+ */
+@Composable
+private fun HomeTwoPrimaryDestinations(
+    urbanFarmingLocation: Location?,
+    tamanTogaLocation: Location?,
+    onLocationClick: (String) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        // Destination 1: Urban Farming
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            color = PrimaryGreenLight,
+            border = BorderStroke(1.5.dp, PrimaryGreen.copy(alpha = 0.6f)),
+            tonalElevation = 0.dp,
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    urbanFarmingLocation?.let { onLocationClick(it.id) }
+                }
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(text = "🌱", fontSize = 28.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Urban Farming",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = PrimaryGreenDark
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "RW 01 • Budidaya Sayuran & Pangan",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    lineHeight = 16.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Kunjungi Kebun →",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = PrimaryGreenDark
+                )
+            }
+        }
+
+        // Destination 2: Taman Toga
+        Surface(
+            shape = RoundedCornerShape(18.dp),
+            color = Color(0xFFFFF5D6), // Sunny botanical container
+            border = BorderStroke(1.5.dp, MascotYellow.copy(alpha = 0.8f)),
+            tonalElevation = 0.dp,
+            modifier = Modifier
+                .weight(1f)
+                .clickable {
+                    tamanTogaLocation?.let { onLocationClick(it.id) }
+                }
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(text = "🌿", fontSize = 28.sp)
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Taman Toga",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF5A4400)
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "RW 03 • Herbal & Obat Keluarga",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = TextSecondary,
+                    lineHeight = 16.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = "Kunjungi Kebun →",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = Color(0xFF5A4400)
+                )
+            }
         }
     }
 }

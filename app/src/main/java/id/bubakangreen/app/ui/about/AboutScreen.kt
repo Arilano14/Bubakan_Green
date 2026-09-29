@@ -178,7 +178,7 @@ fun AboutScreen(
                         }
 
                         Mascot(
-                            type = MascotType.POINTING,
+                            type = MascotType.CTA_PROCESS,
                             size = 100.dp,
                             modifier = Modifier.padding(start = 8.dp)
                         )

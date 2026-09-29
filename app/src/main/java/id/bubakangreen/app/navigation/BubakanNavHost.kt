@@ -22,6 +22,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -55,11 +57,12 @@ import id.bubakangreen.app.ui.pic.PicDashboardScreen
 import id.bubakangreen.app.ui.pic.PicDashboardViewModel
 import id.bubakangreen.app.ui.pic.PlantFormScreen
 import id.bubakangreen.app.ui.pic.PlantFormViewModel
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
-import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.PrimaryGreen
+import id.bubakangreen.app.ui.theme.PrimaryGreenDark
+import id.bubakangreen.app.ui.theme.PrimaryGreenLight
+import id.bubakangreen.app.ui.theme.Surface
+import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
  * Main application navigation shell.
@@ -74,6 +77,8 @@ fun BubakanAppNavHost(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
     val context = LocalContext.current
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val rootRoutes = listOf(
         Screen.Home.route,
@@ -86,13 +91,12 @@ fun BubakanAppNavHost(
         bottomBar = {
             if (showBottomBar) {
                 androidx.compose.material3.Surface(
-                    shape = androidx.compose.foundation.shape.RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
-                    border = BorderStroke(1.5.dp, id.bubakangreen.app.ui.theme.OutlineOrganic),
-                    color = id.bubakangreen.app.ui.theme.SurfaceCardWhite,
+                    border = BorderStroke(0.8.dp, BorderDivider),
+                    color = Surface,
                     tonalElevation = 0.dp
                 ) {
                     NavigationBar(
-                        containerColor = id.bubakangreen.app.ui.theme.SurfaceCardWhite,
+                        containerColor = Surface,
                         tonalElevation = 0.dp
                     ) {
                         bottomNavigationItems.forEach { item ->
@@ -100,12 +104,29 @@ fun BubakanAppNavHost(
                             NavigationBarItem(
                                 selected = isSelected,
                                 onClick = {
-                                    navController.navigate(item.screen.route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
+                                    keyboardController?.hide()
+                                    focusManager.clearFocus()
+                                    val destination = item.screen.route
+                                    if (currentDestination?.route != destination) {
+                                        if (destination == Screen.Home.route) {
+                                            val popped = navController.popBackStack(Screen.Home.route, inclusive = false)
+                                            if (!popped) {
+                                                navController.navigate(Screen.Home.route) {
+                                                    popUpTo(navController.graph.findStartDestination().id) {
+                                                        inclusive = false
+                                                    }
+                                                    launchSingleTop = true
+                                                }
+                                            }
+                                        } else {
+                                            navController.navigate(destination) {
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
                                     }
                                 },
                                 icon = {
@@ -128,11 +149,11 @@ fun BubakanAppNavHost(
                                     )
                                 },
                                 colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = id.bubakangreen.app.ui.theme.PrimarySeedlingGreen,
-                                    selectedTextColor = id.bubakangreen.app.ui.theme.PrimarySeedlingGreen,
-                                    indicatorColor = id.bubakangreen.app.ui.theme.PrimaryContainerMint,
-                                    unselectedIconColor = id.bubakangreen.app.ui.theme.OnSurfaceSageMuted,
-                                    unselectedTextColor = id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+                                    selectedIconColor = PrimaryGreenDark,
+                                    selectedTextColor = PrimaryGreenDark,
+                                    indicatorColor = PrimaryGreenLight,
+                                    unselectedIconColor = TextSecondary,
+                                    unselectedTextColor = TextSecondary
                                 )
                             )
                         }
@@ -157,10 +178,26 @@ fun BubakanAppNavHost(
                         navController.navigate(Screen.PlantDetail.createRoute(plantId))
                     },
                     onNavigateToLocations = {
-                        navController.navigate(Screen.Locations.route)
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        navController.navigate(Screen.Locations.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     },
                     onNavigateToCatalog = {
-                        navController.navigate(Screen.Catalog.route)
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        navController.navigate(Screen.Catalog.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                     },
                     onInfoClick = {
                         navController.navigate(Screen.About.route)

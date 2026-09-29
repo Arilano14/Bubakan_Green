@@ -222,12 +222,12 @@ fun PlantDetailScreen(
                                 Spacer(modifier = Modifier.height(20.dp))
                             }
 
-                            // 4. "Kenalan lebih dekat 🌱" (Section 12: Educational content with Mascot LEARNING 160dp)
-                            Card(
-                                shape = RoundedCornerShape(24.dp),
-                                colors = CardDefaults.cardColors(containerColor = id.bubakangreen.app.ui.theme.Surface),
-                                border = BorderStroke(1.5.dp, BorderDivider),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                            // 4. "Kenalan lebih dekat 🌱" (Section 9: Educational content with Mascot LEARNING 160dp)
+                            Surface(
+                                shape = RoundedCornerShape(18.dp),
+                                color = id.bubakangreen.app.ui.theme.Surface,
+                                border = BorderStroke(1.dp, BorderDivider),
+                                tonalElevation = 0.dp,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(modifier = Modifier.padding(18.dp)) {
@@ -252,12 +252,16 @@ fun PlantDetailScreen(
                                             )
                                         }
 
-                                        // Companion Mascot LEARNING (160dp)
-                                        Mascot(
-                                            type = MascotType.LEARNING,
-                                            size = 140.dp,
-                                            modifier = Modifier.padding(start = 8.dp)
-                                        )
+                                        // Companion Mascot LEARNING (160dp) - hidden when success state shows to keep single mascot rule
+                                        if (!isLessonCompleted) {
+                                            Mascot(
+                                                type = MascotType.LEARNING,
+                                                size = 160.dp,
+                                                baseRotation = 2f,
+                                                animateIdle = true,
+                                                modifier = Modifier.padding(start = 8.dp)
+                                            )
+                                        }
                                     }
 
                                     Spacer(modifier = Modifier.height(14.dp))
@@ -276,11 +280,11 @@ fun PlantDetailScreen(
                             Spacer(modifier = Modifier.height(20.dp))
 
                             // 5. GARDEN PRESENCE IN BUBAKAN
-                            Card(
-                                shape = RoundedCornerShape(20.dp),
-                                colors = CardDefaults.cardColors(containerColor = PrimaryGreenLight.copy(alpha = 0.5f)),
-                                border = BorderStroke(1.5.dp, PrimaryGreen.copy(alpha = 0.3f)),
-                                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                            Surface(
+                                shape = RoundedCornerShape(18.dp),
+                                color = PrimaryGreenLight.copy(alpha = 0.5f),
+                                border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.35f)),
+                                tonalElevation = 0.dp,
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Row(
@@ -293,7 +297,7 @@ fun PlantDetailScreen(
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column {
                                         Text(
-                                            text = "Lokasi di Kebun Bubakan",
+                                            text = "Di mana kamu bisa menemukannya?",
                                             style = MaterialTheme.typography.titleSmall,
                                             fontWeight = FontWeight.Bold,
                                             color = PrimaryGreenDark
@@ -310,13 +314,13 @@ fun PlantDetailScreen(
 
                             Spacer(modifier = Modifier.height(24.dp))
 
-                            // 6. SUCCESS STATE (Section 14: Mascot HAPPY 200dp, green dominant, no gamification)
+                            // 6. SUCCESS STATE (Section 9: Mascot HAPPY 200dp, green dominant, single mascot in viewport)
                             if (isLessonCompleted) {
-                                Card(
-                                    shape = RoundedCornerShape(24.dp),
-                                    colors = CardDefaults.cardColors(containerColor = PrimaryGreenLight),
-                                    border = BorderStroke(2.dp, PrimaryGreen),
-                                    elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                                Surface(
+                                    shape = RoundedCornerShape(18.dp),
+                                    color = PrimaryGreenLight,
+                                    border = BorderStroke(1.5.dp, PrimaryGreen),
+                                    tonalElevation = 0.dp,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
                                     Column(
@@ -327,7 +331,8 @@ fun PlantDetailScreen(
                                     ) {
                                         Mascot(
                                             type = MascotType.HAPPY,
-                                            size = 200.dp
+                                            size = 200.dp,
+                                            animateIdle = true
                                         )
 
                                         Spacer(modifier = Modifier.height(16.dp))

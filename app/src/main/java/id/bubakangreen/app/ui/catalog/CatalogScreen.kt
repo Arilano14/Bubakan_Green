@@ -75,6 +75,9 @@ fun CatalogScreen(
         ) {
             OfflineStatusBar(isOffline = uiState.isOffline)
 
+            val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+            val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+
             // Search Bar with rounded 18dp shape
             OutlinedTextField(
                 value = uiState.searchQuery,
@@ -99,11 +102,24 @@ fun CatalogScreen(
                             imageVector = Icons.Outlined.Close,
                             contentDescription = "Hapus Pencarian",
                             tint = TextSecondary,
-                            modifier = Modifier.clickable { viewModel.resetSearch() }
+                            modifier = Modifier.clickable {
+                                viewModel.resetSearch()
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                            }
                         )
                     }
                 },
                 singleLine = true,
+                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                    imeAction = androidx.compose.ui.text.input.ImeAction.Search
+                ),
+                keyboardActions = androidx.compose.foundation.text.KeyboardActions(
+                    onSearch = {
+                        focusManager.clearFocus()
+                        keyboardController?.hide()
+                    }
+                ),
                 shape = RoundedCornerShape(18.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedContainerColor = Surface,

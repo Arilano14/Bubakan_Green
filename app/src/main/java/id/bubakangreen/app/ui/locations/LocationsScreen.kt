@@ -208,11 +208,101 @@ fun LocationsScreen(
                             ),
                             verticalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
-                            items(locationsState.data, key = { it.id }) { location ->
-                                LocationCard(
-                                    location = location,
-                                    onClick = { onLocationClick(location.id) }
-                                )
+                            // Section 10: Mascot Guide Banner (size 96dp)
+                            item {
+                                Surface(
+                                    shape = RoundedCornerShape(18.dp),
+                                    color = id.bubakangreen.app.ui.theme.Surface,
+                                    border = BorderStroke(1.dp, id.bubakangreen.app.ui.theme.BorderDivider),
+                                    tonalElevation = 0.dp,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(14.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        id.bubakangreen.app.ui.components.Mascot(
+                                            type = id.bubakangreen.app.ui.components.MascotType.POINTING,
+                                            size = 96.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = "Panduan Jelajah Kebun",
+                                                style = MaterialTheme.typography.titleSmall,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = id.bubakangreen.app.ui.theme.PrimaryGreenDark
+                                            )
+                                            Spacer(modifier = Modifier.height(3.dp))
+                                            Text(
+                                                text = "Kunjungi petak kebun binaan warga Bubakan untuk melihat langsung budidaya sayuran segar dan konservasi herbal keluarga.",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = id.bubakangreen.app.ui.theme.TextSecondary,
+                                                lineHeight = 17.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (uiState.selectedType == null) {
+                                val urbanFarmingList = locationsState.data.filter { it.type == LocationType.URBAN_FARMING }
+                                val tamanTogaList = locationsState.data.filter { it.type == LocationType.TAMAN_TOGA }
+
+                                if (urbanFarmingList.isNotEmpty()) {
+                                    item {
+                                        Column(modifier = Modifier.padding(top = 4.dp)) {
+                                            Text(
+                                                text = "🌱 KEBUN URBAN FARMING",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = id.bubakangreen.app.ui.theme.PrimaryGreenDark
+                                            )
+                                            Text(
+                                                text = "Budidaya sayur-mayur dan ketahanan pangan mandiri",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = id.bubakangreen.app.ui.theme.TextSecondary
+                                            )
+                                        }
+                                    }
+                                    items(urbanFarmingList, key = { it.id }) { location ->
+                                        LocationCard(
+                                            location = location,
+                                            onClick = { onLocationClick(location.id) }
+                                        )
+                                    }
+                                }
+
+                                if (tamanTogaList.isNotEmpty()) {
+                                    item {
+                                        Column(modifier = Modifier.padding(top = 10.dp)) {
+                                            Text(
+                                                text = "🌿 TAMAN TOGA & HERBAL",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                fontWeight = FontWeight.ExtraBold,
+                                                color = Color(0xFF5A4400)
+                                            )
+                                            Text(
+                                                text = "Konservasi tanaman obat keluarga dan apotek hidup warga",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = id.bubakangreen.app.ui.theme.TextSecondary
+                                            )
+                                        }
+                                    }
+                                    items(tamanTogaList, key = { it.id }) { location ->
+                                        LocationCard(
+                                            location = location,
+                                            onClick = { onLocationClick(location.id) }
+                                        )
+                                    }
+                                }
+                            } else {
+                                items(locationsState.data, key = { it.id }) { location ->
+                                    LocationCard(
+                                        location = location,
+                                        onClick = { onLocationClick(location.id) }
+                                    )
+                                }
                             }
                         }
                     } else {
