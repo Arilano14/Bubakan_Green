@@ -345,7 +345,7 @@ private fun HomeHeroWelcomeCard(
                     onClick = onActionClick,
                     height = 48.dp,
                     shapeRadius = 14.dp,
-                    modifier = Modifier.fillMaxWidth(0.92f)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
@@ -353,7 +353,7 @@ private fun HomeHeroWelcomeCard(
 
             Mascot(
                 type = MascotType.GREETING,
-                size = 180.dp,
+                size = 170.dp,
                 modifier = Modifier.padding(vertical = 4.dp)
             )
         }

@@ -55,6 +55,7 @@ fun PrimaryButton(
             pressedElevation = 0.dp,
             disabledElevation = 0.dp
         ),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 0.dp),
         modifier = modifier
             .fillMaxWidth()
             .height(height)
@@ -79,7 +80,8 @@ fun PrimaryButton(
                     text = text,
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
-                    fontSize = 15.sp
+                    fontSize = 14.sp,
+                    maxLines = 1
                 )
             }
         }
