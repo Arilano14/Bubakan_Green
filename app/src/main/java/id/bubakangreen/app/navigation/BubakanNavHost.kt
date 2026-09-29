@@ -108,24 +108,12 @@ fun BubakanAppNavHost(
                                     focusManager.clearFocus()
                                     val destination = item.screen.route
                                     if (currentDestination?.route != destination) {
-                                        if (destination == Screen.Home.route) {
-                                            val popped = navController.popBackStack(Screen.Home.route, inclusive = false)
-                                            if (!popped) {
-                                                navController.navigate(Screen.Home.route) {
-                                                    popUpTo(navController.graph.findStartDestination().id) {
-                                                        inclusive = false
-                                                    }
-                                                    launchSingleTop = true
-                                                }
+                                        navController.navigate(destination) {
+                                            popUpTo(navController.graph.findStartDestination().id) {
+                                                saveState = true
                                             }
-                                        } else {
-                                            navController.navigate(destination) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
                                     }
                                 },

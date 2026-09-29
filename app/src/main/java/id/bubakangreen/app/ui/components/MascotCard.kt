@@ -60,7 +60,7 @@ fun MascotCard(
             Column(
                 modifier = Modifier.padding(
                     start = 18.dp,
-                    top = (mascotSize * 0.45f) + 2.dp,
+                    top = (mascotSize * 0.65f) + 6.dp,
                     end = 18.dp,
                     bottom = 18.dp
                 ),
