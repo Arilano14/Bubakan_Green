@@ -27,7 +27,7 @@ data class LocationsUiState(
     val isOffline: Boolean = false
 )
 
-class LocationsViewModel(
+class LocationsViewModel @JvmOverloads constructor(
     private val locationRepository: LocationRepository = RepositoryProvider.getLocationRepository()
 ) : ViewModel() {
 

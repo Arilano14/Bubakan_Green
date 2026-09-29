@@ -26,7 +26,7 @@ data class PlantDetailUiState(
     val isOffline: Boolean = false
 )
 
-class PlantDetailViewModel(
+class PlantDetailViewModel @JvmOverloads constructor(
     application: Application,
     private val plantRepository: PlantRepository = RepositoryProvider.getPlantRepository(),
     private val locationRepository: LocationRepository = RepositoryProvider.getLocationRepository(),

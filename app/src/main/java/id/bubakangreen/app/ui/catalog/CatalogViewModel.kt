@@ -23,7 +23,7 @@ data class CatalogUiState(
 )
 
 @OptIn(FlowPreview::class)
-class CatalogViewModel(
+class CatalogViewModel @JvmOverloads constructor(
     private val plantRepository: PlantRepository = RepositoryProvider.getPlantRepository()
 ) : ViewModel() {
 

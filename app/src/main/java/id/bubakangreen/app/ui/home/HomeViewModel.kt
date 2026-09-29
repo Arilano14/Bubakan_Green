@@ -21,7 +21,7 @@ data class HomeUiState(
     val isOffline: Boolean = false
 )
 
-class HomeViewModel(
+class HomeViewModel @JvmOverloads constructor(
     private val locationRepository: LocationRepository = RepositoryProvider.getLocationRepository(),
     private val plantRepository: PlantRepository = RepositoryProvider.getPlantRepository()
 ) : ViewModel() {

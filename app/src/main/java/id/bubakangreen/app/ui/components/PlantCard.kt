@@ -190,3 +190,97 @@ fun PlantCard(
         }
     }
 }
+
+/**
+ * Horizontal variant for carousel discovery in HomeScreen.
+ * Follows Section 11 (horizontal card/list, rounded 20dp, stable keys).
+ */
+@Composable
+fun PlantHorizontalCard(
+    plant: MasterPlant,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = id.bubakangreen.app.ui.theme.Surface),
+        border = BorderStroke(1.5.dp, id.bubakangreen.app.ui.theme.BorderDivider),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = modifier
+            .width(200.dp)
+            .clickable(onClick = onClick)
+    ) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(116.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(id.bubakangreen.app.ui.theme.PrimaryGreenLight),
+                contentAlignment = Alignment.Center
+            ) {
+                if (!plant.primaryPhotoUrl.isNullOrBlank()) {
+                    AsyncImage(
+                        model = plant.primaryPhotoUrl,
+                        contentDescription = "Foto tanaman ${plant.nameId}",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    Text(
+                        text = "🌱",
+                        style = MaterialTheme.typography.displaySmall
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = plant.nameId,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = id.bubakangreen.app.ui.theme.TextPrimary,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            if (plant.nameLatin.isNotBlank()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = plant.nameLatin,
+                    style = MaterialTheme.typography.bodySmall,
+                    fontStyle = FontStyle.Italic,
+                    color = id.bubakangreen.app.ui.theme.TextSecondary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(6.dp),
+                    color = id.bubakangreen.app.ui.theme.PrimaryGreenLight
+                ) {
+                    Text(
+                        text = "BOTANI",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = id.bubakangreen.app.ui.theme.PrimaryGreenDark,
+                        fontSize = 9.sp,
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                    )
+                }
+                Text(
+                    text = "Pelajari →",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = id.bubakangreen.app.ui.theme.PrimaryGreen,
+                    fontSize = 12.sp
+                )
+            }
+        }
+    }
+}
+
