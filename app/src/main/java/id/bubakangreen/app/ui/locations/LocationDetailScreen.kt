@@ -95,7 +95,7 @@ fun LocationDetailScreen(
                 onInfoClick = onInfoClick
             )
         },
-        containerColor = BackgroundVanilla,
+        containerColor = id.bubakangreen.app.ui.theme.BackgroundWarm,
         modifier = modifier
     ) { paddingValues ->
         Column(

@@ -29,14 +29,17 @@ import id.bubakangreen.app.ui.theme.TextSecondary
 fun SectionHeader(
     title: String,
     subtitle: String? = null,
+    actionLabel: String? = null,
     actionText: String? = null,
     onActionClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
+    val effectiveAction = actionLabel ?: actionText
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 6.dp),
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -57,9 +60,9 @@ fun SectionHeader(
             }
         }
 
-        if (!actionText.isNullOrBlank() && onActionClick != null) {
+        if (!effectiveAction.isNullOrBlank() && onActionClick != null) {
             Text(
-                text = actionText,
+                text = effectiveAction,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = PrimaryGreen,

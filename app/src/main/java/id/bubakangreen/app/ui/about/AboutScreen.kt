@@ -1,7 +1,7 @@
 package id.bubakangreen.app.ui.about
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,25 +25,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.bubakangreen.app.ui.components.BubakanTopBar
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.OnPrimaryContainerDark
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
-import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.components.Mascot
+import id.bubakangreen.app.ui.components.MascotType
+import id.bubakangreen.app.ui.theme.BackgroundWarm
+import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.PrimaryGreen
+import id.bubakangreen.app.ui.theme.PrimaryGreenDark
+import id.bubakangreen.app.ui.theme.PrimaryGreenLight
+import id.bubakangreen.app.ui.theme.Surface
+import id.bubakangreen.app.ui.theme.TextPrimary
+import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
- * AboutScreen (SCR-PUB-06): Official information profile of the Bubakan Green program.
- * Outlines the civic vision, QR code physical scanning guide, and product identity.
+ * AboutScreen: Profil Resmi Program Bubakan Green.
+ * Features civic vision, mascot identity, and QR scanning guide with Mascot POINTING.
  */
 @Composable
 fun AboutScreen(
@@ -61,7 +61,7 @@ fun AboutScreen(
                 onNavigateBack = onNavigateBack
             )
         },
-        containerColor = BackgroundLight,
+        containerColor = BackgroundWarm,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -71,34 +71,30 @@ fun AboutScreen(
                 .verticalScroll(scrollState)
                 .padding(16.dp)
         ) {
-            // Header Identity Card
+            // Header Identity Card with Mascot
             Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, OutlineGrey),
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                border = BorderStroke(1.5.dp, BorderDivider),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(64.dp)
-                            .clip(CircleShape)
-                            .background(PrimaryContainerMint),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(text = "🌱", style = MaterialTheme.typography.headlineLarge)
-                    }
+                    Mascot(
+                        type = MascotType.DEFAULT,
+                        size = 120.dp
+                    )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     Text(
                         text = "BUBAKAN GREEN",
                         style = MaterialTheme.typography.headlineSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = PrimaryForest
+                        fontWeight = FontWeight.ExtraBold,
+                        color = PrimaryGreenDark
                     )
 
                     Spacer(modifier = Modifier.height(4.dp))
@@ -107,7 +103,7 @@ fun AboutScreen(
                         text = "Sistem Informasi Urban Farming & Taman Toga",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.SemiBold,
-                        color = OnSurfaceDark,
+                        color = TextPrimary,
                         textAlign = TextAlign.Center
                     )
 
@@ -116,33 +112,34 @@ fun AboutScreen(
                     Text(
                         text = "Kelurahan Bubakan, Kecamatan Mijen\nKota Semarang",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceVariant,
+                        color = TextSecondary,
                         textAlign = TextAlign.Center
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             // Vision & Civic Goals
             Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, OutlineGrey),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                border = BorderStroke(1.5.dp, BorderDivider),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
+                Column(modifier = Modifier.padding(18.dp)) {
                     Text(
                         text = "Latar Belakang & Tujuan",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = OnSurfaceDark
+                        color = TextPrimary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = "Program BUBAKAN GREEN digagas sebagai platform digital untuk mendokumentasikan, mengedukasi, dan mempromosikan inisiatif pertanian perkotaan (Urban Farming) dan taman tanaman obat keluarga (Taman Toga) yang dikelola oleh warga di lingkungan rukun warga (RW) se-Kelurahan Bubakan.",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = OnSurfaceDark,
+                        color = TextPrimary,
                         lineHeight = 22.sp
                     )
                 }
@@ -150,26 +147,49 @@ fun AboutScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // QR Scanning Instructions
+            // QR Scanning Instructions with Mascot POINTING (Section 16)
             Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                border = BorderStroke(1.dp, OutlineGrey),
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                border = BorderStroke(1.5.dp, BorderDivider),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        text = "Panduan Memindai Stiker QR di Kebun",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = OnSurfaceDark
-                    )
-                    Spacer(modifier = Modifier.height(12.dp))
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "Panduan Memindai QR di Kebun",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = TextPrimary
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Arahkan kamera ke QR tanaman",
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.SemiBold,
+                                color = PrimaryGreenDark
+                            )
+                        }
+
+                        Mascot(
+                            type = MascotType.POINTING,
+                            size = 100.dp,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(14.dp))
 
                     QrStepItem(
                         number = "1",
                         title = "Buka Kamera HP atau Google Lens",
-                        description = "Gunakan aplikasi kamera bawaan smartphone Anda tanpa perlu memasang aplikasi pemindai tambahan."
+                        description = "Gunakan aplikasi kamera bawaan smartphone Anda tanpa perlu memasang aplikasi tambahan."
                     )
                     Spacer(modifier = Modifier.height(10.dp))
                     QrStepItem(
@@ -181,14 +201,14 @@ fun AboutScreen(
                     QrStepItem(
                         number = "3",
                         title = "Akses Pengetahuan Botani Lengkap",
-                        description = "Ketuk tautan yang muncul untuk membuka khasiat herbal, panduan budidaya, dan mendengarkan pelafalan bahasa Mandarin."
+                        description = "Ketuk tautan untuk membuka khasiat herbal, panduan budidaya, dan pelafalan bahasa Mandarin."
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // Version & Handover Metadata
+            // Metadata footer
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -196,9 +216,9 @@ fun AboutScreen(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Versi 1.0.0 (Build Produksi)\nPemerintah Kelurahan Bubakan • Semarang",
+                    text = "Versi 1.0.0 • Bubakan Green\nPemerintah Kelurahan Bubakan • Kota Semarang",
                     style = MaterialTheme.typography.labelSmall,
-                    color = OnSurfaceVariant,
+                    color = TextSecondary,
                     textAlign = TextAlign.Center
                 )
             }
@@ -215,7 +235,7 @@ private fun QrStepItem(
     Row(modifier = Modifier.fillMaxWidth()) {
         Surface(
             shape = CircleShape,
-            color = PrimaryContainerMint,
+            color = PrimaryGreenLight,
             modifier = Modifier.size(28.dp)
         ) {
             Box(contentAlignment = Alignment.Center) {
@@ -223,7 +243,7 @@ private fun QrStepItem(
                     text = number,
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.Bold,
-                    color = OnPrimaryContainerDark
+                    color = PrimaryGreenDark
                 )
             }
         }
@@ -233,13 +253,13 @@ private fun QrStepItem(
                 text = title,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
-                color = OnSurfaceDark
+                color = TextPrimary
             )
             Spacer(modifier = Modifier.height(2.dp))
             Text(
                 text = description,
-                style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
-                color = OnSurfaceVariant
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary
             )
         }
     }

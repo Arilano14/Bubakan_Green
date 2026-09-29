@@ -101,7 +101,7 @@ fun LocationsScreen(
                 onInfoClick = onInfoClick
             )
         },
-        containerColor = BackgroundVanilla,
+        containerColor = id.bubakangreen.app.ui.theme.BackgroundWarm,
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -113,17 +113,17 @@ fun LocationsScreen(
 
             // Segmented Switch: [ Daftar Kebun ] | [ Peta Persebaran ]
             Surface(
-                color = SurfaceCardWhite,
-                border = BorderStroke(1.dp, OutlineOrganic)
+                color = id.bubakangreen.app.ui.theme.Surface,
+                border = BorderStroke(1.dp, id.bubakangreen.app.ui.theme.BorderDivider)
             ) {
                 TabRow(
                     selectedTabIndex = uiState.viewMode.ordinal,
-                    containerColor = SurfaceCardWhite,
-                    contentColor = PrimarySeedlingGreen,
+                    containerColor = id.bubakangreen.app.ui.theme.Surface,
+                    contentColor = id.bubakangreen.app.ui.theme.PrimaryGreen,
                     indicator = { tabPositions ->
                         TabRowDefaults.SecondaryIndicator(
                             modifier = Modifier.tabIndicatorOffset(tabPositions[uiState.viewMode.ordinal]),
-                            color = PrimarySeedlingGreen
+                            color = id.bubakangreen.app.ui.theme.PrimaryGreen
                         )
                     }
                 ) {
@@ -133,7 +133,8 @@ fun LocationsScreen(
                         text = {
                             Text(
                                 text = "Daftar Kebun",
-                                fontWeight = if (uiState.viewMode == ViewMode.LIST) FontWeight.ExtraBold else FontWeight.Medium
+                                fontWeight = if (uiState.viewMode == ViewMode.LIST) FontWeight.ExtraBold else FontWeight.Medium,
+                                color = if (uiState.viewMode == ViewMode.LIST) id.bubakangreen.app.ui.theme.PrimaryGreenDark else id.bubakangreen.app.ui.theme.TextSecondary
                             )
                         }
                     )
@@ -143,7 +144,8 @@ fun LocationsScreen(
                         text = {
                             Text(
                                 text = "Peta Sebaran",
-                                fontWeight = if (uiState.viewMode == ViewMode.MAP) FontWeight.ExtraBold else FontWeight.Medium
+                                fontWeight = if (uiState.viewMode == ViewMode.MAP) FontWeight.ExtraBold else FontWeight.Medium,
+                                color = if (uiState.viewMode == ViewMode.MAP) id.bubakangreen.app.ui.theme.PrimaryGreenDark else id.bubakangreen.app.ui.theme.TextSecondary
                             )
                         }
                     )
