@@ -11,5 +11,7 @@ data class UserSession(
     val email: String,
     val displayName: String,
     val role: UserRole = UserRole.PUBLIC,
+    val isActive: Boolean = true,
     val assignedLocations: List<String> = emptyList()
 )
+

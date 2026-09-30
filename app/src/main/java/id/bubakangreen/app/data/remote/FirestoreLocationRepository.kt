@@ -6,6 +6,7 @@ import com.google.firebase.firestore.snapshots
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
+import id.bubakangreen.app.domain.model.LocationConditionLog
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.repository.LocationRepository
@@ -22,34 +23,42 @@ class FirestoreLocationRepository(
         firestore.collection("locations")
     }
 
+    private val conditionLogsCollection by lazy {
+        firestore.collection("location_condition_logs")
+    }
+
     override fun getPublishedLocations(): Flow<Result<List<Location>>> {
         return collection
-            .whereEqualTo("status", LocationStatus.PUBLISHED.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
+                val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
+                    loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED && loc.status != LocationStatus.DRAFT
+                }
+                Result.Success(list) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
     override fun getFeaturedLocations(): Flow<Result<List<Location>>> {
         return collection
-            .whereEqualTo("status", LocationStatus.PUBLISHED.name)
-            .whereEqualTo("featured", true)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
+                val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
+                    loc.featured && loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED
+                }
+                Result.Success(list) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
     override fun getLocationsByType(type: LocationType): Flow<Result<List<Location>>> {
         return collection
-            .whereEqualTo("status", LocationStatus.PUBLISHED.name)
-            .whereEqualTo("type", type.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
+                val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
+                    loc.type == type && loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED
+                }
+                Result.Success(list) as Result<List<Location>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
@@ -57,6 +66,12 @@ class FirestoreLocationRepository(
     override fun getLocationById(locationId: String): Flow<Result<Location?>> {
         return collection.document(locationId).snapshots().map { snapshot ->
             Result.Success(snapshot.toLocation()) as Result<Location?>
+        }.catch { emit(Result.Error(it, it.localizedMessage)) }
+    }
+
+    override fun getAllLocations(): Flow<Result<List<Location>>> {
+        return collection.snapshots().map { snapshot ->
+            Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
         }.catch { emit(Result.Error(it, it.localizedMessage)) }
     }
 
@@ -84,6 +99,95 @@ class FirestoreLocationRepository(
         }
     }
 
+    override suspend fun updateLocationCondition(
+        locationId: String,
+        status: String,
+        note: String,
+        photoUrl: String?,
+        updatedBy: String
+    ): Result<Unit> {
+        return try {
+            val now = System.currentTimeMillis()
+            val parsedStatus = runCatching { LocationStatus.valueOf(status) }.getOrDefault(LocationStatus.ACTIVE)
+            val updates = mutableMapOf<String, Any?>(
+                "status" to parsedStatus.name,
+                "conditionNote" to note,
+                "conditionUpdatedAt" to now,
+                "conditionUpdatedBy" to updatedBy,
+                "updatedAt" to now
+            )
+            if (!photoUrl.isNullOrBlank()) {
+                updates["coverPhotoUrl"] = photoUrl
+                updates["photoUrl"] = photoUrl
+            }
+            collection.document(locationId).update(updates).await()
+
+            // Record lightweight condition log (Section 16)
+            val logRef = conditionLogsCollection.document()
+            val log = LocationConditionLog(
+                id = logRef.id,
+                locationId = locationId,
+                status = parsedStatus.name,
+                note = note,
+                photoUrl = photoUrl,
+                updatedBy = updatedBy,
+                updatedAt = now
+            )
+            val logMap = mapOf(
+                "id" to log.id,
+                "locationId" to log.locationId,
+                "status" to log.status,
+                "note" to log.note,
+                "photoUrl" to log.photoUrl,
+                "updatedBy" to log.updatedBy,
+                "updatedAt" to log.updatedAt
+            )
+            logRef.set(logMap).await()
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override fun getLocationConditionLogs(locationId: String): Flow<Result<List<LocationConditionLog>>> {
+        return conditionLogsCollection
+            .whereEqualTo("locationId", locationId)
+            .snapshots()
+            .map { snapshot ->
+                val logs = snapshot.documents.mapNotNull { doc ->
+                    if (!doc.exists()) return@mapNotNull null
+                    LocationConditionLog(
+                        id = doc.getString("id") ?: doc.id,
+                        locationId = doc.getString("locationId") ?: "",
+                        status = doc.getString("status") ?: LocationStatus.ACTIVE.name,
+                        note = doc.getString("note") ?: "",
+                        photoUrl = doc.getString("photoUrl"),
+                        updatedBy = doc.getString("updatedBy") ?: "Admin",
+                        updatedAt = doc.getLong("updatedAt") ?: System.currentTimeMillis()
+                    )
+                }.sortedByDescending { it.updatedAt }
+                Result.Success(logs) as Result<List<LocationConditionLog>>
+            }
+            .catch { emit(Result.Error(it, it.localizedMessage)) }
+    }
+
+    override suspend fun deactivateLocation(locationId: String): Result<Unit> {
+        return try {
+            val now = System.currentTimeMillis()
+            collection.document(locationId).update(
+                mapOf(
+                    "isPublished" to false,
+                    "status" to LocationStatus.INACTIVE.name,
+                    "updatedAt" to now
+                )
+            ).await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
     override suspend fun getAssignedLocations(picUid: String): Result<List<Location>> {
         return try {
             val snapshot = collection.whereEqualTo("picUid", picUid).get().await()
@@ -103,12 +207,8 @@ class FirestoreLocationRepository(
     }
 
     override suspend fun deleteLocation(locationId: String): Result<Unit> {
-        return try {
-            collection.document(locationId).delete().await()
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Result.Error(e, e.localizedMessage)
-        }
+        // Preferred soft delete per Section 8
+        return deactivateLocation(locationId)
     }
 
     companion object {
@@ -123,8 +223,14 @@ class FirestoreLocationRepository(
             "longitude" to longitude,
             "coordinatesStatus" to coordinatesStatus.name,
             "featured" to featured,
-            "photoUrl" to photoUrl,
-            "picUid" to picUid,
+            "coverPhotoUrl" to coverPhotoUrl,
+            "photoUrl" to (photoUrl ?: coverPhotoUrl),
+            "conditionNote" to conditionNote,
+            "conditionUpdatedAt" to conditionUpdatedAt,
+            "conditionUpdatedBy" to conditionUpdatedBy,
+            "isPublished" to isPublished,
+            "createdBy" to createdBy,
+            "picUid" to (picUid.ifBlank { createdBy }),
             "status" to status.name,
             "accuracyMeters" to accuracyMeters,
             "capturedAt" to capturedAt,
@@ -147,10 +253,16 @@ class FirestoreLocationRepository(
             val coordStatusStr = getString("coordinatesStatus") ?: CoordinatesStatus.PENDING.name
             val coordinatesStatus = runCatching { CoordinatesStatus.valueOf(coordStatusStr) }.getOrDefault(CoordinatesStatus.PENDING)
             val featured = getBoolean("featured") ?: false
-            val photoUrl = getString("photoUrl")
-            val picUid = getString("picUid") ?: ""
-            val statusStr = getString("status") ?: LocationStatus.DRAFT.name
-            val status = runCatching { LocationStatus.valueOf(statusStr) }.getOrDefault(LocationStatus.DRAFT)
+            val coverPhotoUrl = getString("coverPhotoUrl") ?: getString("photoUrl")
+            val photoUrl = coverPhotoUrl
+            val conditionNote = getString("conditionNote") ?: ""
+            val conditionUpdatedAt = getLong("conditionUpdatedAt")
+            val conditionUpdatedBy = getString("conditionUpdatedBy")
+            val statusStr = getString("status") ?: LocationStatus.ACTIVE.name
+            val status = runCatching { LocationStatus.valueOf(statusStr) }.getOrDefault(LocationStatus.ACTIVE)
+            val isPublished = getBoolean("isPublished") ?: (status == LocationStatus.PUBLISHED || status == LocationStatus.ACTIVE || status == LocationStatus.NEEDS_MAINTENANCE)
+            val createdBy = getString("createdBy") ?: getString("picUid") ?: ""
+            val picUid = createdBy
             val accuracyMeters = getDouble("accuracyMeters")?.toFloat()
             val capturedAt = getLong("capturedAt")
             val rejectionNote = getString("rejectionNote")
@@ -168,7 +280,13 @@ class FirestoreLocationRepository(
                 longitude = longitude,
                 coordinatesStatus = coordinatesStatus,
                 featured = featured,
+                coverPhotoUrl = coverPhotoUrl,
                 photoUrl = photoUrl,
+                conditionNote = conditionNote,
+                conditionUpdatedAt = conditionUpdatedAt,
+                conditionUpdatedBy = conditionUpdatedBy,
+                isPublished = isPublished,
+                createdBy = createdBy,
                 picUid = picUid,
                 status = status,
                 accuracyMeters = accuracyMeters,
@@ -180,3 +298,4 @@ class FirestoreLocationRepository(
         }
     }
 }
+

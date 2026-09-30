@@ -143,11 +143,11 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "BUBAKAN GREEN",
+                text = "Admin",
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
                     color = PrimaryForest,
-                    letterSpacing = 1.sp
+                    letterSpacing = 0.5.sp
                 )
             )
 
@@ -162,7 +162,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Masuk menggunakan kredensial resmi untuk mengelola data kebun dan tanaman.",
+                text = "Masuk menggunakan kredensial admin untuk mengelola data lahan dan tanaman.",
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = OnSurfaceVariant
                 ),
@@ -191,15 +191,15 @@ fun LoginScreen(
                 }
             }
 
-            // Email Field
+            // Username Field (Section 4)
             OutlinedTextField(
-                value = uiState.email,
-                onValueChange = viewModel::onEmailChange,
-                label = { Text("Email Petugas / Admin") },
-                placeholder = { Text("contoh: pic@bubakan.id") },
+                value = uiState.username,
+                onValueChange = viewModel::onUsernameChange,
+                label = { Text("Username") },
+                placeholder = { Text("admin") },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
+                    keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
@@ -220,11 +220,12 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Password Field
+            // Password Field (Section 4)
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Kata Sandi") },
+                label = { Text("Password") },
+                placeholder = { Text("********") },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -241,7 +242,7 @@ fun LoginScreen(
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Default.Check else Icons.Default.Lock,
-                            contentDescription = if (passwordVisible) "Sembunyikan kata sandi" else "Tampilkan kata sandi",
+                            contentDescription = if (passwordVisible) "Sembunyikan password" else "Tampilkan password",
                             tint = OnSurfaceVariant
                         )
                     }
@@ -261,7 +262,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Submit Button (Min 48dp touch target)
+            // Submit Button: [ Masuk ] (Section 4)
             Button(
                 onClick = {
                     focusManager.clearFocus()
@@ -285,7 +286,7 @@ fun LoginScreen(
                     )
                 } else {
                     Text(
-                        text = "Masuk ke Sistem",
+                        text = "Masuk",
                         style = MaterialTheme.typography.labelLarge.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -293,60 +294,7 @@ fun LoginScreen(
                     )
                 }
             }
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Demo Quick-Fill Section for Reviewers
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = SurfaceWhite,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Akses Cepat Pengujian (Reviewer)",
-                        style = MaterialTheme.typography.labelMedium.copy(
-                            color = OnSurfaceVariant,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    )
-                    Spacer(modifier = Modifier.height(10.dp))
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.onEmailChange("pic.kebun@bubakan.id")
-                                viewModel.onPasswordChange("password123")
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "Akun PIC",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
-                            )
-                        }
-                        OutlinedButton(
-                            onClick = {
-                                viewModel.onEmailChange("admin.kelurahan@bubakan.id")
-                                viewModel.onPasswordChange("password123")
-                            },
-                            modifier = Modifier.weight(1f),
-                            shape = RoundedCornerShape(8.dp)
-                        ) {
-                            Text(
-                                text = "Akun Admin",
-                                style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold)
-                            )
-                        }
-                    }
-                }
-            }
         }
     }
 }
+

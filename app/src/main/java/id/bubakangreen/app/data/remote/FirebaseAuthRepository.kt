@@ -1,6 +1,7 @@
 package id.bubakangreen.app.data.remote
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.domain.model.UserRole
 import id.bubakangreen.app.domain.model.UserSession
@@ -11,35 +12,50 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class FirebaseAuthRepository(
-    private val auth: FirebaseAuth
+    private val auth: FirebaseAuth,
+    private val firestore: FirebaseFirestore? = null
 ) : AuthRepository {
+
+    private fun getFirestore(): FirebaseFirestore = firestore ?: FirebaseFirestore.getInstance()
 
     override val currentUserSession: Flow<UserSession> = callbackFlow {
         val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user == null) {
-                trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC))
+                trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC, isActive = true))
             } else {
-                user.getIdToken(false).addOnSuccessListener { tokenResult ->
-                    val roleStr = tokenResult.claims["role"] as? String
-                    val role = when (roleStr?.lowercase()) {
-                        "admin" -> UserRole.ADMIN
-                        "pic" -> UserRole.PIC
-                        else -> UserRole.PUBLIC
-                    }
-                    val assigned = (tokenResult.claims["assignedLocations"] as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
-                    trySend(
-                        UserSession(
-                            uid = user.uid,
-                            email = user.email ?: "",
-                            displayName = user.displayName ?: user.email ?: "",
-                            role = role,
-                            assignedLocations = assigned
+                getFirestore().collection("users").document(user.uid).get()
+                    .addOnSuccessListener { doc ->
+                        val roleStr = doc.getString("role")
+                        val isActive = doc.getBoolean("isActive") ?: false
+                        val role = if (isActive && roleStr.equals("ADMIN", ignoreCase = true)) {
+                            UserRole.ADMIN
+                        } else if (isActive && roleStr.equals("PIC", ignoreCase = true)) {
+                            UserRole.PIC
+                        } else {
+                            UserRole.PUBLIC
+                        }
+                        trySend(
+                            UserSession(
+                                uid = user.uid,
+                                email = user.email ?: "",
+                                displayName = doc.getString("name") ?: user.displayName ?: user.email ?: "",
+                                role = role,
+                                isActive = isActive
+                            )
                         )
-                    )
-                }.addOnFailureListener {
-                    trySend(UserSession(uid = user.uid, email = user.email ?: "", displayName = "", role = UserRole.PUBLIC))
-                }
+                    }
+                    .addOnFailureListener {
+                        trySend(
+                            UserSession(
+                                uid = user.uid,
+                                email = user.email ?: "",
+                                displayName = user.email ?: "",
+                                role = UserRole.PUBLIC,
+                                isActive = false
+                            )
+                        )
+                    }
             }
         }
         auth.addAuthStateListener(listener)
@@ -50,25 +66,38 @@ class FirebaseAuthRepository(
         return try {
             val authResult = auth.signInWithEmailAndPassword(email, password).await()
             val user = authResult.user ?: return Result.Error(IllegalStateException("User is null"))
-            val tokenResult = user.getIdToken(false).await()
-            val roleStr = tokenResult.claims["role"] as? String
-            val role = when (roleStr?.lowercase()) {
-                "admin" -> UserRole.ADMIN
-                "pic" -> UserRole.PIC
-                else -> UserRole.PUBLIC
+
+            // Section 5: Verify role in users/{uid}
+            val userDoc = getFirestore().collection("users").document(user.uid).get().await()
+            val roleStr = userDoc.getString("role")
+            val isActive = userDoc.getBoolean("isActive") ?: false
+
+            if (!roleStr.equals("ADMIN", ignoreCase = true) || !isActive) {
+                auth.signOut()
+                return Result.Error(
+                    SecurityException("Akun ini tidak memiliki akses admin.")
+                )
             }
-            val assigned = (tokenResult.claims["assignedLocations"] as? List<*>)?.mapNotNull { it?.toString() } ?: emptyList()
+
             Result.Success(
                 UserSession(
                     uid = user.uid,
                     email = user.email ?: "",
-                    displayName = user.displayName ?: user.email ?: "",
-                    role = role,
-                    assignedLocations = assigned
+                    displayName = userDoc.getString("name") ?: user.displayName ?: user.email ?: "Admin",
+                    role = UserRole.ADMIN,
+                    isActive = true
                 )
             )
         } catch (e: Exception) {
-            Result.Error(e, e.localizedMessage)
+            val friendlyMessage = when {
+                e is SecurityException -> e.message ?: "Akun ini tidak memiliki akses admin."
+                e.message?.contains("password", ignoreCase = true) == true ||
+                e.message?.contains("credential", ignoreCase = true) == true ||
+                e.message?.contains("user-not-found", ignoreCase = true) == true -> "Username atau password salah."
+                e.message?.contains("network", ignoreCase = true) == true -> "Koneksi internet diperlukan untuk masuk ke sistem."
+                else -> e.localizedMessage ?: "Gagal masuk. Periksa kembali username dan kata sandi Anda."
+            }
+            Result.Error(e, friendlyMessage)
         }
     }
 
@@ -83,3 +112,4 @@ class FirebaseAuthRepository(
 
     override fun isUserSignedIn(): Boolean = auth.currentUser != null
 }
+

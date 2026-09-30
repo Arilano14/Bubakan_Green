@@ -266,11 +266,19 @@ fun BubakanAppNavHost(
                 )
             }
 
-            // About Screen
+            // About Screen / Profile (Public Entry Point to Admin)
             composable(Screen.About.route) {
                 AboutScreen(
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onAdminClick = {
+                        val authRepo = RepositoryProvider.getAuthRepository()
+                        if (authRepo.isUserSignedIn()) {
+                            navController.navigate(Screen.AdminDashboard.route)
+                        } else {
+                            navController.navigate(Screen.Login.route)
+                        }
                     }
                 )
             }
@@ -294,7 +302,7 @@ fun BubakanAppNavHost(
                     },
                     onNavigateToAdminDashboard = {
                         navController.navigate(Screen.AdminDashboard.route) {
-                            popUpTo(Screen.Home.route)
+                            popUpTo(Screen.About.route)
                         }
                     }
                 )
@@ -388,16 +396,23 @@ fun BubakanAppNavHost(
                     onNavigateToApprovalQueue = {
                         navController.navigate(Screen.LocationApproval.route)
                     },
+                    onNavigateToLocationForm = { locId ->
+                        navController.navigate(Screen.LocationForm.createRoute(locId))
+                    },
+                    onNavigateToPlantForm = { locId ->
+                        navController.navigate(Screen.PlantForm.createRoute(locId))
+                    },
                     onNavigateToMasterPlantForm = { plantId ->
                         navController.navigate(Screen.MasterPlantForm.createRoute(plantId))
                     },
                     onSignedOut = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Home.route) { inclusive = true }
+                        navController.navigate(Screen.About.route) {
+                            popUpTo(Screen.Home.route)
                         }
                     }
                 )
             }
+
 
             // SCR-ADM-02: Location Approval Queue
             composable(Screen.LocationApproval.route) {

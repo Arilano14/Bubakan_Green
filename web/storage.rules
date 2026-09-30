@@ -1,0 +1,34 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() && (
+        request.auth.token.role == 'ADMIN' ||
+        request.auth.token.role == 'admin'
+      );
+    }
+
+    // Public: Read-only access to published photos
+    // Unauthenticated public: WRITE DENIED
+    // Admin: Authorized upload/update/delete
+    match /locations/{locationId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /location-plants/{locationPlantId}/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

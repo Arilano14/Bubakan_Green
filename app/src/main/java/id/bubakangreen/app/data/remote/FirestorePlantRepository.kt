@@ -6,6 +6,7 @@ import com.google.firebase.firestore.snapshots
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.domain.model.LocationPlant
 import id.bubakangreen.app.domain.model.MasterPlant
+import id.bubakangreen.app.domain.model.PlantCondition
 import id.bubakangreen.app.domain.model.PlantStatus
 import id.bubakangreen.app.domain.repository.PlantRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +19,7 @@ class FirestorePlantRepository(
 ) : PlantRepository {
 
     private val masterPlantsCollection by lazy {
-        firestore.collection("master_plants")
+        firestore.collection("plants")
     }
 
     private val locationPlantsCollection by lazy {
@@ -43,10 +44,10 @@ class FirestorePlantRepository(
     override fun getPlantsAtLocation(locationId: String): Flow<Result<List<LocationPlant>>> {
         return locationPlantsCollection
             .whereEqualTo("locationId", locationId)
-            .whereEqualTo("status", PlantStatus.ACTIVE.name)
             .snapshots()
             .map { snapshot ->
-                Result.Success(snapshot.documents.mapNotNull { it.toLocationPlant() }) as Result<List<LocationPlant>>
+                val list = snapshot.documents.mapNotNull { it.toLocationPlant() }.filter { it.isPresent && it.status == PlantStatus.ACTIVE }
+                Result.Success(list) as Result<List<LocationPlant>>
             }
             .catch { emit(Result.Error(it, it.localizedMessage)) }
     }
@@ -101,7 +102,16 @@ class FirestorePlantRepository(
 
     override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> {
         return try {
-            locationPlantsCollection.document(locationPlantId).delete().await()
+            // Soft delete/deactivate presence per Section 12 & 13
+            val now = System.currentTimeMillis()
+            locationPlantsCollection.document(locationPlantId).update(
+                mapOf(
+                    "isPresent" to false,
+                    "condition" to PlantCondition.NOT_AVAILABLE.name,
+                    "status" to PlantStatus.ARCHIVED.name,
+                    "updatedAt" to now
+                )
+            ).await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)
@@ -111,13 +121,20 @@ class FirestorePlantRepository(
     companion object {
         fun MasterPlant.toMap(): Map<String, Any?> = mapOf(
             "id" to id,
-            "nameId" to nameId,
-            "nameLatin" to nameLatin,
-            "nameMandarin" to nameMandarin,
-            "pinyin" to pinyin,
+            "name" to (name.ifBlank { nameId }),
+            "nameId" to (nameId.ifBlank { name }),
+            "scientificName" to (scientificName.ifBlank { nameLatin }),
+            "nameLatin" to (nameLatin.ifBlank { scientificName }),
+            "mandarinName" to mandarinName,
+            "mandarinPinyin" to (mandarinPinyin ?: pinyin),
+            "pinyin" to (pinyin ?: mandarinPinyin),
             "description" to description,
-            "primaryPhotoUrl" to primaryPhotoUrl,
+            "benefits" to benefits,
+            "plantingGuide" to plantingGuide,
+            "defaultPhotoUrl" to (defaultPhotoUrl ?: primaryPhotoUrl),
+            "primaryPhotoUrl" to (primaryPhotoUrl ?: defaultPhotoUrl),
             "mandarinAudioUrl" to mandarinAudioUrl,
+            "isPublished" to isPublished,
             "createdAt" to createdAt,
             "updatedAt" to updatedAt
         )
@@ -125,25 +142,35 @@ class FirestorePlantRepository(
         fun DocumentSnapshot.toMasterPlant(): MasterPlant? {
             if (!exists()) return null
             val id = getString("id") ?: id
-            val nameId = getString("nameId") ?: return null
-            val nameLatin = getString("nameLatin") ?: ""
+            val name = getString("name") ?: getString("nameId") ?: return null
+            val scientificName = getString("scientificName") ?: getString("nameLatin") ?: ""
             val nameMandarin = getString("nameMandarin")
-            val pinyin = getString("pinyin")
+            val pinyin = getString("mandarinPinyin") ?: getString("pinyin")
             val description = getString("description") ?: ""
-            val primaryPhotoUrl = getString("primaryPhotoUrl")
+            val benefits = getString("benefits") ?: ""
+            val plantingGuide = getString("plantingGuide") ?: ""
+            val photoUrl = getString("defaultPhotoUrl") ?: getString("primaryPhotoUrl")
             val mandarinAudioUrl = getString("mandarinAudioUrl")
+            val isPublished = getBoolean("isPublished") ?: true
             val createdAt = getLong("createdAt") ?: System.currentTimeMillis()
             val updatedAt = getLong("updatedAt") ?: System.currentTimeMillis()
 
             return MasterPlant(
                 id = id,
-                nameId = nameId,
-                nameLatin = nameLatin,
-                nameMandarin = nameMandarin,
+                name = name,
+                nameId = name,
+                scientificName = scientificName,
+                nameLatin = scientificName,
+                mandarinName = nameMandarin,
+                mandarinPinyin = pinyin,
                 pinyin = pinyin,
                 description = description,
-                primaryPhotoUrl = primaryPhotoUrl,
+                benefits = benefits,
+                plantingGuide = plantingGuide,
+                defaultPhotoUrl = photoUrl,
+                primaryPhotoUrl = photoUrl,
                 mandarinAudioUrl = mandarinAudioUrl,
+                isPublished = isPublished,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
@@ -152,12 +179,19 @@ class FirestorePlantRepository(
         fun LocationPlant.toMap(): Map<String, Any?> = mapOf(
             "id" to id,
             "locationId" to locationId,
-            "masterPlantId" to masterPlantId,
-            "localPhotoUrl" to localPhotoUrl,
-            "quantityNote" to quantityNote,
+            "plantId" to (plantId.ifBlank { masterPlantId }),
+            "masterPlantId" to (masterPlantId.ifBlank { plantId }),
+            "photoUrl" to (photoUrl ?: localPhotoUrl),
+            "localPhotoUrl" to (localPhotoUrl ?: photoUrl),
+            "condition" to condition.name,
+            "quantity" to quantity,
+            "quantityNote" to (quantityNote ?: "$quantity polybag"),
             "notes" to notes,
+            "isPresent" to isPresent,
             "featuredForQr" to featuredForQr,
             "status" to status.name,
+            "createdBy" to createdBy,
+            "updatedBy" to updatedBy,
             "createdAt" to createdAt,
             "updatedAt" to updatedAt
         )
@@ -166,28 +200,42 @@ class FirestorePlantRepository(
             if (!exists()) return null
             val id = getString("id") ?: id
             val locationId = getString("locationId") ?: return null
-            val masterPlantId = getString("masterPlantId") ?: return null
-            val localPhotoUrl = getString("localPhotoUrl")
+            val plantId = getString("plantId") ?: getString("masterPlantId") ?: return null
+            val photoUrl = getString("photoUrl") ?: getString("localPhotoUrl")
+            val conditionStr = getString("condition") ?: PlantCondition.GOOD.name
+            val condition = runCatching { PlantCondition.valueOf(conditionStr) }.getOrDefault(PlantCondition.GOOD)
+            val quantity = getLong("quantity")?.toInt() ?: 1
             val quantityNote = getString("quantityNote")
             val notes = getString("notes")
+            val isPresent = getBoolean("isPresent") ?: true
             val featuredForQr = getBoolean("featuredForQr") ?: false
             val statusStr = getString("status") ?: PlantStatus.ACTIVE.name
             val status = runCatching { PlantStatus.valueOf(statusStr) }.getOrDefault(PlantStatus.ACTIVE)
+            val createdBy = getString("createdBy")
+            val updatedBy = getString("updatedBy") ?: createdBy
             val createdAt = getLong("createdAt") ?: System.currentTimeMillis()
             val updatedAt = getLong("updatedAt") ?: System.currentTimeMillis()
 
             return LocationPlant(
                 id = id,
                 locationId = locationId,
-                masterPlantId = masterPlantId,
-                localPhotoUrl = localPhotoUrl,
+                plantId = plantId,
+                masterPlantId = plantId,
+                photoUrl = photoUrl,
+                localPhotoUrl = photoUrl,
+                condition = condition,
+                quantity = quantity,
                 quantityNote = quantityNote,
                 notes = notes,
+                isPresent = isPresent,
                 featuredForQr = featuredForQr,
                 status = status,
+                createdBy = createdBy,
+                updatedBy = updatedBy,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
         }
     }
 }
+

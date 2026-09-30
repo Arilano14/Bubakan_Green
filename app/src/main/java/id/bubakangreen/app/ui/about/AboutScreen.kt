@@ -48,8 +48,10 @@ import id.bubakangreen.app.ui.theme.TextSecondary
 @Composable
 fun AboutScreen(
     onNavigateBack: () -> Unit,
+    onAdminClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+
     val scrollState = rememberScrollState()
 
     Scaffold(
@@ -206,9 +208,56 @@ fun AboutScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Section 19: Profile Admin Entry Point
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                border = BorderStroke(1.5.dp, BorderDivider),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Text(
+                        text = "Kelola Data",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Akses khusus pengelola Kelurahan Bubakan untuk mengelola data lahan, tanaman, kondisi, dan koordinat.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary
+                    )
+                    Spacer(modifier = Modifier.height(14.dp))
+                    androidx.compose.material3.Button(
+                        onClick = onAdminClick,
+                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                            containerColor = PrimaryGreenDark,
+                            contentColor = androidx.compose.ui.graphics.Color.White
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                    ) {
+                        Text(
+                            text = "Admin",
+                            style = MaterialTheme.typography.labelLarge.copy(
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 15.sp
+                            )
+                        )
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // Metadata footer
+
             Box(
                 modifier = Modifier
                     .fillMaxWidth()

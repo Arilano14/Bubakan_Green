@@ -10,7 +10,9 @@ import id.bubakangreen.app.data.remote.FirestorePlantRepository
 import id.bubakangreen.app.domain.model.AuditLog
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
+import id.bubakangreen.app.domain.model.LocationConditionLog
 import id.bubakangreen.app.domain.model.LocationPlant
+
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.MasterPlant
@@ -151,17 +153,22 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
         )
     )
 
+    private val previewConditionLogs = mutableListOf<LocationConditionLog>()
+
     override fun getPublishedLocations(): Flow<Result<List<Location>>> =
-        flowOf(Result.Success(previewLocations.filter { it.status == LocationStatus.PUBLISHED }))
+        flowOf(Result.Success(previewLocations.filter { it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }))
 
     override fun getFeaturedLocations(): Flow<Result<List<Location>>> =
-        flowOf(Result.Success(previewLocations.filter { it.featured && it.status == LocationStatus.PUBLISHED }))
+        flowOf(Result.Success(previewLocations.filter { it.featured && it.isPublished && it.status != LocationStatus.INACTIVE }))
 
     override fun getLocationsByType(type: LocationType): Flow<Result<List<Location>>> =
-        flowOf(Result.Success(previewLocations.filter { it.type == type && it.status == LocationStatus.PUBLISHED }))
+        flowOf(Result.Success(previewLocations.filter { it.type == type && it.isPublished && it.status != LocationStatus.INACTIVE }))
 
     override fun getLocationById(locationId: String): Flow<Result<Location?>> =
         flowOf(Result.Success(previewLocations.find { it.id == locationId }))
+
+    override fun getAllLocations(): Flow<Result<List<Location>>> =
+        flowOf(Result.Success(previewLocations))
 
     override suspend fun createLocation(location: Location): Result<String> {
         previewLocations.add(location)
@@ -178,17 +185,68 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
         return Result.Success(Unit)
     }
 
+    override suspend fun updateLocationCondition(
+        locationId: String,
+        status: String,
+        note: String,
+        photoUrl: String?,
+        updatedBy: String
+    ): Result<Unit> {
+        val now = System.currentTimeMillis()
+        val index = previewLocations.indexOfFirst { it.id == locationId }
+        val parsedStatus = runCatching { LocationStatus.valueOf(status) }.getOrDefault(LocationStatus.ACTIVE)
+        if (index != -1) {
+            val old = previewLocations[index]
+            previewLocations[index] = old.copy(
+                status = parsedStatus,
+                conditionNote = note,
+                conditionUpdatedAt = now,
+                conditionUpdatedBy = updatedBy,
+                coverPhotoUrl = photoUrl ?: old.coverPhotoUrl,
+                photoUrl = photoUrl ?: old.photoUrl,
+                updatedAt = now
+            )
+        }
+        previewConditionLogs.add(
+            LocationConditionLog(
+                id = "LOG_${System.currentTimeMillis()}",
+                locationId = locationId,
+                status = parsedStatus.name,
+                note = note,
+                photoUrl = photoUrl,
+                updatedBy = updatedBy,
+                updatedAt = now
+            )
+        )
+        return Result.Success(Unit)
+    }
+
+    override fun getLocationConditionLogs(locationId: String): Flow<Result<List<LocationConditionLog>>> =
+        flowOf(Result.Success(previewConditionLogs.filter { it.locationId == locationId }.sortedByDescending { it.updatedAt }))
+
+    override suspend fun deactivateLocation(locationId: String): Result<Unit> {
+        val index = previewLocations.indexOfFirst { it.id == locationId }
+        if (index != -1) {
+            val old = previewLocations[index]
+            previewLocations[index] = old.copy(
+                isPublished = false,
+                status = LocationStatus.INACTIVE,
+                updatedAt = System.currentTimeMillis()
+            )
+        }
+        return Result.Success(Unit)
+    }
+
     override suspend fun getAssignedLocations(picUid: String): Result<List<Location>> =
         Result.Success(previewLocations.filter { it.picUid == picUid || picUid == "system_preview" })
 
     override suspend fun getPendingLocations(): Result<List<Location>> =
         Result.Success(previewLocations.filter { it.status == LocationStatus.PENDING_APPROVAL })
 
-    override suspend fun deleteLocation(locationId: String): Result<Unit> {
-        previewLocations.removeAll { it.id == locationId }
-        return Result.Success(Unit)
-    }
+    override suspend fun deleteLocation(locationId: String): Result<Unit> =
+        deactivateLocation(locationId)
 }
+
 
 /**
  * UI_PREVIEW_ONLY: Fixture repository used solely when Firebase is unconfigured.

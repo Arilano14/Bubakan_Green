@@ -21,7 +21,8 @@ sealed interface LoginNavigationEvent {
 }
 
 data class LoginUiState(
-    val email: String = "",
+    val username: String = "",
+    val email: String = username,
     val password: String = "",
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -38,8 +39,12 @@ class LoginViewModel(
     private val _navigationEvent = MutableSharedFlow<LoginNavigationEvent>()
     val navigationEvent: SharedFlow<LoginNavigationEvent> = _navigationEvent.asSharedFlow()
 
+    fun onUsernameChange(newUsername: String) {
+        _uiState.update { it.copy(username = newUsername, email = newUsername, errorMessage = null) }
+    }
+
     fun onEmailChange(newEmail: String) {
-        _uiState.update { it.copy(email = newEmail, errorMessage = null) }
+        onUsernameChange(newEmail)
     }
 
     fun onPasswordChange(newPassword: String) {
@@ -48,10 +53,10 @@ class LoginViewModel(
 
     fun signIn() {
         val currentState = _uiState.value
-        val email = currentState.email.trim()
+        val rawInput = currentState.username.trim()
         val password = currentState.password.trim()
 
-        if (email.isBlank()) {
+        if (rawInput.isBlank()) {
             _uiState.update { it.copy(errorMessage = "Email tidak boleh kosong.") }
             return
         }
@@ -60,9 +65,17 @@ class LoginViewModel(
             return
         }
 
+
+        // Section 4: Map UI username "admin" internally to configured admin Firebase Auth account
+        val targetEmail = if (rawInput.contains("@")) {
+            rawInput
+        } else {
+            "${rawInput.lowercase()}@bubakangreen.id"
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
-            when (val result = authRepository.signInWithEmail(email, password)) {
+            when (val result = authRepository.signInWithEmail(targetEmail, password)) {
                 is Result.Success -> {
                     val session = result.data
                     _uiState.update {
@@ -72,26 +85,44 @@ class LoginViewModel(
                             errorMessage = null
                         )
                     }
-                    when (session.role) {
-                        UserRole.ADMIN -> _navigationEvent.emit(LoginNavigationEvent.NavigateToAdminDashboard)
-                        UserRole.PIC -> _navigationEvent.emit(LoginNavigationEvent.NavigateToPicDashboard)
-                        UserRole.PUBLIC -> {
-                            _uiState.update {
-                                it.copy(
-                                    errorMessage = "Akun Anda belum memiliki hak akses Petugas atau Admin."
-                                )
-                            }
+                    // Section 5: Authorization role verification
+                    if (session.role == UserRole.ADMIN && session.isActive) {
+                        _navigationEvent.emit(LoginNavigationEvent.NavigateToAdminDashboard)
+                    } else if (session.role == UserRole.PIC && session.isActive) {
+                        _navigationEvent.emit(LoginNavigationEvent.NavigateToPicDashboard)
+                    } else {
+                        _uiState.update {
+                            it.copy(
+                                errorMessage = "Akun ini tidak memiliki akses admin."
+                            )
                         }
                     }
                 }
                 is Result.Error -> {
+                    val msg = result.message ?: result.exception.message ?: ""
+                    val friendlyError = when {
+                        result.exception is SecurityException ||
+                        msg.contains("tidak memiliki akses admin", ignoreCase = true) ||
+                        msg.contains("akses admin", ignoreCase = true) ->
+                            "Akun ini tidak memiliki akses admin."
+                        msg.contains("salah", ignoreCase = true) ||
+                        msg.contains("invalid", ignoreCase = true) ||
+                        msg.contains("credential", ignoreCase = true) ||
+                        msg.contains("password", ignoreCase = true) ->
+                            "Username atau password salah."
+                        msg.contains("koneksi", ignoreCase = true) ||
+                        msg.contains("network", ignoreCase = true) ->
+                            "Koneksi internet diperlukan untuk menyimpan perubahan."
+                        else -> if (msg.isNotBlank()) msg else "Username atau password salah."
+                    }
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            errorMessage = result.message ?: result.exception.message ?: "Gagal masuk. Periksa kembali email dan kata sandi Anda."
+                            errorMessage = friendlyError
                         )
                     }
                 }
+
                 is Result.Loading -> {
                     _uiState.update { it.copy(isLoading = true) }
                 }
@@ -99,3 +130,4 @@ class LoginViewModel(
         }
     }
 }
+
