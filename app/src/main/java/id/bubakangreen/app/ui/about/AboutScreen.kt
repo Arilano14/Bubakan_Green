@@ -254,6 +254,33 @@ fun AboutScreen(
                 }
             }
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Referensi & Kredit
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = Surface),
+                border = BorderStroke(1.5.dp, BorderDivider),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(18.dp)) {
+                    Text(
+                        text = "Referensi & Kredit",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = TextPrimary
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = "• Taksonomi Botani: Royal Botanic Gardens, Kew (Plants of the World Online - POWO) & Flora of China.\n• Aset Foto Default: Kontributor Wikimedia Commons (Forest & Kim Starr, Wouter Hagens, Frank Vincentz, Alvesgaspar, H. Zell, Vengolis, Pratheepps, Ji-Elle) berlisensi Creative Commons (CC BY-SA 3.0 / CC BY-SA 4.0).\n• Dokumentasi lengkap lisensi & sumber botani tersimpan di arsip dokumen aplikasi (docs/data/).",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = TextSecondary,
+                        lineHeight = 18.sp
+                    )
+                }
+            }
+
             Spacer(modifier = Modifier.height(20.dp))
 
             // Metadata footer
