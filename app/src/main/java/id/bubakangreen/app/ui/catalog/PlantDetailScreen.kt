@@ -56,6 +56,7 @@ import id.bubakangreen.app.ui.components.MandarinSpeakerButton
 import id.bubakangreen.app.ui.components.Mascot
 import id.bubakangreen.app.ui.components.MascotType
 import id.bubakangreen.app.ui.components.OfflineStatusBar
+import id.bubakangreen.app.ui.components.PlantImage
 import id.bubakangreen.app.ui.components.PrimaryButton
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.theme.AquaAccent
@@ -145,21 +146,12 @@ fun PlantDetailScreen(
                                 .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
                                 .background(PrimaryGreenLight)
                         ) {
-                            if (!plant.primaryPhotoUrl.isNullOrBlank()) {
-                                AsyncImage(
-                                    model = plant.primaryPhotoUrl,
-                                    contentDescription = "Foto tanaman ${plant.nameId}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(text = "🌿", style = MaterialTheme.typography.displayMedium)
-                                }
-                            }
+                            PlantImage(
+                                plant = plant,
+                                contentDescription = "Foto tanaman ${plant.nameId}",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
 
                             // Back button overlay
                             Box(
@@ -258,7 +250,72 @@ fun PlantDetailScreen(
                                 color = TextPrimary
                             )
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            if (plant.characteristics.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                BotanicalInfoCard(
+                                    title = "Karakteristik Tanaman",
+                                    icon = "🔍",
+                                    content = plant.characteristics
+                                )
+                            }
+
+                            val usefulBenefits = plant.commonUses.ifBlank { plant.benefits }
+                            if (usefulBenefits.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                BotanicalInfoCard(
+                                    title = "Khasiat & Kegunaan",
+                                    icon = "✨",
+                                    content = usefulBenefits
+                                )
+                            }
+
+                            val cultivation = plant.cultivationNotes.ifBlank { plant.plantingGuide }
+                            if (cultivation.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                BotanicalInfoCard(
+                                    title = "Panduan Budidaya",
+                                    icon = "🌱",
+                                    content = cultivation
+                                )
+                            }
+
+                            if (!plant.imageAuthor.isNullOrBlank() || !plant.imageLicense.isNullOrBlank() || plant.sourceReferences.isNotBlank()) {
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(14.dp))
+                                        .background(id.bubakangreen.app.ui.theme.PrimaryContainerMint.copy(alpha = 0.4f))
+                                        .padding(14.dp)
+                                ) {
+                                    Column {
+                                        Text(
+                                            text = "Sumber & Lisensi",
+                                            style = MaterialTheme.typography.labelMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = PrimaryGreenDark
+                                        )
+                                        if (!plant.imageAuthor.isNullOrBlank() || !plant.imageLicense.isNullOrBlank()) {
+                                            Spacer(modifier = Modifier.height(4.dp))
+                                            Text(
+                                                text = "Foto: ${plant.imageAuthor.orEmpty()} (${plant.imageLicense.orEmpty()})",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = TextSecondary
+                                            )
+                                        }
+                                        if (plant.sourceReferences.isNotBlank()) {
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = "Taksonomi: ${plant.sourceReferences}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = TextSecondary
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(20.dp))
 
                             // Garden presence
                             Box(
@@ -414,6 +471,42 @@ private fun MandarinPod(
                 audioState = audioState,
                 onClick = onPlayAudio,
                 enabled = hasAudio
+            )
+        }
+    }
+}
+
+@Composable
+private fun BotanicalInfoCard(
+    title: String,
+    icon: String,
+    content: String,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        Column {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = icon, fontSize = 20.sp)
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = PrimaryGreenDark
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = content,
+                style = MaterialTheme.typography.bodyMedium,
+                lineHeight = 22.sp,
+                color = TextPrimary
             )
         }
     }

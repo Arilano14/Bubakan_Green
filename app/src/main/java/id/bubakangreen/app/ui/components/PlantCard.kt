@@ -77,19 +77,12 @@ fun PlantCard(
                     .background(PrimaryContainerMint),
                 contentAlignment = Alignment.Center
             ) {
-                if (!plant.primaryPhotoUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = plant.primaryPhotoUrl,
-                        contentDescription = "Foto tanaman ${plant.nameId}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Text(
-                        text = "🌱",
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                }
+                PlantImage(
+                    plant = plant,
+                    contentDescription = "Foto tanaman ${plant.nameId}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
 
             Spacer(modifier = Modifier.width(14.dp))
@@ -205,19 +198,12 @@ fun PlantHorizontalCard(
                     .background(id.bubakangreen.app.ui.theme.PrimaryGreenLight),
                 contentAlignment = Alignment.Center
             ) {
-                if (!plant.primaryPhotoUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = plant.primaryPhotoUrl,
-                        contentDescription = "Foto tanaman ${plant.nameId}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Text(
-                        text = "🌱",
-                        style = MaterialTheme.typography.displaySmall
-                    )
-                }
+                PlantImage(
+                    plant = plant,
+                    contentDescription = "Foto tanaman ${plant.nameId}",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(

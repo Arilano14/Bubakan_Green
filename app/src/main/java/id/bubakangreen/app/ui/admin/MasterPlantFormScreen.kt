@@ -205,17 +205,17 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Deskripsi & Khasiat
+            // Deskripsi Singkat
             Text(
-                text = "Deskripsi & Khasiat Herbal *",
+                text = "Deskripsi Tanaman *",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = state.description,
                 onValueChange = viewModel::onDescriptionChange,
-                placeholder = { Text("Jelaskan bagian tanaman yang digunakan, kandungan aktif, dan manfaat kesehatannya...") },
-                minLines = 4,
+                placeholder = { Text("Deskripsi umum mengenai tanaman...") },
+                minLines = 3,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryForest,
                     unfocusedBorderColor = OutlineGrey,
@@ -228,16 +228,157 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Foto URL Referensi
+            // Karakteristik Morfologi
             Text(
-                text = "URL Foto Referensi Resmi (Opsional)",
+                text = "Karakteristik Morfologi Tanaman",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = state.characteristics,
+                onValueChange = viewModel::onCharacteristicsChange,
+                placeholder = { Text("Bentuk daun, habitus, warna bunga, aroma batang...") },
+                minLines = 2,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryForest,
+                    unfocusedBorderColor = OutlineGrey,
+                    focusedContainerColor = SurfaceWhite,
+                    unfocusedContainerColor = SurfaceWhite
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Manfaat & Penggunaan
+            Text(
+                text = "Manfaat & Penggunaan (Kuliner / Herbal Tradisional)",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = state.commonUses,
+                onValueChange = viewModel::onCommonUsesChange,
+                placeholder = { Text("Khasiat herbal tradisional atau kegunaan konsumsi...") },
+                minLines = 2,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryForest,
+                    unfocusedBorderColor = OutlineGrey,
+                    focusedContainerColor = SurfaceWhite,
+                    unfocusedContainerColor = SurfaceWhite
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Panduan Budidaya
+            Text(
+                text = "Panduan Budidaya & Perawatan",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = state.cultivationNotes,
+                onValueChange = viewModel::onCultivationNotesChange,
+                placeholder = { Text("Kebutuhan sinar matahari, media tanam, penyiraman...") },
+                minLines = 2,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryForest,
+                    unfocusedBorderColor = OutlineGrey,
+                    focusedContainerColor = SurfaceWhite,
+                    unfocusedContainerColor = SurfaceWhite
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Foto URL Referensi (Remote URL)
+            Text(
+                text = "URL Foto Referensi (Wajib HTTPS jika URL web)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
             OutlinedTextField(
                 value = state.primaryPhotoUrl,
                 onValueChange = viewModel::onPhotoUrlChange,
-                placeholder = { Text("https://commons.wikimedia.org/.../jahe.jpg") },
+                placeholder = { Text("https://upload.wikimedia.org/.../plant.jpg atau plant_sereh") },
+                singleLine = true,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = PrimaryForest,
+                    unfocusedBorderColor = OutlineGrey,
+                    focusedContainerColor = SurfaceWhite,
+                    unfocusedContainerColor = SurfaceWhite
+                ),
+                shape = RoundedCornerShape(10.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Lisensi & Pembuat Foto
+            Row(modifier = Modifier.fillMaxWidth()) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Fotografer / Pembuat",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = state.imageAuthor,
+                        onValueChange = viewModel::onImageAuthorChange,
+                        placeholder = { Text("Contoh: Wouter Hagens") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryForest,
+                            unfocusedBorderColor = OutlineGrey,
+                            focusedContainerColor = SurfaceWhite,
+                            unfocusedContainerColor = SurfaceWhite
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                Spacer(modifier = Modifier.size(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = "Lisensi Foto",
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    OutlinedTextField(
+                        value = state.imageLicense,
+                        onValueChange = viewModel::onImageLicenseChange,
+                        placeholder = { Text("CC BY-SA 4.0 / CC0") },
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryForest,
+                            unfocusedBorderColor = OutlineGrey,
+                            focusedContainerColor = SurfaceWhite,
+                            unfocusedContainerColor = SurfaceWhite
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Referensi Taksonomi Ilmiah
+            Text(
+                text = "Referensi Taksonomi Ilmiah",
+                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = state.sourceReferences,
+                onValueChange = viewModel::onSourceReferencesChange,
+                placeholder = { Text("Contoh: Royal Botanic Gardens, Kew (POWO)") },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryForest,

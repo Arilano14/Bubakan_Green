@@ -125,14 +125,24 @@ class FirestorePlantRepository(
             "nameId" to (nameId.ifBlank { name }),
             "scientificName" to (scientificName.ifBlank { nameLatin }),
             "nameLatin" to (nameLatin.ifBlank { scientificName }),
-            "mandarinName" to mandarinName,
+            "mandarinName" to (mandarinName ?: nameMandarin),
+            "nameMandarin" to (nameMandarin ?: mandarinName),
             "mandarinPinyin" to (mandarinPinyin ?: pinyin),
             "pinyin" to (pinyin ?: mandarinPinyin),
             "description" to description,
-            "benefits" to benefits,
-            "plantingGuide" to plantingGuide,
+            "characteristics" to characteristics,
+            "commonUses" to (commonUses.ifBlank { benefits }),
+            "cultivationNotes" to (cultivationNotes.ifBlank { plantingGuide }),
+            "benefits" to (benefits.ifBlank { commonUses }),
+            "plantingGuide" to (plantingGuide.ifBlank { cultivationNotes }),
             "defaultPhotoUrl" to (defaultPhotoUrl ?: primaryPhotoUrl),
             "primaryPhotoUrl" to (primaryPhotoUrl ?: defaultPhotoUrl),
+            "imageSourceType" to imageSourceType,
+            "imageAssetName" to imageAssetName,
+            "imageSource" to imageSource,
+            "imageLicense" to imageLicense,
+            "imageAuthor" to imageAuthor,
+            "sourceReferences" to sourceReferences,
             "mandarinAudioUrl" to mandarinAudioUrl,
             "isPublished" to isPublished,
             "createdAt" to createdAt,
@@ -144,12 +154,23 @@ class FirestorePlantRepository(
             val id = getString("id") ?: id
             val name = getString("name") ?: getString("nameId") ?: return null
             val scientificName = getString("scientificName") ?: getString("nameLatin") ?: ""
-            val nameMandarin = getString("nameMandarin")
+            val nameMandarin = getString("nameMandarin") ?: getString("mandarinName")
             val pinyin = getString("mandarinPinyin") ?: getString("pinyin")
             val description = getString("description") ?: ""
-            val benefits = getString("benefits") ?: ""
-            val plantingGuide = getString("plantingGuide") ?: ""
+            val characteristics = getString("characteristics") ?: ""
+            val commonUses = getString("commonUses") ?: getString("benefits") ?: ""
+            val cultivationNotes = getString("cultivationNotes") ?: getString("plantingGuide") ?: ""
+            val benefits = getString("benefits") ?: commonUses
+            val plantingGuide = getString("plantingGuide") ?: cultivationNotes
             val photoUrl = getString("defaultPhotoUrl") ?: getString("primaryPhotoUrl")
+            val imageSourceType = getString("imageSourceType")
+                ?: if (photoUrl?.startsWith("http") == true) "REMOTE_URL" else "LOCAL"
+            val imageAssetName = getString("imageAssetName")
+                ?: if (photoUrl != null && !photoUrl.startsWith("http")) photoUrl else null
+            val imageSource = getString("imageSource")
+            val imageLicense = getString("imageLicense")
+            val imageAuthor = getString("imageAuthor")
+            val sourceReferences = getString("sourceReferences") ?: ""
             val mandarinAudioUrl = getString("mandarinAudioUrl")
             val isPublished = getBoolean("isPublished") ?: true
             val createdAt = getLong("createdAt") ?: System.currentTimeMillis()
@@ -162,13 +183,23 @@ class FirestorePlantRepository(
                 scientificName = scientificName,
                 nameLatin = scientificName,
                 mandarinName = nameMandarin,
+                nameMandarin = nameMandarin,
                 mandarinPinyin = pinyin,
                 pinyin = pinyin,
                 description = description,
+                characteristics = characteristics,
+                commonUses = commonUses,
+                cultivationNotes = cultivationNotes,
                 benefits = benefits,
                 plantingGuide = plantingGuide,
                 defaultPhotoUrl = photoUrl,
                 primaryPhotoUrl = photoUrl,
+                imageSourceType = imageSourceType,
+                imageAssetName = imageAssetName,
+                imageSource = imageSource,
+                imageLicense = imageLicense,
+                imageAuthor = imageAuthor,
+                sourceReferences = sourceReferences,
                 mandarinAudioUrl = mandarinAudioUrl,
                 isPublished = isPublished,
                 createdAt = createdAt,
