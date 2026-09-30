@@ -1,7 +1,5 @@
 package id.bubakangreen.app.navigation
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -24,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -57,7 +56,7 @@ import id.bubakangreen.app.ui.pic.PicDashboardScreen
 import id.bubakangreen.app.ui.pic.PicDashboardViewModel
 import id.bubakangreen.app.ui.pic.PlantFormScreen
 import id.bubakangreen.app.ui.pic.PlantFormViewModel
-import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.PrimaryGreen
 import id.bubakangreen.app.ui.theme.PrimaryGreenDark
 import id.bubakangreen.app.ui.theme.PrimaryGreenLight
@@ -66,8 +65,7 @@ import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
  * Main application navigation shell.
- * Coordinates 3-tab bottom bar, screen backstack, deep-link routing,
- * and authenticated PIC & Admin governance workflows.
+ * Root-level Scaffold with stable bottom navigation and single backstack.
  */
 @Composable
 fun BubakanAppNavHost(
@@ -90,65 +88,60 @@ fun BubakanAppNavHost(
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                androidx.compose.material3.Surface(
-                    border = BorderStroke(0.8.dp, BorderDivider),
-                    color = Surface,
+                NavigationBar(
+                    containerColor = Surface,
                     tonalElevation = 0.dp
                 ) {
-                    NavigationBar(
-                        containerColor = Surface,
-                        tonalElevation = 0.dp
-                    ) {
-                        bottomNavigationItems.forEach { item ->
-                            val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
-                            NavigationBarItem(
-                                selected = isSelected,
-                                onClick = {
-                                    keyboardController?.hide()
-                                    focusManager.clearFocus()
-                                    val destination = item.screen.route
-                                    if (currentDestination?.route != destination) {
-                                        navController.navigate(destination) {
-                                            popUpTo(navController.graph.findStartDestination().id) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
+                    bottomNavigationItems.forEach { item ->
+                        val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
+                        NavigationBarItem(
+                            selected = isSelected,
+                            onClick = {
+                                keyboardController?.hide()
+                                focusManager.clearFocus()
+                                val destination = item.screen.route
+                                if (currentDestination?.route != destination) {
+                                    navController.navigate(destination) {
+                                        popUpTo(navController.graph.findStartDestination().id) {
+                                            saveState = true
                                         }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                },
-                                icon = {
-                                    val iconVector = when (item.screen) {
-                                        Screen.Home -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
-                                        Screen.Locations -> if (isSelected) Icons.Filled.Place else Icons.Outlined.Place
-                                        Screen.Catalog -> if (isSelected) Icons.Filled.Search else Icons.Outlined.Search
-                                        else -> Icons.Filled.Home
-                                    }
-                                    Icon(
-                                        imageVector = iconVector,
-                                        contentDescription = item.label
-                                    )
-                                },
-                                label = {
-                                    Text(
-                                        text = item.label,
-                                        fontWeight = if (isSelected) androidx.compose.ui.text.font.FontWeight.ExtraBold else androidx.compose.ui.text.font.FontWeight.SemiBold,
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                },
-                                colors = NavigationBarItemDefaults.colors(
-                                    selectedIconColor = PrimaryGreenDark,
-                                    selectedTextColor = PrimaryGreenDark,
-                                    indicatorColor = PrimaryGreenLight,
-                                    unselectedIconColor = TextSecondary,
-                                    unselectedTextColor = TextSecondary
+                                }
+                            },
+                            icon = {
+                                val iconVector = when (item.screen) {
+                                    Screen.Home -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
+                                    Screen.Locations -> if (isSelected) Icons.Filled.Place else Icons.Outlined.Place
+                                    Screen.Catalog -> if (isSelected) Icons.Filled.Search else Icons.Outlined.Search
+                                    else -> Icons.Filled.Home
+                                }
+                                Icon(
+                                    imageVector = iconVector,
+                                    contentDescription = item.label
                                 )
+                            },
+                            label = {
+                                Text(
+                                    text = item.label,
+                                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            },
+                            colors = NavigationBarItemDefaults.colors(
+                                selectedIconColor = PrimaryGreenDark,
+                                selectedTextColor = PrimaryGreenDark,
+                                indicatorColor = PrimaryGreenLight,
+                                unselectedIconColor = TextSecondary,
+                                unselectedTextColor = TextSecondary
                             )
-                        }
+                        )
                     }
                 }
             }
         },
+        containerColor = BackgroundWarm,
         modifier = modifier.fillMaxSize()
     ) { paddingValues ->
         NavHost(

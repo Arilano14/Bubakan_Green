@@ -68,4 +68,3 @@ val OutlineOrganic = BorderDivider
 val OutlineGrey = BorderDivider
 val ErrorRestrainedRed = ErrorMaterialRed
 val ErrorRed = ErrorMaterialRed
-

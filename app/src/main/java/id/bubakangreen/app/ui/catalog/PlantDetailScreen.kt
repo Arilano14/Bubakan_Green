@@ -2,6 +2,7 @@ package id.bubakangreen.app.ui.catalog
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,10 +16,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -46,7 +51,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
 import id.bubakangreen.app.core.audio.AudioState
 import id.bubakangreen.app.ui.common.UiState
-import id.bubakangreen.app.ui.components.BubakanTopBar
 import id.bubakangreen.app.ui.components.EmptyState
 import id.bubakangreen.app.ui.components.MandarinSpeakerButton
 import id.bubakangreen.app.ui.components.Mascot
@@ -54,8 +58,7 @@ import id.bubakangreen.app.ui.components.MascotType
 import id.bubakangreen.app.ui.components.OfflineStatusBar
 import id.bubakangreen.app.ui.components.PrimaryButton
 import id.bubakangreen.app.ui.components.ShimmerBox
-import id.bubakangreen.app.ui.theme.AccentSunnyContainer
-import id.bubakangreen.app.ui.theme.AccentSunnyGold
+import id.bubakangreen.app.ui.theme.AquaAccent
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.BorderDivider
 import id.bubakangreen.app.ui.theme.PrimaryGreen
@@ -65,14 +68,10 @@ import id.bubakangreen.app.ui.theme.TextPrimary
 import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
- * PlantDetailScreen: Overhauled Botanical Learning Screen.
- * Conforms to Section 12, 14, and 15:
- * 1. [Back] navigation in top bar
- * 2. [Plant Image] Hero photography (primary visual subject)
- * 3. Plant Name & Scientific Latin Name
- * 4. Mandarin Pod: Hanzi, Pinyin, Speaker Audio
- * 5. "Kenalan lebih dekat 🌱": Educational companion section with MascotType.LEARNING (160dp)
- * 6. Success State: MascotType.HAPPY (200dp) with "Bagus! Kamu sudah mengenal tanaman ini."
+ * PlantDetailScreen: Redesigned as a mini lesson experience.
+ *
+ * Structure: Hero Photo → Nomenclature → Mandarin → Educational Guide → Location → Completion
+ * Single mascot rule enforced: only LEARNING or HAPPY visible at any time.
  */
 @Composable
 fun PlantDetailScreen(
@@ -98,15 +97,6 @@ fun PlantDetailScreen(
     }
 
     Scaffold(
-        topBar = {
-            BubakanTopBar(
-                title = "Detail Tanaman",
-                subtitle = "Ensiklopedi Tanaman Bubakan",
-                canNavigateBack = true,
-                onNavigateBack = onNavigateBack,
-                onInfoClick = onInfoClick
-            )
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = BackgroundWarm,
         modifier = modifier
@@ -121,27 +111,19 @@ fun PlantDetailScreen(
             when (val plantState = uiState.plant) {
                 is UiState.Loading -> {
                     Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
+                        modifier = Modifier.fillMaxSize().padding(20.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         ShimmerBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(260.dp),
+                            modifier = Modifier.fillMaxWidth().height(240.dp),
                             cornerRadius = 24.dp
                         )
                         ShimmerBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(90.dp),
+                            modifier = Modifier.fillMaxWidth().height(80.dp),
                             cornerRadius = 20.dp
                         )
                         ShimmerBox(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(160.dp),
+                            modifier = Modifier.fillMaxWidth().height(140.dp),
                             cornerRadius = 20.dp
                         )
                     }
@@ -155,7 +137,7 @@ fun PlantDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                     ) {
-                        // 1. [Plant Image] Hero Botanical Photo (Visual Main Subject)
+                        // Hero plant photo with overlaid back button
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -175,28 +157,42 @@ fun PlantDetailScreen(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
                                 ) {
-                                    Text(
-                                        text = "🌿",
-                                        style = MaterialTheme.typography.displayMedium
-                                    )
+                                    Text(text = "🌿", style = MaterialTheme.typography.displayMedium)
                                 }
+                            }
+
+                            // Back button overlay
+                            Box(
+                                modifier = Modifier
+                                    .padding(16.dp)
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .background(Color.White.copy(alpha = 0.9f))
+                                    .clickable(onClick = onNavigateBack),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = "Kembali",
+                                    tint = TextPrimary,
+                                    modifier = Modifier.size(20.dp)
+                                )
                             }
                         }
 
-                        // Content Container
+                        // Content
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 20.dp)
+                                .padding(horizontal = 20.dp, vertical = 20.dp)
                         ) {
-                            // 2. NOMENCLATURE: Plant Name + Scientific Latin Name
+                            // Plant name & scientific name
                             Text(
                                 text = plant.nameId,
                                 style = MaterialTheme.typography.headlineMedium,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = TextPrimary
                             )
-
                             if (plant.nameLatin.isNotBlank()) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
@@ -208,91 +204,71 @@ fun PlantDetailScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
 
-                            // 3. MANDARIN DISCOVERY POD: Hanzi, Pinyin, Speaker Audio
+                            // Mandarin pronunciation pod
                             if (!plant.nameMandarin.isNullOrBlank() || !plant.pinyin.isNullOrBlank()) {
-                                MandarinDiscoveryPod(
+                                MandarinPod(
                                     hanzi = plant.nameMandarin.orEmpty(),
                                     pinyin = plant.pinyin.orEmpty(),
                                     audioState = uiState.audioState,
                                     hasAudio = !plant.mandarinAudioUrl.isNullOrBlank(),
                                     onPlayAudio = { viewModel.playMandarinAudio() }
                                 )
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(24.dp))
                             }
 
-                            // 4. "Kenalan lebih dekat 🌱" (Section 9: Educational content with Mascot LEARNING 160dp)
-                            Surface(
-                                shape = RoundedCornerShape(18.dp),
-                                color = id.bubakangreen.app.ui.theme.Surface,
-                                border = BorderStroke(1.dp, BorderDivider),
-                                tonalElevation = 0.dp,
-                                modifier = Modifier.fillMaxWidth()
+                            // Educational guide section with mascot
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.Top
                             ) {
-                                Column(modifier = Modifier.padding(18.dp)) {
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        horizontalArrangement = Arrangement.SpaceBetween,
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = "Kenalan lebih dekat 🌱",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = PrimaryGreenDark,
-                                                fontSize = 18.sp
-                                            )
-                                            Spacer(modifier = Modifier.height(4.dp))
-                                            Text(
-                                                text = "Panduan botani & perawatan",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = TextSecondary
-                                            )
-                                        }
-
-                                        // Companion Mascot LEARNING (160dp) - hidden when success state shows to keep single mascot rule
-                                        if (!isLessonCompleted) {
-                                            Mascot(
-                                                type = MascotType.LEARNING,
-                                                size = 160.dp,
-                                                baseRotation = 2f,
-                                                animateIdle = true,
-                                                modifier = Modifier.padding(start = 8.dp)
-                                            )
-                                        }
-                                    }
-
-                                    Spacer(modifier = Modifier.height(14.dp))
-
+                                Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = plant.description.ifBlank {
-                                            "Tanaman ini merupakan salah satu flora unggulan yang dibudidayakan di kebun binaan Kelurahan Bubakan untuk penghijauan serta pemenuhan tanaman obat keluarga (TOGA) mandiri."
-                                        },
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        lineHeight = 22.sp,
-                                        color = TextPrimary
+                                        text = "Kenalan lebih dekat 🌱",
+                                        style = MaterialTheme.typography.titleLarge,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = PrimaryGreenDark
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = "Panduan botani & perawatan",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = TextSecondary
+                                    )
+                                }
+                                if (!isLessonCompleted) {
+                                    Mascot(
+                                        type = MascotType.LEARNING,
+                                        size = 100.dp,
+                                        baseRotation = -2f,
+                                        animateIdle = true
                                     )
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(12.dp))
 
-                            // 5. GARDEN PRESENCE IN BUBAKAN
-                            Surface(
-                                shape = RoundedCornerShape(18.dp),
-                                color = PrimaryGreenLight.copy(alpha = 0.5f),
-                                border = BorderStroke(1.dp, PrimaryGreen.copy(alpha = 0.35f)),
-                                tonalElevation = 0.dp,
-                                modifier = Modifier.fillMaxWidth()
+                            Text(
+                                text = plant.description.ifBlank {
+                                    "Tanaman ini merupakan salah satu flora unggulan yang dibudidayakan di kebun binaan Kelurahan Bubakan untuk penghijauan serta pemenuhan tanaman obat keluarga (TOGA) mandiri."
+                                },
+                                style = MaterialTheme.typography.bodyLarge,
+                                lineHeight = 24.sp,
+                                color = TextPrimary
+                            )
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            // Garden presence
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .background(PrimaryGreenLight.copy(alpha = 0.5f))
+                                    .padding(16.dp)
                             ) {
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(text = "📍", fontSize = 24.sp)
                                     Spacer(modifier = Modifier.width(12.dp))
                                     Column {
@@ -302,7 +278,6 @@ fun PlantDetailScreen(
                                             fontWeight = FontWeight.Bold,
                                             color = PrimaryGreenDark
                                         )
-                                        Spacer(modifier = Modifier.height(2.dp))
                                         Text(
                                             text = "Dapat ditemukan dan dipelajari langsung di Taman Toga RW 03 dan Urban Farming Bubakan.",
                                             style = MaterialTheme.typography.bodySmall,
@@ -312,64 +287,47 @@ fun PlantDetailScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
+                            Spacer(modifier = Modifier.height(28.dp))
 
-                            // 6. SUCCESS STATE (Section 9: Mascot HAPPY 200dp, green dominant, single mascot in viewport)
+                            // Completion state
                             if (isLessonCompleted) {
-                                Surface(
-                                    shape = RoundedCornerShape(18.dp),
-                                    color = PrimaryGreenLight,
-                                    border = BorderStroke(1.5.dp, PrimaryGreen),
-                                    tonalElevation = 0.dp,
-                                    modifier = Modifier.fillMaxWidth()
+                                Column(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(24.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Mascot(
-                                            type = MascotType.HAPPY,
-                                            size = 200.dp,
-                                            animateIdle = true
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        Text(
-                                            text = "Bagus! Kamu sudah mengenal tanaman ini.",
-                                            style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            color = PrimaryGreenDark,
-                                            textAlign = TextAlign.Center,
-                                            fontSize = 18.sp
-                                        )
-
-                                        Spacer(modifier = Modifier.height(6.dp))
-
-                                        Text(
-                                            text = "Terima kasih sudah belajar bersama Bubakan Green 🌱",
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = TextSecondary,
-                                            textAlign = TextAlign.Center
-                                        )
-
-                                        Spacer(modifier = Modifier.height(16.dp))
-
-                                        PrimaryButton(
-                                            text = "Kembali ke Katalog",
-                                            onClick = onNavigateBack,
-                                            height = 48.dp,
-                                            modifier = Modifier.fillMaxWidth(0.8f)
-                                        )
-                                    }
+                                    Mascot(
+                                        type = MascotType.HAPPY,
+                                        size = 180.dp,
+                                        animateIdle = true
+                                    )
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = "Bagus! Kamu sudah mengenal tanaman ini.",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = PrimaryGreenDark,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    Text(
+                                        text = "Terima kasih sudah belajar bersama Bubakan Green 🌱",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = TextSecondary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(20.dp))
+                                    PrimaryButton(
+                                        text = "Kembali ke Katalog",
+                                        onClick = onNavigateBack,
+                                        height = 50.dp,
+                                        modifier = Modifier.fillMaxWidth(0.75f)
+                                    )
                                 }
                             } else {
                                 PrimaryButton(
                                     text = "Selesai Mengenal Tanaman Ini ✨",
                                     onClick = { isLessonCompleted = true },
-                                    height = 50.dp
+                                    height = 52.dp
                                 )
                             }
 
@@ -401,46 +359,37 @@ fun PlantDetailScreen(
 }
 
 /**
- * Mandarin pod with Hanzi, Pinyin, and speaker audio pronunciation button.
+ * Mandarin pronunciation pod — clean, teal-accented.
  */
 @Composable
-private fun MandarinDiscoveryPod(
+private fun MandarinPod(
     hanzi: String,
     pinyin: String,
     audioState: AudioState,
     hasAudio: Boolean,
     onPlayAudio: () -> Unit
 ) {
-    Card(
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = id.bubakangreen.app.ui.theme.Surface),
-        border = BorderStroke(1.5.dp, BorderDivider),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        modifier = Modifier.fillMaxWidth()
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(AquaAccent.copy(alpha = 0.1f))
+            .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = PrimaryGreenLight
-                ) {
-                    Text(
-                        text = "PELAFALAN BAHASA MANDARIN",
-                        style = MaterialTheme.typography.labelSmall,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = PrimaryGreenDark,
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
-                    )
-                }
-
+                Text(
+                    text = "PELAFALAN MANDARIN",
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = PrimaryGreenDark,
+                    letterSpacing = 0.5.sp
+                )
                 Spacer(modifier = Modifier.height(8.dp))
-
                 Row(verticalAlignment = Alignment.Bottom) {
                     if (hanzi.isNotBlank()) {
                         Text(
@@ -461,7 +410,6 @@ private fun MandarinDiscoveryPod(
                     }
                 }
             }
-
             MandarinSpeakerButton(
                 audioState = audioState,
                 onClick = onPlayAudio,

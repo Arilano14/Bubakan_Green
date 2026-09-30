@@ -28,8 +28,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
@@ -51,9 +49,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.ui.common.UiState
-import id.bubakangreen.app.ui.components.BubakanTopBar
 import id.bubakangreen.app.ui.components.CategoryFilterChip
 import id.bubakangreen.app.ui.components.LocationCard
+import id.bubakangreen.app.ui.components.Mascot
+import id.bubakangreen.app.ui.components.MascotType
 import id.bubakangreen.app.ui.components.OfflineStatusBar
 import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.components.StateEmptyView
@@ -61,20 +60,24 @@ import id.bubakangreen.app.ui.components.StateErrorView
 import id.bubakangreen.app.ui.components.TactileButton
 import id.bubakangreen.app.ui.components.TactileButtonStyle
 import id.bubakangreen.app.ui.theme.AccentSunnyContainer
-import id.bubakangreen.app.ui.theme.AccentSunnyGold
-import id.bubakangreen.app.ui.theme.BackgroundVanilla
+import id.bubakangreen.app.ui.theme.BackgroundWarm
+import id.bubakangreen.app.ui.theme.BorderDivider
 import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
 import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
 import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForestDark
+import id.bubakangreen.app.ui.theme.PrimaryGreen
+import id.bubakangreen.app.ui.theme.PrimaryGreenDark
+import id.bubakangreen.app.ui.theme.PrimaryGreenLight
 import id.bubakangreen.app.ui.theme.PrimarySeedlingGreen
-import id.bubakangreen.app.ui.theme.SecondarySage
+import id.bubakangreen.app.ui.theme.Surface
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
+import id.bubakangreen.app.ui.theme.TextPrimary
+import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
- * LocationsScreen: "Jelajahi Lokasi Tanaman di Bubakan".
- * Field exploration guide highlighting flagship garden hubs (Urban Farming Kelurahan & Taman Toga RW 03).
+ * LocationsScreen: "Jelajah Kebun" — field exploration guide.
+ * Redesigned with inline header, pointing mascot guide, and clean list.
  */
 @Composable
 fun LocationsScreen(
@@ -93,246 +96,213 @@ fun LocationsScreen(
         }
     }
 
-    Scaffold(
-        topBar = {
-            BubakanTopBar(
-                title = "Jelajah Kebun",
-                subtitle = "Persebaran Kebun di Bubakan",
-                canNavigateBack = false,
-                onInfoClick = onInfoClick
-            )
-        },
-        containerColor = id.bubakangreen.app.ui.theme.BackgroundWarm,
+    Column(
         modifier = modifier
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            OfflineStatusBar(isOffline = uiState.isOffline)
+            .fillMaxSize()
+            .background(BackgroundWarm)
+    ) {
+        OfflineStatusBar(isOffline = uiState.isOffline)
 
-            // Segmented Switch: [ Daftar Kebun ] | [ Peta Persebaran ]
-            Surface(
-                color = id.bubakangreen.app.ui.theme.Surface,
-                border = BorderStroke(1.dp, id.bubakangreen.app.ui.theme.BorderDivider)
-            ) {
-                TabRow(
-                    selectedTabIndex = uiState.viewMode.ordinal,
-                    containerColor = id.bubakangreen.app.ui.theme.Surface,
-                    contentColor = id.bubakangreen.app.ui.theme.PrimaryGreen,
-                    indicator = { tabPositions ->
-                        TabRowDefaults.SecondaryIndicator(
-                            modifier = Modifier.tabIndicatorOffset(tabPositions[uiState.viewMode.ordinal]),
-                            color = id.bubakangreen.app.ui.theme.PrimaryGreen
+        // Inline header with mascot guide
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Jelajah Kebun",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = TextPrimary
+                )
+                Text(
+                    text = "Temukan kebun dan taman toga di Bubakan",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextSecondary
+                )
+            }
+            Mascot(
+                type = MascotType.POINTING,
+                size = 72.dp,
+                baseRotation = 2f
+            )
+        }
+
+        // Tab switch: List / Map
+        TabRow(
+            selectedTabIndex = uiState.viewMode.ordinal,
+            containerColor = Surface,
+            contentColor = PrimaryGreen,
+            indicator = { tabPositions ->
+                TabRowDefaults.SecondaryIndicator(
+                    modifier = Modifier.tabIndicatorOffset(tabPositions[uiState.viewMode.ordinal]),
+                    color = PrimaryGreen
+                )
+            },
+            modifier = Modifier.padding(horizontal = 20.dp)
+        ) {
+            Tab(
+                selected = uiState.viewMode == ViewMode.LIST,
+                onClick = { viewModel.setViewMode(ViewMode.LIST) },
+                text = {
+                    Text(
+                        text = "Daftar Kebun",
+                        fontWeight = if (uiState.viewMode == ViewMode.LIST) FontWeight.ExtraBold else FontWeight.Medium,
+                        color = if (uiState.viewMode == ViewMode.LIST) PrimaryGreenDark else TextSecondary
+                    )
+                }
+            )
+            Tab(
+                selected = uiState.viewMode == ViewMode.MAP,
+                onClick = { viewModel.setViewMode(ViewMode.MAP) },
+                text = {
+                    Text(
+                        text = "Peta Sebaran",
+                        fontWeight = if (uiState.viewMode == ViewMode.MAP) FontWeight.ExtraBold else FontWeight.Medium,
+                        color = if (uiState.viewMode == ViewMode.MAP) PrimaryGreenDark else TextSecondary
+                    )
+                }
+            )
+        }
+
+        // Category filter chips
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            CategoryFilterChip(
+                label = "Semua Kebun",
+                selected = uiState.selectedType == null,
+                onClick = { viewModel.setCategoryFilter(null) }
+            )
+            CategoryFilterChip(
+                label = "🌱 Urban Farming",
+                selected = uiState.selectedType == LocationType.URBAN_FARMING,
+                onClick = { viewModel.setCategoryFilter(LocationType.URBAN_FARMING) }
+            )
+            CategoryFilterChip(
+                label = "🌿 Taman Toga",
+                selected = uiState.selectedType == LocationType.TAMAN_TOGA,
+                onClick = { viewModel.setCategoryFilter(LocationType.TAMAN_TOGA) }
+            )
+        }
+
+        // Content area
+        when (val locationsState = uiState.locations) {
+            is UiState.Loading -> {
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(20.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    repeat(3) {
+                        ShimmerBox(
+                            modifier = Modifier.fillMaxWidth().height(180.dp),
+                            cornerRadius = 20.dp
                         )
                     }
-                ) {
-                    Tab(
-                        selected = uiState.viewMode == ViewMode.LIST,
-                        onClick = { viewModel.setViewMode(ViewMode.LIST) },
-                        text = {
-                            Text(
-                                text = "Daftar Kebun",
-                                fontWeight = if (uiState.viewMode == ViewMode.LIST) FontWeight.ExtraBold else FontWeight.Medium,
-                                color = if (uiState.viewMode == ViewMode.LIST) id.bubakangreen.app.ui.theme.PrimaryGreenDark else id.bubakangreen.app.ui.theme.TextSecondary
-                            )
-                        }
-                    )
-                    Tab(
-                        selected = uiState.viewMode == ViewMode.MAP,
-                        onClick = { viewModel.setViewMode(ViewMode.MAP) },
-                        text = {
-                            Text(
-                                text = "Peta Sebaran",
-                                fontWeight = if (uiState.viewMode == ViewMode.MAP) FontWeight.ExtraBold else FontWeight.Medium,
-                                color = if (uiState.viewMode == ViewMode.MAP) id.bubakangreen.app.ui.theme.PrimaryGreenDark else id.bubakangreen.app.ui.theme.TextSecondary
-                            )
-                        }
-                    )
                 }
             }
 
-            // Category Filter Chips
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                CategoryFilterChip(
-                    label = "Semua Kebun",
-                    selected = uiState.selectedType == null,
-                    onClick = { viewModel.setCategoryFilter(null) }
-                )
-                CategoryFilterChip(
-                    label = "🌱 Urban Farming",
-                    selected = uiState.selectedType == LocationType.URBAN_FARMING,
-                    onClick = { viewModel.setCategoryFilter(LocationType.URBAN_FARMING) }
-                )
-                CategoryFilterChip(
-                    label = "🌿 Taman Toga",
-                    selected = uiState.selectedType == LocationType.TAMAN_TOGA,
-                    onClick = { viewModel.setCategoryFilter(LocationType.TAMAN_TOGA) }
-                )
-            }
-
-            // Content Area (List vs Map)
-            when (val locationsState = uiState.locations) {
-                is UiState.Loading -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+            is UiState.Success -> {
+                if (uiState.viewMode == ViewMode.LIST) {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 20.dp, end = 20.dp, bottom = 24.dp
+                        ),
+                        verticalArrangement = Arrangement.spacedBy(14.dp)
                     ) {
-                        repeat(3) {
-                            ShimmerBox(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(200.dp),
-                                cornerRadius = 22.dp
-                            )
-                        }
-                    }
-                }
+                        if (uiState.selectedType == null) {
+                            val urbanFarmingList = locationsState.data.filter { it.type == LocationType.URBAN_FARMING }
+                            val tamanTogaList = locationsState.data.filter { it.type == LocationType.TAMAN_TOGA }
 
-                is UiState.Success -> {
-                    if (uiState.viewMode == ViewMode.LIST) {
-                        LazyColumn(
-                            modifier = Modifier.fillMaxSize(),
-                            contentPadding = PaddingValues(
-                                start = 16.dp,
-                                end = 16.dp,
-                                bottom = 24.dp
-                            ),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            // Section 10: Mascot Guide Banner (size 96dp)
-                            item {
-                                Surface(
-                                    shape = RoundedCornerShape(18.dp),
-                                    color = id.bubakangreen.app.ui.theme.Surface,
-                                    border = BorderStroke(1.dp, id.bubakangreen.app.ui.theme.BorderDivider),
-                                    tonalElevation = 0.dp,
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Row(
-                                        modifier = Modifier.padding(14.dp),
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        id.bubakangreen.app.ui.components.Mascot(
-                                            type = id.bubakangreen.app.ui.components.MascotType.POINTING,
-                                            size = 96.dp
+                            if (urbanFarmingList.isNotEmpty()) {
+                                item {
+                                    Column(modifier = Modifier.padding(top = 4.dp)) {
+                                        Text(
+                                            text = "🌱 KEBUN URBAN FARMING",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = PrimaryGreenDark
                                         )
-                                        Spacer(modifier = Modifier.width(12.dp))
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(
-                                                text = "Panduan Jelajah Kebun",
-                                                style = MaterialTheme.typography.titleSmall,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = id.bubakangreen.app.ui.theme.PrimaryGreenDark
-                                            )
-                                            Spacer(modifier = Modifier.height(3.dp))
-                                            Text(
-                                                text = "Kunjungi petak kebun binaan warga Bubakan untuk melihat langsung budidaya sayuran segar dan konservasi herbal keluarga.",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = id.bubakangreen.app.ui.theme.TextSecondary,
-                                                lineHeight = 17.sp
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            if (uiState.selectedType == null) {
-                                val urbanFarmingList = locationsState.data.filter { it.type == LocationType.URBAN_FARMING }
-                                val tamanTogaList = locationsState.data.filter { it.type == LocationType.TAMAN_TOGA }
-
-                                if (urbanFarmingList.isNotEmpty()) {
-                                    item {
-                                        Column(modifier = Modifier.padding(top = 4.dp)) {
-                                            Text(
-                                                text = "🌱 KEBUN URBAN FARMING",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = id.bubakangreen.app.ui.theme.PrimaryGreenDark
-                                            )
-                                            Text(
-                                                text = "Budidaya sayur-mayur dan ketahanan pangan mandiri",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = id.bubakangreen.app.ui.theme.TextSecondary
-                                            )
-                                        }
-                                    }
-                                    items(urbanFarmingList, key = { it.id }) { location ->
-                                        LocationCard(
-                                            location = location,
-                                            onClick = { onLocationClick(location.id) }
+                                        Text(
+                                            text = "Budidaya sayur-mayur dan ketahanan pangan mandiri",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = TextSecondary
                                         )
                                     }
                                 }
-
-                                if (tamanTogaList.isNotEmpty()) {
-                                    item {
-                                        Column(modifier = Modifier.padding(top = 10.dp)) {
-                                            Text(
-                                                text = "🌿 TAMAN TOGA & HERBAL",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                fontWeight = FontWeight.ExtraBold,
-                                                color = Color(0xFF5A4400)
-                                            )
-                                            Text(
-                                                text = "Konservasi tanaman obat keluarga dan apotek hidup warga",
-                                                style = MaterialTheme.typography.bodySmall,
-                                                color = id.bubakangreen.app.ui.theme.TextSecondary
-                                            )
-                                        }
-                                    }
-                                    items(tamanTogaList, key = { it.id }) { location ->
-                                        LocationCard(
-                                            location = location,
-                                            onClick = { onLocationClick(location.id) }
-                                        )
-                                    }
-                                }
-                            } else {
-                                items(locationsState.data, key = { it.id }) { location ->
+                                items(urbanFarmingList, key = { it.id }) { location ->
                                     LocationCard(
                                         location = location,
                                         onClick = { onLocationClick(location.id) }
                                     )
                                 }
                             }
+
+                            if (tamanTogaList.isNotEmpty()) {
+                                item {
+                                    Column(modifier = Modifier.padding(top = 10.dp)) {
+                                        Text(
+                                            text = "🌿 TAMAN TOGA & HERBAL",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = Color(0xFF5A4400)
+                                        )
+                                        Text(
+                                            text = "Konservasi tanaman obat keluarga dan apotek hidup warga",
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = TextSecondary
+                                        )
+                                    }
+                                }
+                                items(tamanTogaList, key = { it.id }) { location ->
+                                    LocationCard(
+                                        location = location,
+                                        onClick = { onLocationClick(location.id) }
+                                    )
+                                }
+                            }
+                        } else {
+                            items(locationsState.data, key = { it.id }) { location ->
+                                LocationCard(
+                                    location = location,
+                                    onClick = { onLocationClick(location.id) }
+                                )
+                            }
                         }
-                    } else {
-                        // Map Mode (Agnostic Visual Container + Floating Card)
-                        MapVisualContainer(
-                            locations = locationsState.data,
-                            selectedLocation = uiState.selectedMapLocation,
-                            onSelectLocation = { viewModel.selectMapLocation(it) },
-                            onOpenDetail = { onLocationClick(it.id) },
-                            onOpenExternalMap = { launchGoogleMaps(context, it) }
-                        )
                     }
-                }
-
-                is UiState.Empty -> {
-                    StateEmptyView(
-                        title = "Belum Ada Lokasi",
-                        message = locationsState.message,
-                        actionLabel = "Tampilkan Semua",
-                        onActionClick = { viewModel.setCategoryFilter(null) }
+                } else {
+                    // Map Mode
+                    MapVisualContainer(
+                        locations = locationsState.data,
+                        selectedLocation = uiState.selectedMapLocation,
+                        onSelectLocation = { viewModel.selectMapLocation(it) },
+                        onOpenDetail = { onLocationClick(it.id) },
+                        onOpenExternalMap = { launchGoogleMaps(context, it) }
                     )
                 }
+            }
 
-                is UiState.Error -> {
-                    StateErrorView(
-                        message = locationsState.message,
-                        onRetry = { viewModel.loadLocations() }
-                    )
-                }
+            is UiState.Empty -> {
+                StateEmptyView(
+                    title = "Belum Ada Lokasi",
+                    message = locationsState.message,
+                    actionLabel = "Tampilkan Semua",
+                    onActionClick = { viewModel.setCategoryFilter(null) }
+                )
+            }
+
+            is UiState.Error -> {
+                StateErrorView(
+                    message = locationsState.message,
+                    onRetry = { viewModel.loadLocations() }
+                )
             }
         }
     }
@@ -340,7 +310,6 @@ fun LocationsScreen(
 
 /**
  * Provider-agnostic visual map container.
- * Displays garden pins across Kelurahan Bubakan and an elevated preview card.
  */
 @Composable
 private fun MapVisualContainer(
@@ -356,11 +325,10 @@ private fun MapVisualContainer(
             .fillMaxSize()
             .background(PrimaryContainerMint.copy(alpha = 0.25f))
     ) {
-        // Pins Column / Visual Garden List
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             item {
@@ -428,13 +396,12 @@ private fun MapVisualContainer(
                 }
             }
 
-            // Bottom space for floating card clearance
             item {
                 Spacer(modifier = Modifier.height(240.dp))
             }
         }
 
-        // Floating Garden Preview Card
+        // Floating preview card
         if (selectedLocation != null) {
             Card(
                 shape = RoundedCornerShape(22.dp),
@@ -444,7 +411,7 @@ private fun MapVisualContainer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(16.dp)
+                    .padding(20.dp)
             ) {
                 Column(modifier = Modifier.padding(18.dp)) {
                     Text(
@@ -457,7 +424,7 @@ private fun MapVisualContainer(
                     )
                     Text(
                         text = "RW ${selectedLocation.rw} • ${selectedLocation.address}",
-                        style = MaterialTheme.typography.bodySmall ?: MaterialTheme.typography.bodyMedium,
+                        style = MaterialTheme.typography.bodySmall,
                         color = OnSurfaceSageMuted,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
