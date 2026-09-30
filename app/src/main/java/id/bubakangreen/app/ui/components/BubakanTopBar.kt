@@ -49,7 +49,6 @@ fun BubakanTopBar(
     canNavigateBack: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onInfoClick: (() -> Unit)? = null,
-    onLoginClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -105,24 +104,6 @@ fun BubakanTopBar(
 
             // Action Buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
-                if (onLoginClick != null) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .clip(CircleShape)
-                            .background(SurfaceCardWhite)
-                            .clickable(onClick = onLoginClick),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Lock,
-                            contentDescription = "Masuk Petugas & Admin",
-                            tint = PrimarySeedlingGreen,
-                            modifier = Modifier.size(18.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
                 if (onInfoClick != null) {
                     Box(
                         modifier = Modifier

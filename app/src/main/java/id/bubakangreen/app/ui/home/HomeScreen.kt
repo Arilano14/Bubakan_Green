@@ -70,7 +70,6 @@ fun HomeScreen(
     onNavigateToLocations: (LocationType?) -> Unit,
     onNavigateToCatalog: () -> Unit,
     onInfoClick: () -> Unit,
-    onLoginClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -93,8 +92,7 @@ fun HomeScreen(
             // Open composition: text left, mascot right. No card wrapper.
             WelcomeHero(
                 onMulaiJelajah = onNavigateToCatalog,
-                onInfoClick = onInfoClick,
-                onLoginClick = onLoginClick
+                onInfoClick = onInfoClick
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -257,8 +255,7 @@ fun HomeScreen(
 @Composable
 private fun WelcomeHero(
     onMulaiJelajah: () -> Unit,
-    onInfoClick: () -> Unit,
-    onLoginClick: () -> Unit
+    onInfoClick: () -> Unit
 ) {
     // Green gradient header band
     Box(
@@ -292,38 +289,20 @@ private fun WelcomeHero(
                     )
                 }
 
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    // Minimal action dots (login + info)
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f))
-                            .clickable(onClick = onLoginClick),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Lock,
-                            contentDescription = "Masuk Petugas",
-                            tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
-                    Box(
-                        modifier = Modifier
-                            .size(36.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f))
-                            .clickable(onClick = onInfoClick),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Outlined.Info,
-                            contentDescription = "Tentang",
-                            tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.size(16.dp)
-                        )
-                    }
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f))
+                        .clickable(onClick = onInfoClick),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Tentang",
+                        tint = androidx.compose.ui.graphics.Color.White,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
             }
 

@@ -348,26 +348,30 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
 
     override suspend fun signInWithEmail(email: String, password: String): Result<UserSession> {
         val session = when {
-            email.contains("admin", ignoreCase = true) -> UserSession(
-                uid = "admin_preview_uid",
-                email = email,
-                displayName = "Admin Kelurahan Bubakan",
-                role = UserRole.ADMIN
-            )
-            email.contains("pic", ignoreCase = true) -> UserSession(
-                uid = "pic_preview",
-                email = email,
-                displayName = "Petugas Lapangan RW 01",
-                role = UserRole.PIC,
-                assignedLocations = listOf("LOC_PREVIEW_01", "LOC_PREVIEW_03")
-            )
-            else -> UserSession(
-                uid = "pic_preview",
-                email = email,
-                displayName = "Petugas Lapangan",
-                role = UserRole.PIC,
-                assignedLocations = listOf("LOC_PREVIEW_01")
-            )
+            email.contains("admin", ignoreCase = true) -> {
+                if (password != "admin_bubakan") {
+                    return Result.Error(Exception("Password salah."))
+                }
+                UserSession(
+                    uid = "admin_preview_uid",
+                    email = email,
+                    displayName = "Admin Kelurahan Bubakan",
+                    role = UserRole.ADMIN,
+                    isActive = true
+                )
+            }
+            email.contains("unauthorized", ignoreCase = true) -> {
+                UserSession(
+                    uid = "unauthorized_preview_uid",
+                    email = email,
+                    displayName = "Warga Biasa",
+                    role = UserRole.PUBLIC,
+                    isActive = true
+                )
+            }
+            else -> {
+                return Result.Error(Exception("Username atau password salah."))
+            }
         }
         sessionState.value = session
         return Result.Success(session)

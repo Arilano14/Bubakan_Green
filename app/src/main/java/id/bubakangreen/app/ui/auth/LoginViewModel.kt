@@ -91,8 +91,11 @@ class LoginViewModel(
                     } else if (session.role == UserRole.PIC && session.isActive) {
                         _navigationEvent.emit(LoginNavigationEvent.NavigateToPicDashboard)
                     } else {
+                        // Section 5: If role != ADMIN or isActive != true, deny admin access
+                        authRepository.signOut()
                         _uiState.update {
                             it.copy(
+                                signedInSession = null,
                                 errorMessage = "Akun ini tidak memiliki akses admin."
                             )
                         }
@@ -112,7 +115,7 @@ class LoginViewModel(
                             "Username atau password salah."
                         msg.contains("koneksi", ignoreCase = true) ||
                         msg.contains("network", ignoreCase = true) ->
-                            "Koneksi internet diperlukan untuk menyimpan perubahan."
+                            "Koneksi internet diperlukan untuk masuk."
                         else -> if (msg.isNotBlank()) msg else "Username atau password salah."
                     }
                     _uiState.update {

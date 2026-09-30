@@ -182,9 +182,6 @@ fun BubakanAppNavHost(
                     },
                     onInfoClick = {
                         navController.navigate(Screen.About.route)
-                    },
-                    onLoginClick = {
-                        navController.navigate(Screen.Login.route)
                     }
                 )
             }
