@@ -67,6 +67,28 @@ fun MasterPlantFormScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            Surface(
+                color = SurfaceWhite,
+                shadowElevation = 8.dp,
+                tonalElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    id.bubakangreen.app.ui.components.PrimaryButton(
+                        text = if (plantId != null) "Perbarui Ensiklopedia" else "Simpan ke Ensiklopedia",
+                        onClick = { viewModel.savePlant(adminUid) },
+                        enabled = !state.isSaving,
+                        loading = state.isSaving,
+                        height = 54.dp
+                    )
+                }
+            }
+        },
         containerColor = BackgroundLight,
         topBar = {
             TopAppBar(
@@ -391,37 +413,7 @@ fun MasterPlantFormScreen(
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Submit Button
-            Button(
-                onClick = { viewModel.savePlant(adminUid) },
-                enabled = !state.isSaving,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryForest,
-                    contentColor = OnPrimaryWhite
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                if (state.isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        color = OnPrimaryWhite,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = if (plantId != null) "Perbarui Ensiklopedia" else "Simpan ke Ensiklopedia",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

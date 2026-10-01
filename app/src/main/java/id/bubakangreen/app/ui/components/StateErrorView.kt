@@ -19,6 +19,7 @@ fun StateErrorView(
         message = message,
         actionLabel = "Coba Lagi",
         onActionClick = onRetry,
+        mascotType = MascotType.WARNING,
         modifier = modifier
     )
 }

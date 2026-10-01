@@ -29,6 +29,7 @@ fun EmptyState(
     message: String = "Data tanaman ini belum lengkap.",
     actionLabel: String? = null,
     onActionClick: () -> Unit = {},
+    mascotType: MascotType = MascotType.THINKING,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -38,10 +39,11 @@ fun EmptyState(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // Mascot in Warning / Confused / Empathetic pose (160dp)
+        // Character-led guidance mascot with subtle idle motion
         Mascot(
-            type = MascotType.WARNING,
-            size = 160.dp
+            type = mascotType,
+            size = 150.dp,
+            animateIdle = true
         )
 
         Spacer(modifier = Modifier.height(20.dp))

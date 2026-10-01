@@ -1,5 +1,6 @@
 package id.bubakangreen.app.ui.components
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,12 +23,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import id.bubakangreen.app.ui.theme.PrimaryGreen
-import id.bubakangreen.app.ui.theme.PrimaryGreenDark
+import id.bubakangreen.app.ui.theme.LeafGreen
+import id.bubakangreen.app.ui.theme.LeafGreenDark
+import id.bubakangreen.app.ui.theme.TextOnColor
 
 /**
- * Standard reusable primary action button complying with Fitts's law (>=48dp touch target),
- * Eco-Green design system, and responsive feedback.
+ * Duolingo-inspired rounded pill primary action button.
+ * - Height: 52-56dp (default 54dp)
+ * - Rounded pill geometry (27dp radius)
+ * - Strong contrast botanical green
+ * - Meets Fitts's Law touch target ergonomics (>= 48dp)
  */
 @Composable
 fun PrimaryButton(
@@ -37,25 +42,27 @@ fun PrimaryButton(
     enabled: Boolean = true,
     loading: Boolean = false,
     icon: ImageVector? = null,
-    height: Dp = 50.dp,
-    shapeRadius: Dp = 18.dp
+    height: Dp = 54.dp,
+    shapeRadius: Dp = 27.dp,
+    containerColor: Color = LeafGreen,
+    contentColor: Color = TextOnColor
 ) {
     Button(
         onClick = onClick,
         enabled = enabled && !loading,
         shape = RoundedCornerShape(shapeRadius),
         colors = ButtonDefaults.buttonColors(
-            containerColor = PrimaryGreen,
-            contentColor = Color.White,
-            disabledContainerColor = PrimaryGreen.copy(alpha = 0.5f),
-            disabledContentColor = Color.White.copy(alpha = 0.7f)
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = containerColor.copy(alpha = 0.45f),
+            disabledContentColor = contentColor.copy(alpha = 0.7f)
         ),
         elevation = ButtonDefaults.buttonElevation(
             defaultElevation = 2.dp,
             pressedElevation = 0.dp,
             disabledElevation = 0.dp
         ),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 0.dp),
         modifier = modifier
             .fillMaxWidth()
             .height(height)
@@ -63,7 +70,7 @@ fun PrimaryButton(
         if (loading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(22.dp),
-                color = Color.White,
+                color = contentColor,
                 strokeWidth = 2.5.dp
             )
         } else {
@@ -79,8 +86,8 @@ fun PrimaryButton(
                 Text(
                     text = text,
                     style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 14.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 15.sp,
                     maxLines = 1
                 )
             }

@@ -81,27 +81,25 @@ fun BubakanAppNavHost(
     val rootRoutes = listOf(
         Screen.Home.route,
         Screen.Locations.route,
-        Screen.Catalog.route
+        Screen.Catalog.route,
+        Screen.About.route,
+        Screen.AdminDashboard.route
     )
     val showBottomBar = currentDestination?.route in rootRoutes
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
-                NavigationBar(
-                    containerColor = Surface,
-                    tonalElevation = 0.dp
-                ) {
-                    bottomNavigationItems.forEach { item ->
-                        val isSelected = currentDestination?.hierarchy?.any { it.route == item.screen.route } == true
-                        NavigationBarItem(
-                            selected = isSelected,
-                            onClick = {
-                                keyboardController?.hide()
-                                focusManager.clearFocus()
-                                val destination = item.screen.route
-                                if (currentDestination?.route != destination) {
-                                    navController.navigate(destination) {
+                id.bubakangreen.app.ui.navigation.AppBottomBar(
+                    currentRoute = currentDestination?.route,
+                    onItemClick = { item ->
+                        keyboardController?.hide()
+                        focusManager.clearFocus()
+                        if (item.screen == Screen.AdminDashboard) {
+                            val authRepo = RepositoryProvider.getAuthRepository()
+                            if (authRepo.isUserSignedIn()) {
+                                if (currentDestination?.route != Screen.AdminDashboard.route) {
+                                    navController.navigate(Screen.AdminDashboard.route) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }
@@ -109,36 +107,23 @@ fun BubakanAppNavHost(
                                         restoreState = true
                                     }
                                 }
-                            },
-                            icon = {
-                                val iconVector = when (item.screen) {
-                                    Screen.Home -> if (isSelected) Icons.Filled.Home else Icons.Outlined.Home
-                                    Screen.Locations -> if (isSelected) Icons.Filled.Place else Icons.Outlined.Place
-                                    Screen.Catalog -> if (isSelected) Icons.Filled.Search else Icons.Outlined.Search
-                                    else -> Icons.Filled.Home
+                            } else {
+                                navController.navigate(Screen.Login.route)
+                            }
+                        } else {
+                            val destination = item.screen.route
+                            if (currentDestination?.route != destination) {
+                                navController.navigate(destination) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        saveState = true
+                                    }
+                                    launchSingleTop = true
+                                    restoreState = true
                                 }
-                                Icon(
-                                    imageVector = iconVector,
-                                    contentDescription = item.label
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = item.label,
-                                    fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
-                                    style = MaterialTheme.typography.labelSmall
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = PrimaryGreenDark,
-                                selectedTextColor = PrimaryGreenDark,
-                                indicatorColor = PrimaryGreenLight,
-                                unselectedIconColor = TextSecondary,
-                                unselectedTextColor = TextSecondary
-                            )
-                        )
+                            }
+                        }
                     }
-                }
+                )
             }
         },
         containerColor = BackgroundWarm,
@@ -267,8 +252,11 @@ fun BubakanAppNavHost(
             composable(Screen.About.route) {
                 AboutScreen(
                     onNavigateBack = {
-                        navController.popBackStack()
+                        if (!navController.popBackStack()) {
+                            navController.navigate(Screen.Home.route)
+                        }
                     },
+                    canNavigateBack = navController.previousBackStackEntry != null,
                     onAdminClick = {
                         val authRepo = RepositoryProvider.getAuthRepository()
                         if (authRepo.isUserSignedIn()) {

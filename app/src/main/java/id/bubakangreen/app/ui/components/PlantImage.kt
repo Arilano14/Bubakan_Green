@@ -78,6 +78,8 @@ fun PlantImage(
             model = ImageRequest.Builder(context)
                 .data(primaryPhotoUrl)
                 .crossfade(true)
+                .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
+                .diskCachePolicy(coil.request.CachePolicy.ENABLED)
                 .error(fallbackResId)
                 .placeholder(fallbackResId)
                 .build(),

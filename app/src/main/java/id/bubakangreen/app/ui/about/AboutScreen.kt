@@ -49,6 +49,7 @@ import id.bubakangreen.app.ui.theme.TextSecondary
 fun AboutScreen(
     onNavigateBack: () -> Unit,
     onAdminClick: () -> Unit = {},
+    canNavigateBack: Boolean = true,
     modifier: Modifier = Modifier
 ) {
 
@@ -59,7 +60,7 @@ fun AboutScreen(
             BubakanTopBar(
                 title = "Tentang Program",
                 subtitle = "Kelurahan Bubakan",
-                canNavigateBack = true,
+                canNavigateBack = canNavigateBack,
                 onNavigateBack = onNavigateBack
             )
         },
@@ -232,25 +233,11 @@ fun AboutScreen(
                         color = TextSecondary
                     )
                     Spacer(modifier = Modifier.height(14.dp))
-                    androidx.compose.material3.Button(
+                    id.bubakangreen.app.ui.components.PrimaryButton(
+                        text = "Masuk Sebagai Admin",
                         onClick = onAdminClick,
-                        colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                            containerColor = PrimaryGreenDark,
-                            contentColor = androidx.compose.ui.graphics.Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp)
-                    ) {
-                        Text(
-                            text = "Admin",
-                            style = MaterialTheme.typography.labelLarge.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-                        )
-                    }
+                        height = 54.dp
+                    )
                 }
             }
 

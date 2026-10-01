@@ -19,15 +19,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -49,18 +44,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import id.bubakangreen.app.ui.theme.BackgroundLight
-import id.bubakangreen.app.ui.theme.ErrorRed
-import id.bubakangreen.app.ui.theme.OnPrimaryWhite
-import id.bubakangreen.app.ui.theme.OnSurfaceDark
-import id.bubakangreen.app.ui.theme.OnSurfaceVariant
-import id.bubakangreen.app.ui.theme.OutlineGrey
-import id.bubakangreen.app.ui.theme.PrimaryContainerMint
-import id.bubakangreen.app.ui.theme.PrimaryForest
-import id.bubakangreen.app.ui.theme.SecondarySage
-import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.ui.components.Mascot
+import id.bubakangreen.app.ui.components.MascotType
+import id.bubakangreen.app.ui.components.PrimaryButton
+import id.bubakangreen.app.ui.theme.BorderCard
+import id.bubakangreen.app.ui.theme.BotanicalPaper
+import id.bubakangreen.app.ui.theme.ForestGreen
+import id.bubakangreen.app.ui.theme.LeafGreen
+import id.bubakangreen.app.ui.theme.SurfaceCard
+import id.bubakangreen.app.ui.theme.TextPrimary
+import id.bubakangreen.app.ui.theme.TextSecondary
 
 @Composable
 fun LoginScreen(
@@ -85,7 +81,7 @@ fun LoginScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
-        containerColor = BackgroundLight,
+        containerColor = BotanicalPaper,
         topBar = {
             Row(
                 modifier = Modifier
@@ -100,15 +96,14 @@ fun LoginScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Kembali ke Beranda",
-                        tint = OnSurfaceDark
+                        tint = ForestGreen
                     )
                 }
                 Text(
                     text = "Masuk Petugas & Admin",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold,
-                        color = OnSurfaceDark
-                    ),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = ForestGreen,
                     modifier = Modifier.padding(start = 4.dp)
                 )
             }
@@ -119,62 +114,55 @@ fun LoginScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 16.dp),
+                .padding(horizontal = 24.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Botanical Lock Icon Badge
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = PrimaryContainerMint,
-                modifier = Modifier.size(64.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = null,
-                        tint = PrimaryForest,
-                        modifier = Modifier.size(32.dp)
-                    )
-                }
-            }
+            // Friendly Character-driven Mascot Greeting
+            Mascot(
+                type = MascotType.GREETING,
+                size = 130.dp,
+                animateIdle = true
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Admin",
-                style = MaterialTheme.typography.titleLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryForest,
-                    letterSpacing = 0.5.sp
-                )
+                text = "Halo Petugas! 🌱",
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = ForestGreen,
+                textAlign = TextAlign.Center
             )
+
+            Spacer(modifier = Modifier.height(4.dp))
 
             Text(
                 text = "Kelurahan Bubakan, Mijen",
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = OnSurfaceVariant,
-                    fontWeight = FontWeight.Medium
-                )
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = TextSecondary,
+                textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Masuk menggunakan kredensial admin untuk mengelola data lahan dan tanaman.",
-                style = MaterialTheme.typography.bodySmall.copy(
-                    color = OnSurfaceVariant
-                ),
+                text = "Masuk untuk mengelola data kebun dan ensiklopedia tanaman Bubakan.",
+                style = MaterialTheme.typography.bodySmall,
+                color = TextSecondary,
+                textAlign = TextAlign.Center,
+                lineHeight = 18.sp,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // Error Banner
             if (uiState.errorMessage != null) {
                 Surface(
-                    shape = RoundedCornerShape(8.dp),
+                    shape = RoundedCornerShape(14.dp),
                     color = MaterialTheme.colorScheme.errorContainer,
                     modifier = Modifier
                         .fillMaxWidth()
@@ -182,16 +170,15 @@ fun LoginScreen(
                 ) {
                     Text(
                         text = uiState.errorMessage ?: "",
-                        style = MaterialTheme.typography.bodySmall.copy(
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            fontWeight = FontWeight.Medium
-                        ),
-                        modifier = Modifier.padding(12.dp)
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier.padding(14.dp)
                     )
                 }
             }
 
-            // Username Field (Section 4)
+            // Username Field
             OutlinedTextField(
                 value = uiState.username,
                 onValueChange = viewModel::onUsernameChange,
@@ -206,26 +193,26 @@ fun LoginScreen(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryForest,
-                    focusedLabelColor = PrimaryForest,
-                    unfocusedBorderColor = OutlineGrey,
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite
+                    focusedBorderColor = LeafGreen,
+                    focusedLabelColor = ForestGreen,
+                    unfocusedBorderColor = BorderCard,
+                    focusedContainerColor = SurfaceCard,
+                    unfocusedContainerColor = SurfaceCard
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
 
-            // Password Field (Section 4)
+            // Password Field
             OutlinedTextField(
                 value = uiState.password,
                 onValueChange = viewModel::onPasswordChange,
-                label = { Text("Password") },
-                placeholder = { Text("********") },
+                label = { Text("Kata Sandi") },
+                placeholder = { Text("••••••••") },
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(
@@ -239,22 +226,24 @@ fun LoginScreen(
                     }
                 ),
                 trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                        Icon(
-                            imageVector = if (passwordVisible) Icons.Default.Check else Icons.Default.Lock,
-                            contentDescription = if (passwordVisible) "Sembunyikan password" else "Tampilkan password",
-                            tint = OnSurfaceVariant
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Text(
+                            text = if (passwordVisible) "🙈" else "👁️",
+                            fontSize = 16.sp
                         )
                     }
                 },
                 colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryForest,
-                    focusedLabelColor = PrimaryForest,
-                    unfocusedBorderColor = OutlineGrey,
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite
+                    focusedBorderColor = LeafGreen,
+                    focusedLabelColor = ForestGreen,
+                    unfocusedBorderColor = BorderCard,
+                    focusedContainerColor = SurfaceCard,
+                    unfocusedContainerColor = SurfaceCard
                 ),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(16.dp),
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(60.dp)
@@ -262,39 +251,19 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Submit Button: [ Masuk ] (Section 4)
-            Button(
+            // Submit Button
+            PrimaryButton(
+                text = "Masuk Sebagai Petugas",
                 onClick = {
                     focusManager.clearFocus()
                     viewModel.signIn()
                 },
                 enabled = !uiState.isLoading,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryForest,
-                    contentColor = OnPrimaryWhite
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        color = OnPrimaryWhite,
-                        modifier = Modifier.size(24.dp),
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(
-                        text = "Masuk",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    )
-                }
-            }
+                loading = uiState.isLoading,
+                height = 54.dp
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
-

@@ -279,29 +279,29 @@ private fun WelcomeHero(
                         text = "BUBAKAN GREEN",
                         style = MaterialTheme.typography.labelMedium,
                         fontWeight = FontWeight.ExtraBold,
-                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                        color = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.9f),
                         letterSpacing = 1.5.sp
                     )
                     Text(
                         text = "Kelurahan Bubakan, Mijen",
                         style = MaterialTheme.typography.labelSmall,
-                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.6f)
+                        color = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.7f)
                     )
                 }
 
                 Box(
                     modifier = Modifier
-                        .size(36.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(androidx.compose.ui.graphics.Color.White.copy(alpha = 0.15f))
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.18f))
                         .clickable(onClick = onInfoClick),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Tentang",
-                        tint = androidx.compose.ui.graphics.Color.White,
-                        modifier = Modifier.size(16.dp)
+                        contentDescription = "Tentang Program",
+                        tint = id.bubakangreen.app.ui.theme.TextOnColor,
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             }
@@ -318,7 +318,7 @@ private fun WelcomeHero(
                         text = "Hai, teman\nBubakan!",
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.ExtraBold,
-                        color = androidx.compose.ui.graphics.Color.White,
+                        color = id.bubakangreen.app.ui.theme.TextOnColor,
                         lineHeight = 36.sp
                     )
 
@@ -327,7 +327,7 @@ private fun WelcomeHero(
                     Text(
                         text = "Yuk, kenalan dengan tanaman\ndi sekitar kita 🌱",
                         style = MaterialTheme.typography.bodyLarge,
-                        color = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.85f),
+                        color = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.9f),
                         lineHeight = 22.sp
                     )
 
@@ -336,9 +336,11 @@ private fun WelcomeHero(
                     PrimaryButton(
                         text = "Mulai Jelajah",
                         onClick = onMulaiJelajah,
-                        height = 52.dp,
-                        shapeRadius = 16.dp,
-                        modifier = Modifier.fillMaxWidth(0.85f)
+                        height = 54.dp,
+                        shapeRadius = 27.dp,
+                        containerColor = id.bubakangreen.app.ui.theme.WarmYellow,
+                        contentColor = id.bubakangreen.app.ui.theme.TextPrimary,
+                        modifier = Modifier.fillMaxWidth(0.9f)
                     )
                 }
 

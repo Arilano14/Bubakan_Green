@@ -99,6 +99,36 @@ fun PlantDetailScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        bottomBar = {
+            if (uiState.plant is UiState.Success) {
+                Surface(
+                    color = id.bubakangreen.app.ui.theme.SurfaceCard,
+                    shadowElevation = 8.dp,
+                    tonalElevation = 2.dp,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 12.dp)
+                    ) {
+                        if (isLessonCompleted) {
+                            PrimaryButton(
+                                text = "Kembali ke Katalog",
+                                onClick = onNavigateBack,
+                                height = 54.dp
+                            )
+                        } else {
+                            PrimaryButton(
+                                text = "Selesai Mengenal Tanaman Ini ✨",
+                                onClick = { isLessonCompleted = true },
+                                height = 54.dp
+                            )
+                        }
+                    }
+                }
+            }
+        },
         containerColor = BackgroundWarm,
         modifier = modifier
     ) { paddingValues ->
@@ -346,7 +376,7 @@ fun PlantDetailScreen(
 
                             Spacer(modifier = Modifier.height(28.dp))
 
-                            // Completion state
+                            // Completion state celebration
                             if (isLessonCompleted) {
                                 Column(
                                     modifier = Modifier.fillMaxWidth(),
@@ -354,12 +384,12 @@ fun PlantDetailScreen(
                                 ) {
                                     Mascot(
                                         type = MascotType.HAPPY,
-                                        size = 180.dp,
+                                        size = 160.dp,
                                         animateIdle = true
                                     )
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(14.dp))
                                     Text(
-                                        text = "Bagus! Kamu sudah mengenal tanaman ini.",
+                                        text = "Hebat! Kamu sudah mengenal tanaman ini 🎉",
                                         style = MaterialTheme.typography.titleMedium,
                                         fontWeight = FontWeight.ExtraBold,
                                         color = PrimaryGreenDark,
@@ -372,23 +402,18 @@ fun PlantDetailScreen(
                                         color = TextSecondary,
                                         textAlign = TextAlign.Center
                                     )
-                                    Spacer(modifier = Modifier.height(20.dp))
-                                    PrimaryButton(
-                                        text = "Kembali ke Katalog",
-                                        onClick = onNavigateBack,
-                                        height = 50.dp,
-                                        modifier = Modifier.fillMaxWidth(0.75f)
-                                    )
                                 }
                             } else {
-                                PrimaryButton(
-                                    text = "Selesai Mengenal Tanaman Ini ✨",
-                                    onClick = { isLessonCompleted = true },
-                                    height = 52.dp
+                                Text(
+                                    text = "💡 Ketuk tombol di bawah setelah selesai mempelajari tanaman ini.",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = TextSecondary,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier.fillMaxWidth()
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(32.dp))
+                            Spacer(modifier = Modifier.height(24.dp))
                         }
                     }
                 }

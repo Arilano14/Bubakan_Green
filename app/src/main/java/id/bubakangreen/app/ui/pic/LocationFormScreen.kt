@@ -102,6 +102,28 @@ fun LocationFormScreen(
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
+        bottomBar = {
+            Surface(
+                color = SurfaceWhite,
+                shadowElevation = 8.dp,
+                tonalElevation = 2.dp,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                ) {
+                    id.bubakangreen.app.ui.components.PrimaryButton(
+                        text = if (locationId != null) "Simpan Perubahan" else "Kirim Pengajuan Kebun",
+                        onClick = { viewModel.saveLocation(picUid) },
+                        enabled = !state.isSaving,
+                        loading = state.isSaving,
+                        height = 54.dp
+                    )
+                }
+            }
+        },
         containerColor = BackgroundLight,
         topBar = {
             TopAppBar(
@@ -427,39 +449,7 @@ fun LocationFormScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
-
-            // Submit Button
-            Button(
-                onClick = { viewModel.saveLocation(picUid) },
-                enabled = !state.isSaving,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = PrimaryForest,
-                    contentColor = OnPrimaryWhite
-                ),
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(52.dp)
-            ) {
-                if (state.isSaving) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(22.dp),
-                        strokeWidth = 2.dp,
-                        color = OnPrimaryWhite
-                    )
-                } else {
-                    Text(
-                        text = if (locationId != null) "Simpan Perubahan" else "Kirim Pengajuan Kebun",
-                        style = MaterialTheme.typography.labelLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

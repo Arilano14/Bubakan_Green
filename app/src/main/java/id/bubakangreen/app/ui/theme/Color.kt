@@ -3,68 +3,90 @@ package id.bubakangreen.app.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ==========================================================
-// BUBAKAN GREEN — ECO-GREEN COLOR SYSTEM
-// Baseline Eco-Green identity with Mascot emotional energy
+// BUBAKAN GREEN — ECO-LEARNING COLOR SYSTEM
+// Duolingo-inspired friendly, character-driven botanical palette
 // ==========================================================
 
-// Core Brand Greens (50–60% structural brand presence)
-val PrimaryGreen = Color(0xFF5B9B4A)       // Fresh botanical chlorophyll green
-val PrimaryGreenDark = Color(0xFF3F7337)   // Deep tactile rim & structural contrast
-val PrimaryGreenLight = Color(0xFFE7F4DD)  // Soft sprout container wash
-val EcoMint = Color(0xFF8FD8B0)            // Calming garden mint accent
+// Primary Botanical Greens
+val ForestGreen = Color(0xFF265828)        // Deep rich structural evergreen
+val LeafGreen = Color(0xFF4CAF50)          // Fresh lively chlorophyll green
+val LeafGreenDark = Color(0xFF1E4620)      // High contrast rim and text accent
+val LeafGreenLight = Color(0xFFE8F5E9)     // Soft tender sprout tint
+val EcoMint = Color(0xFF81C784)            // Gentle garden mint
 
-// Mascot Emotional Accents (5–10% accent presence)
-val MascotYellow = Color(0xFFFFD96A)      // Warm radiant bud yellow
-val MascotOrange = Color(0xFFFF8A4C)      // Warm gradient glow orange
-val Coral = Color(0xFFF46B5F)             // Warm energetic coral
-val PinkAccent = Color(0xFFF27B86)        // Mascot cape / friendly spark accent
-val AquaAccent = Color(0xFF68D5C5)        // Pure morning dew / audio accent
+// Secondary Energetic Accents (Character / Mascot matching)
+val WarmYellow = Color(0xFFFFCA28)         // Radiant friendly sun yellow
+val WarmYellowLight = Color(0xFFFFF8E1)    // Soft buttercup pill container
+val SoftOrange = Color(0xFFFF7043)         // Lively friendly orange (matches mascot energy)
+val SoftOrangeLight = Color(0xFFFBE9E7)    // Soft peach card wash
+val SoftCoral = Color(0xFFFF5252)          // Playful highlight coral
 
-// Surfaces & Warm Canvases (25–35% clean breathing space)
-val BackgroundWarm = Color(0xFFFFF9EC)    // Warm organic cream canvas
-val Surface = Color(0xFFFFFFFF)           // Crisp card surface
-val TextPrimary = Color(0xFF28352A)       // Deep readable botanical charcoal
-val TextSecondary = Color(0xFF667267)     // Gentle readable secondary text
-val BorderDivider = Color(0xFFDCE7D8)     // Soft organic divider
+// Surfaces & Warm Botanical Paper Canvas
+val BotanicalPaper = Color(0xFFFAF7EE)     // Warm organic cream paper style
+val SurfaceCard = Color(0xFFFFFFFF)        // Clean white card surface
+val SurfaceCardPressed = Color(0xFFF2ECE1) // Tactile pressed state
+val BorderCard = Color(0xFFE2DAC8)         // Gentle organic outline
+val DividerSoft = Color(0xFFEDE6D6)        // Subtle separation divider
 
-// Status & Material Feedback
-val StatusPublishedGreen = Color(0xFF5B9B4A)
-val StatusVerifiedGreen = StatusPublishedGreen
-val StatusPendingOrange = Color(0xFFFF8A4C)
-val StatusReviewAmber = StatusPendingOrange
-val ErrorMaterialRed = Color(0xFFBA1A1A)   // Standard Material error color
+// Deep High-Contrast Readable Typography
+val TextPrimary = Color(0xFF1B2E1C)        // Deep forest botanical charcoal (accessible contrast)
+val TextSecondary = Color(0xFF566957)      // Readable secondary description
+val TextMuted = Color(0xFF7D8F7E)          // Small captions and metadata
+val TextOnColor = Color(0xFFFFFFFF)        // Crisp white text on primary buttons
+
+// Feedback & Status Colors
+val NaturalGreen = Color(0xFF388E3C)       // Verified / published status
+val AlertOrange = Color(0xFFF57C00)        // Pending / warning indicator
+val FriendlyRed = Color(0xFFD32F2F)        // Approachable error feedback
 
 // ==========================================================
-// BACKWARD-COMPATIBLE ALIASES FOR EXISTING UI COMPONENTS
+// BACKWARD-COMPATIBLE ALIASES FOR COMPONENT STABILITY
 // ==========================================================
-val PrimarySeedlingGreen = PrimaryGreen
-val PrimaryForest = PrimaryGreen
-val PrimaryForestDark = PrimaryGreenDark
-val OnPrimaryWhite = Color(0xFFFFFFFF)
-val PrimaryContainerMint = PrimaryGreenLight
-val OnPrimaryContainerDark = Color(0xFF1B3814)
+val PrimaryGreen = LeafGreen
+val PrimaryGreenDark = ForestGreen
+val PrimaryGreenLight = LeafGreenLight
+val BackgroundWarm = BotanicalPaper
+val Surface = SurfaceCard
+val BorderDivider = BorderCard
+val MascotYellow = WarmYellow
+val MascotOrange = SoftOrange
+val AquaAccent = Color(0xFF4DB6AC)
+val PinkAccent = SoftCoral
 
-val AccentSunnyGold = MascotYellow
-val AccentSunnyContainer = Color(0xFFFFF5D6)
-val OnAccentGoldDark = Color(0xFF4D3800)
+val StatusPublishedGreen = NaturalGreen
+val StatusVerifiedGreen = NaturalGreen
+val StatusPendingOrange = AlertOrange
+val StatusReviewAmber = AlertOrange
+val ErrorMaterialRed = FriendlyRed
+
+val PrimarySeedlingGreen = LeafGreen
+val PrimaryForest = ForestGreen
+val PrimaryForestDark = ForestGreen
+val OnPrimaryWhite = TextOnColor
+val PrimaryContainerMint = LeafGreenLight
+val OnPrimaryContainerDark = ForestGreen
+
+val AccentSunnyGold = WarmYellow
+val AccentSunnyContainer = WarmYellowLight
+val OnAccentGoldDark = Color(0xFF4E342E)
 
 val AccentDewTeal = AquaAccent
-val AccentDewContainer = Color(0xFFE2F8F5)
-val OnDewTealDark = Color(0xFF0F4E47)
+val AccentDewContainer = Color(0xFFE0F2F1)
+val OnDewTealDark = Color(0xFF004D40)
 
-val SecondarySage = PrimaryGreenDark
-val OnSecondaryWhite = Color(0xFFFFFFFF)
+val SecondarySage = ForestGreen
+val OnSecondaryWhite = TextOnColor
 val SecondaryContainer = EcoMint
 
-val BackgroundVanilla = BackgroundWarm
-val BackgroundLight = BackgroundWarm
-val SurfaceCardWhite = Surface
-val SurfaceWhite = Surface
+val BackgroundVanilla = BotanicalPaper
+val BackgroundLight = BotanicalPaper
+val SurfaceCardWhite = SurfaceCard
+val SurfaceWhite = SurfaceCard
 val OnSurfaceForestDark = TextPrimary
 val OnSurfaceDark = TextPrimary
 val OnSurfaceSageMuted = TextSecondary
 val OnSurfaceVariant = TextSecondary
-val OutlineOrganic = BorderDivider
-val OutlineGrey = BorderDivider
-val ErrorRestrainedRed = ErrorMaterialRed
-val ErrorRed = ErrorMaterialRed
+val OutlineOrganic = BorderCard
+val OutlineGrey = BorderCard
+val ErrorRestrainedRed = FriendlyRed
+val ErrorRed = FriendlyRed
