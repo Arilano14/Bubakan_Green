@@ -47,6 +47,20 @@ import id.bubakangreen.app.ui.theme.TextSecondary
  * - Animated pill selection indicator
  * - Material Icons with AdminPanelSettings for Admin
  */
+import androidx.compose.foundation.layout.navigationBarsPadding
+
+/**
+ * AppBottomBar: 4-item Duolingo-inspired botanical footer navigation.
+ * Order:
+ * 1. Admin
+ * 2. Beranda
+ * 3. Lokasi
+ * 4. Katalog
+ * - Always anchored at the bottom of the screen
+ * - Minimum 48dp touch target per item (Fitts's Law)
+ * - Safe from gesture bars via navigationBarsPadding()
+ * - Animated pill selection indicator
+ */
 @Composable
 fun AppBottomBar(
     currentRoute: String?,
@@ -57,26 +71,27 @@ fun AppBottomBar(
         color = SurfaceCard,
         shadowElevation = 8.dp,
         tonalElevation = 2.dp,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(72.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .navigationBarsPadding()
+        ) {
             // Subtle top border divider
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
                     .background(BorderCard)
-                    .align(Alignment.TopCenter)
             )
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(72.dp)
-                    .padding(horizontal = 6.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
+                    .height(64.dp)
+                    .padding(horizontal = 4.dp),
+                horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 bottomNavigationItems.forEach { item ->
