@@ -212,7 +212,7 @@ fun AdminDashboardScreen(
                             Spacer(modifier = Modifier.height(16.dp))
                             PrimaryButton(
                                 text = "Muat Ulang",
-                                onClick = { viewModel.loadDashboard() },
+                                onClick = { viewModel.loadData() },
                                 height = 48.dp
                             )
                         }

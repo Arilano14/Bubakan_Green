@@ -1,14 +1,14 @@
 package id.bubakangreen.app.navigation
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.MenuBook
+import androidx.compose.material.icons.automirrored.outlined.MenuBook
 import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.outlined.AdminPanelSettings
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LocationOn
-import androidx.compose.material.icons.outlined.MenuBook
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
@@ -89,7 +89,7 @@ val bottomNavigationItems = listOf(
     BottomNavItem(
         screen = Screen.Catalog,
         label = "Katalog",
-        activeIcon = Icons.Filled.MenuBook,
-        inactiveIcon = Icons.Outlined.MenuBook
+        activeIcon = Icons.AutoMirrored.Filled.MenuBook,
+        inactiveIcon = Icons.AutoMirrored.Outlined.MenuBook
     )
 )

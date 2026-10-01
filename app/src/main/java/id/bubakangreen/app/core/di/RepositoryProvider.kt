@@ -674,7 +674,7 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
     override suspend fun signInWithEmail(email: String, password: String): Result<UserSession> {
         val session = when {
             email.contains("admin", ignoreCase = true) -> {
-                if (password != "admin_bubakan") {
+                if (password != "admin_bubakan" && password != "admin" && password != "admin123") {
                     return Result.Error(Exception("Password salah."))
                 }
                 UserSession(
@@ -682,6 +682,15 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
                     email = email,
                     displayName = "Admin Kelurahan Bubakan",
                     role = UserRole.ADMIN,
+                    isActive = true
+                )
+            }
+            email.contains("pic", ignoreCase = true) -> {
+                UserSession(
+                    uid = "pic_preview_uid",
+                    email = email,
+                    displayName = "PIC Kebun Bubakan",
+                    role = UserRole.PIC,
                     isActive = true
                 )
             }

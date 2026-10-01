@@ -17,7 +17,9 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -129,6 +131,15 @@ fun BubakanAppNavHost(
                                 }
                             } else {
                                 navController.navigate(Screen.Login.route)
+                            }
+                        } else if (item.screen == Screen.Home) {
+                            if (currentDestination?.route != Screen.Home.route) {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(navController.graph.findStartDestination().id) {
+                                        inclusive = false
+                                    }
+                                    launchSingleTop = true
+                                }
                             }
                         } else {
                             val destination = item.screen.route
@@ -302,12 +313,12 @@ fun BubakanAppNavHost(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateToPicDashboard = {
                         navController.navigate(Screen.PicDashboard.route) {
-                            popUpTo(Screen.Home.route)
+                            popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     },
                     onNavigateToAdminDashboard = {
                         navController.navigate(Screen.AdminDashboard.route) {
-                            popUpTo(Screen.About.route)
+                            popUpTo(Screen.Login.route) { inclusive = true }
                         }
                     }
                 )

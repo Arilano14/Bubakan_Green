@@ -489,11 +489,16 @@ private fun DailyTipSection(
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Mascot(
-                type = MascotType.THINKING,
-                size = 100.dp,
-                baseRotation = 3f
-            )
+            Box(
+                modifier = Modifier.width(96.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Mascot(
+                    type = MascotType.THINKING,
+                    size = 96.dp,
+                    baseRotation = 3f
+                )
+            }
         }
     }
 }

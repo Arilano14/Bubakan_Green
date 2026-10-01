@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.ui.graphics.Color
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -402,7 +403,7 @@ private fun ApprovalCard(
                     onClick = onApprove,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = PrimaryForest,
-                        contentColor = OnPrimaryWhite
+                        contentColor = Color.White
                     ),
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
@@ -412,12 +413,14 @@ private fun ApprovalCard(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
+                        tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = "Setujui & Terbitkan",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                        color = Color.White
                     )
                 }
             }
