@@ -78,28 +78,48 @@ fun BubakanAppNavHost(
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
 
+    val authRepo = remember { RepositoryProvider.getAuthRepository() }
+    val userSession by authRepo.currentUserSession.collectAsState(
+        initial = id.bubakangreen.app.domain.model.UserSession(
+            uid = "",
+            email = "",
+            displayName = "",
+            role = id.bubakangreen.app.domain.model.UserRole.PUBLIC
+        )
+    )
+
     val rootRoutes = listOf(
         Screen.Home.route,
         Screen.Locations.route,
         Screen.Catalog.route,
         Screen.About.route,
-        Screen.AdminDashboard.route
+        Screen.AdminDashboard.route,
+        Screen.PicDashboard.route
     )
     val showBottomBar = currentDestination?.route in rootRoutes
+    val effectiveRoute = if (currentDestination?.route == Screen.PicDashboard.route) {
+        Screen.AdminDashboard.route
+    } else {
+        currentDestination?.route
+    }
 
     Scaffold(
         bottomBar = {
             if (showBottomBar) {
                 id.bubakangreen.app.ui.navigation.AppBottomBar(
-                    currentRoute = currentDestination?.route,
+                    currentRoute = effectiveRoute,
                     onItemClick = { item ->
                         keyboardController?.hide()
                         focusManager.clearFocus()
                         if (item.screen == Screen.AdminDashboard) {
-                            val authRepo = RepositoryProvider.getAuthRepository()
                             if (authRepo.isUserSignedIn()) {
-                                if (currentDestination?.route != Screen.AdminDashboard.route) {
-                                    navController.navigate(Screen.AdminDashboard.route) {
+                                val targetRoute = if (userSession.role == id.bubakangreen.app.domain.model.UserRole.PIC) {
+                                    Screen.PicDashboard.route
+                                } else {
+                                    Screen.AdminDashboard.route
+                                }
+                                if (currentDestination?.route != targetRoute) {
+                                    navController.navigate(targetRoute) {
                                         popUpTo(navController.graph.findStartDestination().id) {
                                             saveState = true
                                         }

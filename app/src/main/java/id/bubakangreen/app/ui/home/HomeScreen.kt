@@ -336,21 +336,28 @@ private fun WelcomeHero(
                     PrimaryButton(
                         text = "Mulai Jelajah",
                         onClick = onMulaiJelajah,
-                        height = 54.dp,
-                        shapeRadius = 27.dp,
+                        height = 50.dp,
+                        shapeRadius = 25.dp,
                         containerColor = id.bubakangreen.app.ui.theme.WarmYellow,
                         contentColor = id.bubakangreen.app.ui.theme.TextPrimary,
-                        modifier = Modifier.fillMaxWidth(0.9f)
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
 
-                // Mascot floating beside the text
-                Mascot(
-                    type = MascotType.GREETING,
-                    size = 150.dp,
-                    baseRotation = 2f,
-                    animateIdle = true
-                )
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Mascot in reserved layout space (Section 14 & 15)
+                Box(
+                    modifier = Modifier.width(136.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Mascot(
+                        type = MascotType.GREETING,
+                        size = 136.dp,
+                        baseRotation = 2f,
+                        animateIdle = true
+                    )
+                }
             }
         }
     }

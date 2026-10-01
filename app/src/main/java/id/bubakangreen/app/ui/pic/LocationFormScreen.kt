@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -107,19 +109,23 @@ fun LocationFormScreen(
                 color = SurfaceWhite,
                 shadowElevation = 8.dp,
                 tonalElevation = 2.dp,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+                    .imePadding()
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .padding(horizontal = 16.dp, vertical = 12.dp)
                 ) {
                     id.bubakangreen.app.ui.components.PrimaryButton(
                         text = if (locationId != null) "Simpan Perubahan" else "Kirim Pengajuan Kebun",
                         onClick = { viewModel.saveLocation(picUid) },
                         enabled = !state.isSaving,
                         loading = state.isSaving,
-                        height = 54.dp
+                        height = 54.dp,
+                        shapeRadius = 27.dp
                     )
                 }
             }

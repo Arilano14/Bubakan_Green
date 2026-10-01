@@ -298,10 +298,10 @@ private fun ApprovalCard(
                     color = BackgroundLight
                 ) {
                     Text(
-                        text = "Diajukan oleh: ${location.picUid.take(10)}...",
+                        text = "Petugas RW ${location.rw}",
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = OnSurfaceVariant,
-                            fontSize = 10.sp
+                            fontWeight = FontWeight.Medium
                         ),
                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
                     )
