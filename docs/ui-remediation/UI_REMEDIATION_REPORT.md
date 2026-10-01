@@ -94,28 +94,28 @@ All tab transitions are non-destructive and maintain stack integrity:
 
 ---
 
-## 4. ADMIN NAVIGATION IMPLEMENTATION
+## 4. ADMIN NAVIGATION & SESSION PERSISTENCE
 
-### Leftmost Footer Placement
-The global bottom navigation strictly follows the mandatory ordering:
+### Rightmost Footer Placement & Profile Button Removal
+The global bottom navigation strictly follows the approved order with **Admin on the far right** (`sebelah paling kanan navbar`):
 
-1. **ADMIN** (`AdminPanelSettings` / `AdminPanelSettingsOutlined`)
-2. **BERANDA** (`Home` / `HomeOutlined`)
-3. **LOKASI** (`LocationOn` / `LocationOnOutlined`)
-4. **KATALOG** (`MenuBook` / `MenuBookOutlined` auto-mirrored)
+1. **BERANDA** (`Icons.Rounded.Home` / `Icons.Outlined.Home`)
+2. **LOKASI** (`Icons.Rounded.Explore` / `Icons.Outlined.Explore`)
+3. **KATALOG** (`Icons.Rounded.LocalFlorist` / `Icons.Outlined.LocalFlorist`)
+4. **ADMIN** (`Icons.Rounded.Dashboard` / `Icons.Outlined.Dashboard` — Rightmost)
 
-### Role-Based Routing Logic
-When the user taps the leftmost **Admin** tab:
-1. **Unauthenticated User:**
-   - Navigates immediately to `Screen.Login.route`.
-   - The user is prompted to sign in with their administrative credentials.
-2. **Authenticated Administrator:**
-   - Routes directly to `Screen.AdminDashboard.route`.
-   - Accesses plant management, location management, and approval workflows.
-3. **Authenticated PIC:**
-   - Routes to `Screen.PicDashboard.route`.
-4. **Security Invariant:**
-   - The bottom bar serves strictly as an entry point. Firestore security rules and repository authentication remain authoritative.
+All standalone Profile buttons have been removed from the navigation bar, headers, and screens for an uncluttered and focused mobile experience.
+
+### Permanent Admin Session Persistence
+- An `AuthSessionStorage` singleton backed by Android `SharedPreferences` was implemented.
+- **First-Time Admin Login:** Once an administrator signs in, their authenticated session is permanently recorded on device.
+- **Permanent Admin Mode:** On every subsequent app launch (even across complete process kills and cold restarts), the application automatically loads the permanent Admin state without prompting for credentials again.
+- Tapping the rightmost **Admin** button immediately opens `AdminDashboardScreen` directly.
+
+### Professional Icon Modernization & UX Law Touch Sizing
+- All navbar icons were upgraded from generic shapes to curated Material Rounded/Outlined symbols matching botanical and civic domains (`Home`, `Explore`, `LocalFlorist`, `Dashboard`).
+- In accordance with **Fitts's Law** and WCAG 2.5.5, all interactive touch targets (back buttons, search clear, password visibility toggles, navbar items) provide at least **48dp × 48dp** interactive bounds.
+- Navbar labels adhere to the $\ge 12\text{sp}$ legibility rule.
 
 ---
 

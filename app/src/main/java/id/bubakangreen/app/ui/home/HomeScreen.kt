@@ -268,10 +268,9 @@ private fun WelcomeHero(
                 .fillMaxWidth()
                 .padding(top = 48.dp, bottom = 24.dp, start = 20.dp, end = 20.dp)
         ) {
-            // Top row: app name + action icons
+            // Top row: app name branding
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
@@ -286,22 +285,6 @@ private fun WelcomeHero(
                         text = "Kelurahan Bubakan, Mijen",
                         style = MaterialTheme.typography.labelSmall,
                         color = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.7f)
-                    )
-                }
-
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.18f))
-                        .clickable(onClick = onInfoClick),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Outlined.Info,
-                        contentDescription = "Tentang Program",
-                        tint = id.bubakangreen.app.ui.theme.TextOnColor,
-                        modifier = Modifier.size(18.dp)
                     )
                 }
             }

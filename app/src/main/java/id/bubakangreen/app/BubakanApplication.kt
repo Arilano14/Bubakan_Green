@@ -10,6 +10,7 @@ class BubakanApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        id.bubakangreen.app.core.di.RepositoryProvider.init(this)
 
         // Initialize Firebase offline persistence safely if Firebase is initialized
         try {

@@ -61,11 +61,11 @@ fun BubakanTopBar(
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Navigation Back Action
+            // Navigation Back Action (UX Law: 48dp touch target)
             if (canNavigateBack) {
                 Box(
                     modifier = Modifier
-                        .size(40.dp)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(SurfaceCardWhite)
                         .clickable(onClick = onNavigateBack),
@@ -75,7 +75,7 @@ fun BubakanTopBar(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Kembali ke layar sebelumnya",
                         tint = OnSurfaceForestDark,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))

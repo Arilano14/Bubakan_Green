@@ -19,6 +19,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -230,9 +232,11 @@ fun LoginScreen(
                         onClick = { passwordVisible = !passwordVisible },
                         modifier = Modifier.size(48.dp)
                     ) {
-                        Text(
-                            text = if (passwordVisible) "🙈" else "👁️",
-                            fontSize = 16.sp
+                        Icon(
+                            imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                            contentDescription = if (passwordVisible) "Sembunyikan kata sandi" else "Tampilkan kata sandi",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 },

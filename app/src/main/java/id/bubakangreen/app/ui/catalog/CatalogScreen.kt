@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -20,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -124,16 +126,21 @@ fun CatalogScreen(
             },
             trailingIcon = {
                 if (uiState.searchQuery.isNotBlank()) {
-                    Icon(
-                        imageVector = Icons.Outlined.Close,
-                        contentDescription = "Hapus Pencarian",
-                        tint = TextSecondary,
-                        modifier = Modifier.clickable {
+                    IconButton(
+                        onClick = {
                             viewModel.resetSearch()
                             focusManager.clearFocus()
                             keyboardController?.hide()
-                        }
-                    )
+                        },
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.Close,
+                            contentDescription = "Hapus Pencarian",
+                            tint = TextSecondary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             },
             singleLine = true,

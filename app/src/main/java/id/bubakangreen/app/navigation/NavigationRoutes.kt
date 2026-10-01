@@ -1,23 +1,23 @@
 package id.bubakangreen.app.navigation
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
-import androidx.compose.material.icons.automirrored.outlined.MenuBook
-import androidx.compose.material.icons.filled.AdminPanelSettings
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.outlined.AdminPanelSettings
+import androidx.compose.material.icons.outlined.Dashboard
+import androidx.compose.material.icons.outlined.Explore
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.LocationOn
+import androidx.compose.material.icons.outlined.LocalFlorist
+import androidx.compose.material.icons.rounded.Dashboard
+import androidx.compose.material.icons.rounded.Explore
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.LocalFlorist
 import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * Navigation destination contract for BUBAKAN GREEN.
  * Strictly models the approved 4-item global footer navigation:
- * 1. Admin (AdminPanelSettings)
- * 2. Beranda (Home)
- * 3. Lokasi (LocationOn)
- * 4. Katalog (MenuBook)
+ * 1. Beranda (Home)
+ * 2. Lokasi (Explore)
+ * 3. Katalog (LocalFlorist)
+ * 4. Admin (Dashboard) - Rightmost
  */
 sealed class Screen(
     val route: String,
@@ -55,10 +55,10 @@ sealed class Screen(
 /**
  * Global 4-item bottom navigation contract.
  * Order:
- * 1. ADMIN (AdminPanelSettings)
- * 2. BERANDA (Home)
- * 3. LOKASI (LocationOn)
- * 4. KATALOG (MenuBook)
+ * 1. BERANDA (Home)
+ * 2. LOKASI (Explore)
+ * 3. KATALOG (LocalFlorist)
+ * 4. ADMIN (Dashboard - Rightmost)
  */
 data class BottomNavItem(
     val screen: Screen,
@@ -69,27 +69,27 @@ data class BottomNavItem(
 
 val bottomNavigationItems = listOf(
     BottomNavItem(
-        screen = Screen.AdminDashboard,
-        label = "Admin",
-        activeIcon = Icons.Filled.AdminPanelSettings,
-        inactiveIcon = Icons.Outlined.AdminPanelSettings
-    ),
-    BottomNavItem(
         screen = Screen.Home,
         label = "Beranda",
-        activeIcon = Icons.Filled.Home,
+        activeIcon = Icons.Rounded.Home,
         inactiveIcon = Icons.Outlined.Home
     ),
     BottomNavItem(
         screen = Screen.Locations,
         label = "Lokasi",
-        activeIcon = Icons.Filled.LocationOn,
-        inactiveIcon = Icons.Outlined.LocationOn
+        activeIcon = Icons.Rounded.Explore,
+        inactiveIcon = Icons.Outlined.Explore
     ),
     BottomNavItem(
         screen = Screen.Catalog,
         label = "Katalog",
-        activeIcon = Icons.AutoMirrored.Filled.MenuBook,
-        inactiveIcon = Icons.AutoMirrored.Outlined.MenuBook
+        activeIcon = Icons.Rounded.LocalFlorist,
+        inactiveIcon = Icons.Outlined.LocalFlorist
+    ),
+    BottomNavItem(
+        screen = Screen.AdminDashboard,
+        label = "Admin",
+        activeIcon = Icons.Rounded.Dashboard,
+        inactiveIcon = Icons.Outlined.Dashboard
     )
 )

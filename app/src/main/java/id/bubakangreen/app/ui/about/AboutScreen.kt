@@ -209,37 +209,7 @@ fun AboutScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
 
-            // Section 19: Profile Admin Entry Point
-            Card(
-                shape = RoundedCornerShape(20.dp),
-                colors = CardDefaults.cardColors(containerColor = Surface),
-                border = BorderStroke(1.5.dp, BorderDivider),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
-                    Text(
-                        text = "Kelola Data",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = TextPrimary
-                    )
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Akses khusus pengelola Kelurahan Bubakan untuk mengelola data lahan, tanaman, kondisi, dan koordinat.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = TextSecondary
-                    )
-                    Spacer(modifier = Modifier.height(14.dp))
-                    id.bubakangreen.app.ui.components.PrimaryButton(
-                        text = "Masuk Sebagai Admin",
-                        onClick = onAdminClick,
-                        height = 54.dp
-                    )
-                }
-            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

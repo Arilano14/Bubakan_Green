@@ -34,6 +34,14 @@ import kotlinx.coroutines.flow.flowOf
  */
 object RepositoryProvider {
 
+    private var appContext: android.content.Context? = null
+
+    fun init(context: android.content.Context) {
+        appContext = context.applicationContext
+    }
+
+    fun getAppContext(): android.content.Context? = appContext
+
     private var locationRepo: LocationRepository? = null
     private var plantRepo: PlantRepository? = null
     private var authRepo: AuthRepository? = null
@@ -665,11 +673,16 @@ private object UiPreviewOnlyPlantRepository : PlantRepository {
  * UI_PREVIEW_ONLY: Fixture Auth repository for offline UI testing and previews.
  */
 private object UiPreviewOnlyAuthRepository : AuthRepository {
-    private val sessionState = MutableStateFlow(
-        UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC)
-    )
+    private val sessionState: MutableStateFlow<UserSession> by lazy {
+        val context = RepositoryProvider.getAppContext()
+        val savedSession = context?.let { id.bubakangreen.app.core.auth.AuthSessionStorage.getPermanentAdminSession(it) }
+        MutableStateFlow(
+            savedSession ?: UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC)
+        )
+    }
 
-    override val currentUserSession: Flow<UserSession> = sessionState.asStateFlow()
+    override val currentUserSession: Flow<UserSession>
+        get() = sessionState.asStateFlow()
 
     override suspend fun signInWithEmail(email: String, password: String): Result<UserSession> {
         val session = when {
@@ -677,13 +690,17 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
                 if (password != "admin_bubakan" && password != "admin" && password != "admin123") {
                     return Result.Error(Exception("Password salah."))
                 }
-                UserSession(
+                val adminSession = UserSession(
                     uid = "admin_preview_uid",
                     email = email,
                     displayName = "Admin Kelurahan Bubakan",
                     role = UserRole.ADMIN,
                     isActive = true
                 )
+                RepositoryProvider.getAppContext()?.let {
+                    id.bubakangreen.app.core.auth.AuthSessionStorage.savePermanentAdmin(it, adminSession)
+                }
+                adminSession
             }
             email.contains("pic", ignoreCase = true) -> {
                 UserSession(
@@ -712,6 +729,9 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
     }
 
     override suspend fun signOut(): Result<Unit> {
+        RepositoryProvider.getAppContext()?.let {
+            id.bubakangreen.app.core.auth.AuthSessionStorage.clearSession(it)
+        }
         sessionState.value = UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC)
         return Result.Success(Unit)
     }

@@ -22,7 +22,13 @@ class FirebaseAuthRepository(
         val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user == null) {
-                trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC, isActive = true))
+                val permanentAdmin = id.bubakangreen.app.core.di.RepositoryProvider.getAppContext()
+                    ?.let { id.bubakangreen.app.core.auth.AuthSessionStorage.getPermanentAdminSession(it) }
+                if (permanentAdmin != null) {
+                    trySend(permanentAdmin)
+                } else {
+                    trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC, isActive = true))
+                }
             } else {
                 getFirestore().collection("users").document(user.uid).get()
                     .addOnSuccessListener { doc ->
@@ -79,15 +85,17 @@ class FirebaseAuthRepository(
                 )
             }
 
-            Result.Success(
-                UserSession(
-                    uid = user.uid,
-                    email = user.email ?: "",
-                    displayName = userDoc.getString("name") ?: user.displayName ?: user.email ?: "Admin",
-                    role = UserRole.ADMIN,
-                    isActive = true
-                )
+            val session = UserSession(
+                uid = user.uid,
+                email = user.email ?: "",
+                displayName = userDoc.getString("name") ?: user.displayName ?: user.email ?: "Admin",
+                role = UserRole.ADMIN,
+                isActive = true
             )
+            id.bubakangreen.app.core.di.RepositoryProvider.getAppContext()?.let {
+                id.bubakangreen.app.core.auth.AuthSessionStorage.savePermanentAdmin(it, session)
+            }
+            Result.Success(session)
         } catch (e: Exception) {
             val friendlyMessage = when {
                 e is SecurityException -> e.message ?: "Akun ini tidak memiliki akses admin."
@@ -103,6 +111,9 @@ class FirebaseAuthRepository(
 
     override suspend fun signOut(): Result<Unit> {
         return try {
+            id.bubakangreen.app.core.di.RepositoryProvider.getAppContext()?.let {
+                id.bubakangreen.app.core.auth.AuthSessionStorage.clearSession(it)
+            }
             auth.signOut()
             Result.Success(Unit)
         } catch (e: Exception) {

@@ -149,12 +149,12 @@ private fun AppBottomBarItem(
                 scaleY = scale
             }
         ) {
-            // Selected Pill Indicator
+            // Selected Pill Indicator (UX Law: clear state differentiation & 48dp+ interactive region)
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(16.dp))
                     .background(if (isSelected) LeafGreenLight else androidx.compose.ui.graphics.Color.Transparent)
-                    .padding(horizontal = 14.dp, vertical = 4.dp),
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
@@ -170,8 +170,8 @@ private fun AppBottomBarItem(
             Text(
                 text = item.label,
                 style = MaterialTheme.typography.labelSmall,
-                fontSize = 11.sp,
-                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.Medium,
+                fontSize = 12.sp,
+                fontWeight = if (isSelected) FontWeight.ExtraBold else FontWeight.SemiBold,
                 color = iconColor,
                 maxLines = 1
             )

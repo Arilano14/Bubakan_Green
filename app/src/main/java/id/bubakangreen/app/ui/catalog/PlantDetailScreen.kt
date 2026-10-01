@@ -186,13 +186,13 @@ fun PlantDetailScreen(
                                 modifier = Modifier.fillMaxSize()
                             )
 
-                            // Back button overlay
+                            // Back button overlay (UX Law: 48dp touch target)
                             Box(
                                 modifier = Modifier
                                     .padding(16.dp)
-                                    .size(40.dp)
+                                    .size(48.dp)
                                     .clip(CircleShape)
-                                    .background(Color.White.copy(alpha = 0.9f))
+                                    .background(Color.White.copy(alpha = 0.95f))
                                     .clickable(onClick = onNavigateBack),
                                 contentAlignment = Alignment.Center
                             ) {
@@ -200,7 +200,7 @@ fun PlantDetailScreen(
                                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                     contentDescription = "Kembali",
                                     tint = TextPrimary,
-                                    modifier = Modifier.size(20.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
                         }
