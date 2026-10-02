@@ -5,9 +5,11 @@ import id.bubakangreen.app.domain.model.UserRole
 import id.bubakangreen.app.domain.model.UserSession
 
 /**
- * AuthSessionStorage: Persistent storage for administrator session.
- * Ensures that once an admin logs in for the first time, the application permanently
- * retains the authenticated admin state across app restarts without requiring re-login.
+ * AuthSessionStorage: UI/cache convenience storage for administrator details.
+ * Used for offline preview convenience and UX persistence.
+ * NOTE: This does NOT serve as an authoritative source of authentication or authorization.
+ * Authoritative identity is strictly managed by Firebase Authentication and enforced
+ * by Cloud Firestore Security Rules.
  */
 object AuthSessionStorage {
     private const val PREFS_NAME = "bubakan_auth_session"

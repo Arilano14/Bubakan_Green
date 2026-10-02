@@ -22,13 +22,7 @@ class FirebaseAuthRepository(
         val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
             val user = firebaseAuth.currentUser
             if (user == null) {
-                val permanentAdmin = id.bubakangreen.app.core.di.RepositoryProvider.getAppContext()
-                    ?.let { id.bubakangreen.app.core.auth.AuthSessionStorage.getPermanentAdminSession(it) }
-                if (permanentAdmin != null) {
-                    trySend(permanentAdmin)
-                } else {
-                    trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC, isActive = true))
-                }
+                trySend(UserSession(uid = "", email = "", displayName = "", role = UserRole.PUBLIC, isActive = true))
             } else {
                 getFirestore().collection("users").document(user.uid).get()
                     .addOnSuccessListener { doc ->
@@ -122,9 +116,7 @@ class FirebaseAuthRepository(
     }
 
     override fun isUserSignedIn(): Boolean {
-        if (auth.currentUser != null) return true
-        val context = id.bubakangreen.app.core.di.RepositoryProvider.getAppContext() ?: return false
-        return id.bubakangreen.app.core.auth.AuthSessionStorage.isPermanentAdmin(context)
+        return auth.currentUser != null
     }
 }
 
