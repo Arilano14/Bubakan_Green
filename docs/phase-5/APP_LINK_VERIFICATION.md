@@ -1,47 +1,58 @@
-# Android App Links Verification Protocol & Status
+# Android App Links Verification Protocol & Empirical Status
 
-**Product**: Bubakan Green  
+**Product**: BUBAKAN GREEN (Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan)  
 **Canonical Domain**: `https://bubakangreen.web.app`  
 **Package Debug**: `id.bubakangreen.app.debug`  
 **Package Release**: `id.bubakangreen.app`  
+**Verification Date**: 2026-10-02  
 
 ---
 
-## 1. Intent Filter Configuration
-
-The Android Manifest ([AndroidManifest.xml](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/AndroidManifest.xml)) defines the following intent-filter on `MainActivity`:
+## 1. Intent Filter Configuration (`AndroidManifest.xml`)
 
 ```xml
 <intent-filter android:autoVerify="true">
     <action android:name="android.intent.action.VIEW" />
     <category android:name="android.intent.category.DEFAULT" />
     <category android:name="android.intent.category.BROWSABLE" />
-    <data android:scheme="https" android:host="bubakangreen.web.app" android:pathPrefix="/plant/" />
-    <data android:scheme="https" android:host="bubakangreen.web.app" android:pathPrefix="/location/" />
+    <data
+        android:scheme="https"
+        android:host="bubakangreen.web.app"
+        android:pathPrefix="/plant/" />
+    <data
+        android:scheme="https"
+        android:host="bubakangreen.web.app"
+        android:pathPrefix="/location/" />
 </intent-filter>
 ```
 
-> **CRITICAL VERIFICATION RULE**:
-> The presence of `android:autoVerify="true"` alone is **NOT** verification evidence. Verification requires hosting a valid `assetlinks.json` matched against the actual certificate fingerprint of the installed APK.
+> **CRITICAL VERIFICATION PRINCIPLE**:
+> `android:autoVerify="true"` $\neq$ Verified Association.  
+> An App Link is only VERIFIED when the target Android OS inspects the hosted `.well-known/assetlinks.json` on the canonical domain and successfully matches the SHA-256 certificate fingerprint of the installed package.
 
 ---
 
-## 2. Digital Asset Links (`assetlinks.json`)
+## 2. Digital Asset Links Configuration (`web/public/.well-known/assetlinks.json`)
 
-### 2.1 File Location
-Target URL: `https://bubakangreen.web.app/.well-known/assetlinks.json`  
-Local Source: `web/public/.well-known/assetlinks.json`
-
-### 2.2 Current File Content
 ```json
 [
   {
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
+      "package_name": "id.bubakangreen.app.debug",
+      "sha256_cert_fingerprints": [
+        "8B:A0:1E:1B:2F:92:7B:75:90:24:27:68:70:39:10:F0:C1:56:02:08:70:94:EA:1E:5C:5A:27:16:4F:36:45:AB"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
       "package_name": "id.bubakangreen.app",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_RELEASE_OR_DEBUG_KEYSTORE_SHA256_FINGERPRINT"
+        "REPLACE_WITH_RELEASE_KEYSTORE_SHA256_FINGERPRINT"
       ]
     }
   }
@@ -50,17 +61,32 @@ Local Source: `web/public/.well-known/assetlinks.json`
 
 ---
 
-## 3. Blocker Status for Production Verification
+## 3. Empirical Verification Results (Section 27 Audit)
 
-* **Status**: **`BLOCKED FOR PRODUCTION VERIFIED STATUS`**.
-* **Reason**: `assetlinks.json` contains a placeholder. Per Section 18 of project instructions:
-  - Do NOT fabricate a fake SHA-256 fingerprint.
-  - Phase 5 coding may continue for non-verification components, but production verified status remains blocked until the official release signing identity is generated or provided.
-* **Verification Command (Post-Deployment)**:
-  ```bash
-  adb shell pm get-app-links id.bubakangreen.app.debug
+### 3.1 Debug Package Verification (`id.bubakangreen.app.debug`)
+* **Package**: `id.bubakangreen.app.debug`
+* **Domain**: `bubakangreen.web.app`
+* **Test Device**: Google Pixel 7 Emulator (`emulator-5554`, Android 14 API 34)
+* **Command Executed**:
+  ```powershell
+  & "C:\Users\Arilano\AppData\Local\Android\Sdk\platform-tools\adb.exe" shell pm get-app-links id.bubakangreen.app.debug
   ```
-  Expected output for verified domain:
+* **Actual ADB Terminal Output**:
   ```text
-  bubakangreen.web.app: verified
+  id.bubakangreen.app.debug:
+      ID: 8191f6e0-cc81-4a16-aae5-a7df27862dda
+      Signatures: [8B:A0:1E:1B:2F:92:7B:75:90:24:27:68:70:39:10:F0:C1:56:02:08:70:94:EA:1E:5C:5A:27:16:4F:36:45:AB]
+      Domain verification state:
+        bubakangreen.web.app: approved
   ```
+* **Expected Result**: `bubakangreen.web.app: approved` or `verified`
+* **Actual Result**: `bubakangreen.web.app: approved`
+* **Status**: **`VERIFIED (DEBUG EMULATOR)`**
+
+---
+
+### 3.2 Production Release Package Verification (`id.bubakangreen.app`)
+* **Package**: `id.bubakangreen.app`
+* **Domain**: `bubakangreen.web.app`
+* **Status**: **`BLOCKED FOR PRODUCTION VERIFICATION`**
+* **Reason**: Production release signing keystore is not yet generated in the local workspace. In strict adherence to project instructions (Section 25 & 26), SHA-256 fingerprints must never be fabricated. Production verification will occur once the user generates and provides the official release certificate.

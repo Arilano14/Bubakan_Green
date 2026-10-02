@@ -19,7 +19,7 @@ class FirestorePlantRepository(
 ) : PlantRepository {
 
     private val masterPlantsCollection by lazy {
-        firestore.collection("plants")
+        firestore.collection("master_plants")
     }
 
     private val locationPlantsCollection by lazy {

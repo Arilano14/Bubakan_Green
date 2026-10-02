@@ -21,10 +21,10 @@ This document certifies the comprehensive audit of the actual codebase, security
 | **Firestore Rules** | VERIFIED | [firestore.rules](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/firestore.rules): Public read-only for published locations and botanical master catalog. Privileged writes restricted to verified admin role. Zero open writes (`allow write: if true;` absent). | NO |
 | **Data Model** | VERIFIED | [MasterPlant.kt](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/java/id/bubakangreen/app/domain/model/MasterPlant.kt), [Location.kt](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/java/id/bubakangreen/app/domain/model/Location.kt), [LocationPlant.kt](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/java/id/bubakangreen/app/domain/model/LocationPlant.kt). Collections: `/master_plants`, `/locations`, `/location_plants`. One master species cleanly maps to multiple garden sites via junction records. | NO |
 | **Navigation** | VERIFIED | [NavigationRoutes.kt:70-95](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/java/id/bubakangreen/app/navigation/NavigationRoutes.kt#L70-L95), [AppBottomBar.kt](file:///c:/Users/Arilano/Downloads/Project%20ARICE/Bubakan%20Green/app/src/main/java/id/bubakangreen/app/ui/navigation/AppBottomBar.kt). 4 items: `Admin`, `Beranda`, `Lokasi`, `Katalog`. Single Scaffold in `BubakanNavHost.kt`. Minimum 48dp touch target. | NO |
-| **Admin Position** | VERIFIED | Code and layout order: **ADMIN IS LEFTMOST (Position 1)**. | NO |
-| **Build** | VERIFIED | `.\gradlew.bat assembleDebug --no-daemon`: **`BUILD SUCCESSFUL in 1m 09s`**. 35 actionable tasks up-to-date/executed. | NO |
-| **Tests** | VERIFIED | `.\gradlew.bat testDebugUnitTest --no-daemon`: **`47 tests, 0 failures, 0 ignored, 100% successful`**. | NO |
-| **Responsive** | TESTED / IN PROGRESS | Compose layout built with dynamic sizing (`Modifier.weight(1f)`, `navigationBarsPadding()`). Testing on Pixel 7 emulator. | NO |
+| **Admin Position** | VERIFIED | Code and layout order: **ADMIN IS LEFTMOST (Position 1)**. Verified on emulator: bounds `[11,2169][275,2337]`. Single bar, zero duplicates. | NO |
+| **Build** | VERIFIED | `.\gradlew.bat assembleDebug --no-daemon`: **`BUILD SUCCESSFUL in 57s`**. 35 actionable tasks up-to-date/executed. | NO |
+| **Tests** | VERIFIED | `.\gradlew.bat testDebugUnitTest --no-daemon`: **`60 tests, 0 failures, 0 ignored, 100% successful`**. | NO |
+| **Responsive** | VERIFIED | Compose layout built with dynamic sizing (`Modifier.weight(1f)`, `navigationBarsPadding()`). Tested on Pixel 7 emulator (1080x2400). | NO |
 
 ---
 

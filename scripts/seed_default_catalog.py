@@ -41,7 +41,7 @@ def seed_firestore(service_account_path: str):
         relations = json.load(f)
 
     print("\n--- SEEDING MASTER PLANTS ---")
-    plants_col = db.collection("plants")
+    plants_col = db.collection("master_plants")
     created_plants = 0
     skipped_plants = 0
 

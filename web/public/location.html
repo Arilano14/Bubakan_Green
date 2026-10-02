@@ -134,7 +134,7 @@
         .then(function(doc) {
           var fields = doc.fields || {};
           var status = getStringField(fields, 'status');
-          if (status && status !== 'PUBLISHED') {
+          if (status && status !== 'PUBLISHED' && status !== 'ACTIVE' && status !== 'NEEDS_MAINTENANCE') {
             loadingEl.style.display = 'none';
             unavailableEl.style.display = 'block';
             return;

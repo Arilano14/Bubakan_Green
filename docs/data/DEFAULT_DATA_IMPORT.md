@@ -25,7 +25,7 @@ Dokumen ini menjelaskan prosedur resmi dan aman untuk mengimpor katalog default 
 
 | File | Koleksi Firestore | Jumlah Dokumen | Deskripsi |
 | :--- | :--- | :--- | :--- |
-| `docs/data/DEFAULT_PLANT_CATALOG.json` | `plants` (atau `master_plants`) | 9 Dokumen | 9 Spesies master botani unik terverifikasi POWO |
+| `docs/data/DEFAULT_PLANT_CATALOG.json` | `master_plants` | 9 Dokumen | 9 Spesies master botani unik terverifikasi POWO |
 | `docs/data/DEFAULT_LOCATION_PLANTS.json` | `location_plants` | 10 Dokumen | Relasi tanaman di Urban Farming & Taman Toga |
 
 ---
@@ -51,7 +51,7 @@ python scripts/seed_default_catalog.py --key path/to/serviceAccountKey.json
 ```python
 # Pseudokode Idempoten:
 for plant in default_plants:
-    doc_ref = db.collection("plants").document(plant["id"])
+    doc_ref = db.collection("master_plants").document(plant["id"])
     snapshot = doc_ref.get()
     if not snapshot.exists:
         doc_ref.set(plant)
