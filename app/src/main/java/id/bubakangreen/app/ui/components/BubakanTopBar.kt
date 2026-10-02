@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -49,6 +50,7 @@ fun BubakanTopBar(
     canNavigateBack: Boolean = false,
     onNavigateBack: () -> Unit = {},
     onInfoClick: (() -> Unit)? = null,
+    onQrClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -104,6 +106,25 @@ fun BubakanTopBar(
 
             // Action Buttons
             Row(verticalAlignment = Alignment.CenterVertically) {
+                if (onQrClick != null) {
+                    Box(
+                        modifier = Modifier
+                            .size(38.dp)
+                            .clip(CircleShape)
+                            .background(SurfaceCardWhite)
+                            .clickable(onClick = onQrClick),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.QrCode2,
+                            contentDescription = "Lihat Kode QR",
+                            tint = PrimaryForestDark,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                }
+
                 if (onInfoClick != null) {
                     Box(
                         modifier = Modifier

@@ -81,6 +81,10 @@ dependencies {
     // Location provider (single-shot capture)
     implementation(libs.play.services.location)
 
+    // Phase 5: QR Code generation & Google Code Scanner (zero camera permission)
+    implementation(libs.zxing.core)
+    implementation(libs.play.services.code.scanner)
+
     // Testing
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)

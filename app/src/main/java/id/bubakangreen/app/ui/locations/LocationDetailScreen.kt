@@ -30,6 +30,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -81,10 +84,13 @@ fun LocationDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
+    var showQrDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(locationId) {
         viewModel.loadLocationDetail(locationId)
     }
+
+    val currentLocation = (uiState.location as? UiState.Success)?.data
 
     Scaffold(
         topBar = {
@@ -93,7 +99,10 @@ fun LocationDetailScreen(
                 subtitle = "Kelurahan Bubakan",
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack,
-                onInfoClick = onInfoClick
+                onInfoClick = onInfoClick,
+                onQrClick = if (currentLocation?.isPublished == true) {
+                    { showQrDialog = true }
+                } else null
             )
         },
         containerColor = id.bubakangreen.app.ui.theme.BackgroundWarm,
@@ -345,6 +354,18 @@ fun LocationDetailScreen(
                 }
             }
         }
+    }
+
+    if (showQrDialog && currentLocation != null) {
+        val canonicalUrl = remember(currentLocation.id) {
+            id.bubakangreen.app.core.util.QrUrlBuilder.buildLocationUrl(currentLocation.id)
+        }
+        id.bubakangreen.app.ui.components.QrCodeDisplayDialog(
+            title = currentLocation.name,
+            subtitle = "RW ${currentLocation.rw} • Kelurahan Bubakan",
+            canonicalUrl = canonicalUrl,
+            onDismiss = { showQrDialog = false }
+        )
     }
 }
 

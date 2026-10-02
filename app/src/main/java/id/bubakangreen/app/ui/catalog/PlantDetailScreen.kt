@@ -22,6 +22,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -63,6 +64,7 @@ import id.bubakangreen.app.ui.components.ShimmerBox
 import id.bubakangreen.app.ui.theme.AquaAccent
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.ForestGreen
 import id.bubakangreen.app.ui.theme.PrimaryGreen
 import id.bubakangreen.app.ui.theme.PrimaryGreenDark
 import id.bubakangreen.app.ui.theme.PrimaryGreenLight
@@ -87,6 +89,7 @@ fun PlantDetailScreen(
     val scrollState = rememberScrollState()
     val snackbarHostState = remember { SnackbarHostState() }
     var isLessonCompleted by remember { mutableStateOf(false) }
+    var showQrDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(plantId) {
         viewModel.loadPlantDetail(plantId)
@@ -186,22 +189,47 @@ fun PlantDetailScreen(
                                 modifier = Modifier.fillMaxSize()
                             )
 
-                            // Back button overlay (UX Law: 48dp touch target)
-                            Box(
+                            // Navigation & Action buttons overlay (UX Law: 48dp touch target)
+                            Row(
                                 modifier = Modifier
-                                    .padding(16.dp)
-                                    .size(48.dp)
-                                    .clip(CircleShape)
-                                    .background(Color.White.copy(alpha = 0.95f))
-                                    .clickable(onClick = onNavigateBack),
-                                contentAlignment = Alignment.Center
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Kembali",
-                                    tint = TextPrimary,
-                                    modifier = Modifier.size(24.dp)
-                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(Color.White.copy(alpha = 0.95f))
+                                        .clickable(onClick = onNavigateBack),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Kembali",
+                                        tint = TextPrimary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+
+                                if (plant.isPublished) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clip(CircleShape)
+                                            .background(Color.White.copy(alpha = 0.95f))
+                                            .clickable { showQrDialog = true },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.QrCode2,
+                                            contentDescription = "Lihat Kode QR",
+                                            tint = ForestGreen,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
 
@@ -440,6 +468,19 @@ fun PlantDetailScreen(
                 }
             }
         }
+    }
+
+    if (showQrDialog && uiState.plant is UiState.Success) {
+        val currentPlant = (uiState.plant as UiState.Success).data
+        val canonicalUrl = remember(currentPlant.id) {
+            id.bubakangreen.app.core.util.QrUrlBuilder.buildPlantUrl(currentPlant.id)
+        }
+        id.bubakangreen.app.ui.components.QrCodeDisplayDialog(
+            title = currentPlant.nameId,
+            subtitle = currentPlant.nameLatin,
+            canonicalUrl = canonicalUrl,
+            onDismiss = { showQrDialog = false }
+        )
     }
 }
 
