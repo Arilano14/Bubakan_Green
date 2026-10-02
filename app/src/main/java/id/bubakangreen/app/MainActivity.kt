@@ -1,5 +1,6 @@
 package id.bubakangreen.app
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import id.bubakangreen.app.navigation.BubakanAppNavHost
 import id.bubakangreen.app.ui.theme.BubakanGreenTheme
-
 
 /**
  * Main Activity hosting BUBAKAN GREEN.
@@ -30,4 +30,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+    }
 }
+

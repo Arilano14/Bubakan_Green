@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,6 +61,7 @@ import id.bubakangreen.app.ui.theme.TextSecondary
 fun CatalogScreen(
     onPlantClick: (String) -> Unit,
     onInfoClick: () -> Unit,
+    onScanQrClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: CatalogViewModel = viewModel()
 ) {
@@ -139,6 +141,18 @@ fun CatalogScreen(
                             contentDescription = "Hapus Pencarian",
                             tint = TextSecondary,
                             modifier = Modifier.size(20.dp)
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = onScanQrClick,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Outlined.QrCodeScanner,
+                            contentDescription = "Pindai Kode QR",
+                            tint = PrimaryGreen,
+                            modifier = Modifier.size(22.dp)
                         )
                     }
                 }

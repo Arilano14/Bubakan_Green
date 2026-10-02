@@ -1,16 +1,22 @@
 package id.bubakangreen.app.navigation
 
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.core.util.Consumer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
@@ -21,7 +27,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import id.bubakangreen.app.core.di.RepositoryProvider
+import id.bubakangreen.app.core.util.ParsedQrResult
 import id.bubakangreen.app.data.location.AndroidLocationClient
+import id.bubakangreen.app.ui.scanner.CodeScannerHandler
+import kotlinx.coroutines.launch
 import id.bubakangreen.app.ui.about.AboutScreen
 import id.bubakangreen.app.ui.admin.AdminDashboardScreen
 import id.bubakangreen.app.ui.admin.AdminDashboardViewModel
@@ -58,6 +67,50 @@ fun BubakanAppNavHost(
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Handle deep links when app is already running (warm start / singleTop)
+    DisposableEffect(Unit) {
+        val activity = context as? ComponentActivity
+        val listener = Consumer<android.content.Intent> { newIntent ->
+            navController.handleDeepLink(newIntent)
+        }
+        activity?.addOnNewIntentListener(listener)
+        onDispose {
+            activity?.removeOnNewIntentListener(listener)
+        }
+    }
+
+    val handleScanQr: () -> Unit = {
+        CodeScannerHandler.startScan(
+            context = context,
+            onSuccess = { result ->
+                when (result) {
+                    is ParsedQrResult.Plant -> {
+                        navController.navigate(Screen.PlantDetail.createRoute(result.stableId))
+                    }
+                    is ParsedQrResult.Location -> {
+                        navController.navigate(Screen.LocationDetail.createRoute(result.stableId))
+                    }
+                    is ParsedQrResult.Invalid -> {
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = "QR Code tidak dikenali: ${result.reason}"
+                            )
+                        }
+                    }
+                }
+            },
+            onFailure = { error ->
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        message = "Gagal memindai: ${error.localizedMessage ?: "Pemindai tidak tersedia"}"
+                    )
+                }
+            }
+        )
+    }
 
     val authRepo = remember { RepositoryProvider.getAuthRepository() }
     val userSession by authRepo.currentUserSession.collectAsState(
@@ -85,6 +138,7 @@ fun BubakanAppNavHost(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         bottomBar = {
             if (showBottomBar) {
                 id.bubakangreen.app.ui.navigation.AppBottomBar(
@@ -177,7 +231,8 @@ fun BubakanAppNavHost(
                     },
                     onInfoClick = {
                         navController.navigate(Screen.About.route)
-                    }
+                    },
+                    onScanQrClick = handleScanQr
                 )
             }
 
@@ -201,7 +256,8 @@ fun BubakanAppNavHost(
                     },
                     onInfoClick = {
                         navController.navigate(Screen.About.route)
-                    }
+                    },
+                    onScanQrClick = handleScanQr
                 )
             }
 

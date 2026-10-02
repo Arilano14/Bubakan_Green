@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.QrCodeScanner
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -70,6 +71,7 @@ fun HomeScreen(
     onNavigateToLocations: (LocationType?) -> Unit,
     onNavigateToCatalog: () -> Unit,
     onInfoClick: () -> Unit,
+    onScanQrClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -92,6 +94,7 @@ fun HomeScreen(
             // Open composition: text left, mascot right. No card wrapper.
             WelcomeHero(
                 onMulaiJelajah = onNavigateToCatalog,
+                onScanQr = onScanQrClick,
                 onInfoClick = onInfoClick
             )
 
@@ -255,6 +258,7 @@ fun HomeScreen(
 @Composable
 private fun WelcomeHero(
     onMulaiJelajah: () -> Unit,
+    onScanQr: () -> Unit,
     onInfoClick: () -> Unit
 ) {
     // Green gradient header band
@@ -323,6 +327,19 @@ private fun WelcomeHero(
                         shapeRadius = 25.dp,
                         containerColor = id.bubakangreen.app.ui.theme.WarmYellow,
                         contentColor = id.bubakangreen.app.ui.theme.TextPrimary,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(10.dp))
+
+                    SecondaryButton(
+                        text = "Pindai Label QR",
+                        onClick = onScanQr,
+                        icon = Icons.Outlined.QrCodeScanner,
+                        height = 48.dp,
+                        shapeRadius = 24.dp,
+                        textColor = id.bubakangreen.app.ui.theme.TextOnColor,
+                        borderColor = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.5f),
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
