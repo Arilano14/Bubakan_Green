@@ -46,10 +46,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 /**
  * AppBottomBar: 4-item Duolingo-inspired botanical footer navigation.
  * Order:
- * 1. Beranda (Home)
- * 2. Lokasi (Explore)
- * 3. Katalog (LocalFlorist)
- * 4. Admin (Dashboard) — rightmost
+ * 1. Admin (Dashboard) — leftmost
+ * 2. Beranda (Home)
+ * 3. Lokasi (Explore)
+ * 4. Katalog (LocalFlorist)
  * - Always anchored at the bottom of the screen
  * - Minimum 48dp touch target per item (Fitts's Law)
  * - Safe from gesture bars via navigationBarsPadding()

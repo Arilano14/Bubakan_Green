@@ -55,10 +55,10 @@ sealed class Screen(
 /**
  * Global 4-item bottom navigation contract.
  * Order:
- * 1. BERANDA (Home)
- * 2. LOKASI (Explore)
- * 3. KATALOG (LocalFlorist)
- * 4. ADMIN (Dashboard - Rightmost)
+ * 1. ADMIN (Dashboard - Leftmost)
+ * 2. BERANDA (Home)
+ * 3. LOKASI (Explore)
+ * 4. KATALOG (LocalFlorist)
  */
 data class BottomNavItem(
     val screen: Screen,
@@ -68,6 +68,12 @@ data class BottomNavItem(
 )
 
 val bottomNavigationItems = listOf(
+    BottomNavItem(
+        screen = Screen.AdminDashboard,
+        label = "Admin",
+        activeIcon = Icons.Rounded.Dashboard,
+        inactiveIcon = Icons.Outlined.Dashboard
+    ),
     BottomNavItem(
         screen = Screen.Home,
         label = "Beranda",
@@ -85,11 +91,5 @@ val bottomNavigationItems = listOf(
         label = "Katalog",
         activeIcon = Icons.Rounded.LocalFlorist,
         inactiveIcon = Icons.Outlined.LocalFlorist
-    ),
-    BottomNavItem(
-        screen = Screen.AdminDashboard,
-        label = "Admin",
-        activeIcon = Icons.Rounded.Dashboard,
-        inactiveIcon = Icons.Outlined.Dashboard
     )
 )
