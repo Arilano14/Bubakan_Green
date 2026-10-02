@@ -2,20 +2,7 @@ package id.bubakangreen.app.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Place
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,10 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -59,11 +43,6 @@ import id.bubakangreen.app.ui.pic.PicDashboardViewModel
 import id.bubakangreen.app.ui.pic.PlantFormScreen
 import id.bubakangreen.app.ui.pic.PlantFormViewModel
 import id.bubakangreen.app.ui.theme.BackgroundWarm
-import id.bubakangreen.app.ui.theme.PrimaryGreen
-import id.bubakangreen.app.ui.theme.PrimaryGreenDark
-import id.bubakangreen.app.ui.theme.PrimaryGreenLight
-import id.bubakangreen.app.ui.theme.Surface
-import id.bubakangreen.app.ui.theme.TextSecondary
 
 /**
  * Main application navigation shell.
@@ -174,7 +153,7 @@ fun BubakanAppNavHost(
                     onPlantClick = { plantId ->
                         navController.navigate(Screen.PlantDetail.createRoute(plantId))
                     },
-                    onNavigateToLocations = {
+                    onNavigateToLocations = { _ ->
                         keyboardController?.hide()
                         focusManager.clearFocus()
                         navController.navigate(Screen.Locations.route) {

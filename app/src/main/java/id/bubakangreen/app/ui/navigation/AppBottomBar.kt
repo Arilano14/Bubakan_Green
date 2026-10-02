@@ -40,22 +40,16 @@ import id.bubakangreen.app.ui.theme.LeafGreenLight
 import id.bubakangreen.app.ui.theme.SurfaceCard
 import id.bubakangreen.app.ui.theme.TextSecondary
 
-/**
- * AppBottomBar: 5-item Duolingo-inspired botanical footer navigation.
- * - Always anchored at the bottom of the screen
- * - Minimum 48dp touch target per item (Fitts's Law)
- * - Animated pill selection indicator
- * - Material Icons with AdminPanelSettings for Admin
- */
+
 import androidx.compose.foundation.layout.navigationBarsPadding
 
 /**
  * AppBottomBar: 4-item Duolingo-inspired botanical footer navigation.
  * Order:
- * 1. Admin
- * 2. Beranda
- * 3. Lokasi
- * 4. Katalog
+ * 1. Beranda (Home)
+ * 2. Lokasi (Explore)
+ * 3. Katalog (LocalFlorist)
+ * 4. Admin (Dashboard) — rightmost
  * - Always anchored at the bottom of the screen
  * - Minimum 48dp touch target per item (Fitts's Law)
  * - Safe from gesture bars via navigationBarsPadding()

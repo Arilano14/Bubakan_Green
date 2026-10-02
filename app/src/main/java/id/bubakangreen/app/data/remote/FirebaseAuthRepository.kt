@@ -121,6 +121,10 @@ class FirebaseAuthRepository(
         }
     }
 
-    override fun isUserSignedIn(): Boolean = auth.currentUser != null
+    override fun isUserSignedIn(): Boolean {
+        if (auth.currentUser != null) return true
+        val context = id.bubakangreen.app.core.di.RepositoryProvider.getAppContext() ?: return false
+        return id.bubakangreen.app.core.auth.AuthSessionStorage.isPermanentAdmin(context)
+    }
 }
 
