@@ -1,5 +1,6 @@
 package id.bubakangreen.app.ui.catalog
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -90,6 +91,10 @@ fun PlantDetailScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     var isLessonCompleted by remember { mutableStateOf(false) }
     var showQrDialog by remember { mutableStateOf(false) }
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     LaunchedEffect(plantId) {
         viewModel.loadPlantDetail(plantId)

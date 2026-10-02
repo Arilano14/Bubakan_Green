@@ -144,7 +144,11 @@ class LocationFormViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true, validationError = null) }
 
-            val locationId = current.locationId ?: "LOC_${System.currentTimeMillis()}"
+            val locationId = current.locationId ?: run {
+                val slug = current.name.trim().lowercase().replace(Regex("[^a-z0-9]"), "-").trim('-').take(24)
+                val randomSuffix = java.util.UUID.randomUUID().toString().replace("-", "").take(6).lowercase()
+                if (slug.isNotBlank()) "loc-$slug-$randomSuffix" else "loc-$randomSuffix"
+            }
             val location = Location(
                 id = locationId,
                 name = current.name.trim(),

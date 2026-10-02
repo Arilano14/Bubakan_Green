@@ -74,4 +74,47 @@ class QrUrlBuilderTest {
         val malformedResult = QrUrlBuilder.parseCanonicalUrl("not_a_valid_url_at_all")
         assertThat(malformedResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
     }
+
+    @Test
+    fun parseCanonicalUrl_pathTraversalOrQuery_returnsInvalid() {
+        val traversalResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/../secret")
+        assertThat(traversalResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
+
+        val queryResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/pl-cabai?hack=true")
+        assertThat(queryResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
+
+        val fragmentResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/pl-cabai#fragment")
+        assertThat(fragmentResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
+    }
+
+    @Test
+    fun stableId_immutabilityAcrossAttributeModifications() {
+        val stableId = "pl-sereh-01"
+        val originalUrl = QrUrlBuilder.buildPlantUrl(stableId)
+
+        // Simulating attribute updates (name, description, Mandarin, photo)
+        val updatedName = "Sereh Wangi Super"
+        val updatedDescription = "Deskripsi baru sereh"
+        val updatedMandarin = "香茅"
+
+        // URL must depend strictly on stableId, invariant to metadata changes
+        val urlAfterUpdate = QrUrlBuilder.buildPlantUrl(stableId)
+        assertThat(urlAfterUpdate).isEqualTo(originalUrl)
+        assertThat(urlAfterUpdate).isEqualTo("https://bubakangreen.web.app/plant/pl-sereh-01")
+    }
+
+    @Test
+    fun locationStableId_immutabilityAcrossAttributeModifications() {
+        val stableId = "loc-urban-farming-01"
+        val originalUrl = QrUrlBuilder.buildLocationUrl(stableId)
+
+        // Simulating location description / condition update
+        val updatedCondition = "NEEDS_MAINTENANCE"
+        val updatedNote = "Perlu pemangkasan blok barat"
+
+        val urlAfterUpdate = QrUrlBuilder.buildLocationUrl(stableId)
+        assertThat(urlAfterUpdate).isEqualTo(originalUrl)
+        assertThat(urlAfterUpdate).isEqualTo("https://bubakangreen.web.app/location/loc-urban-farming-01")
+    }
 }
+

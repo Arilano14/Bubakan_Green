@@ -55,6 +55,14 @@ object QrUrlBuilder {
             return ParsedQrResult.Invalid("Unsupported domain: $host. Expected canonical domain.")
         }
 
+        if (!uri.query.isNullOrBlank()) {
+            return ParsedQrResult.Invalid("Canonical URL must not contain query parameters.")
+        }
+
+        if (!uri.fragment.isNullOrBlank()) {
+            return ParsedQrResult.Invalid("Canonical URL must not contain fragments.")
+        }
+
         val path = uri.path ?: return ParsedQrResult.Invalid("Empty path.")
         val segments = path.split("/").filter { it.isNotBlank() }
 

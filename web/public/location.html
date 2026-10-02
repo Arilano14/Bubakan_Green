@@ -10,6 +10,7 @@
 <body>
   <div class="container">
     <header class="header">
+      <img src="/mascot.png" alt="Maskot Bubakan Green" class="mascot-header">
       <h1>BUBAKAN GREEN</h1>
       <p class="subtitle">Taman Toga & Urban Farming · Kelurahan Bubakan</p>
     </header>
@@ -52,7 +53,8 @@
 
         <div class="cta-box">
           <p>Jelajahi koleksi tanaman obat lengkap dan lokasi kebun lainnya di aplikasi.</p>
-          <a href="/index.html" class="btn-primary" id="btn-open-app">📲 Buka di Aplikasi BUBAKAN GREEN</a>
+          <a href="#" class="btn-primary" id="btn-open-app">📲 Buka di Aplikasi</a>
+          <a href="/index.html#download" class="btn-secondary" id="btn-download-app">📥 Download Bubakan Green</a>
         </div>
       </main>
     </div>
@@ -133,8 +135,12 @@
         })
         .then(function(doc) {
           var fields = doc.fields || {};
+          var isPublished = true;
+          if (fields.isPublished && fields.isPublished.booleanValue !== undefined) {
+            isPublished = fields.isPublished.booleanValue;
+          }
           var status = getStringField(fields, 'status');
-          if (status && status !== 'PUBLISHED' && status !== 'ACTIVE' && status !== 'NEEDS_MAINTENANCE') {
+          if (!isPublished || (status && status !== 'PUBLISHED' && status !== 'ACTIVE' && status !== 'NEEDS_MAINTENANCE')) {
             loadingEl.style.display = 'none';
             unavailableEl.style.display = 'block';
             return;
@@ -162,6 +168,11 @@
 
         document.title = name + ' — BUBAKAN GREEN';
         document.getElementById('loc-name').textContent = name;
+
+        var openAppBtn = document.getElementById('btn-open-app');
+        if (openAppBtn) {
+          openAppBtn.href = 'https://bubakangreen.web.app/location/' + encodeURIComponent(locationId);
+        }
 
         var metaParts = [];
         if (rw) metaParts.push('RW ' + rw);

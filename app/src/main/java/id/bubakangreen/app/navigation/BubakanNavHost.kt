@@ -277,7 +277,12 @@ fun BubakanAppNavHost(
                     locationId = locationId,
                     onNavigateBack = {
                         if (!navController.popBackStack()) {
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     },
                     onPlantClick = { plantId ->
@@ -305,7 +310,12 @@ fun BubakanAppNavHost(
                     plantId = plantId,
                     onNavigateBack = {
                         if (!navController.popBackStack()) {
-                            navController.navigate(Screen.Home.route)
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                            }
                         }
                     },
                     onInfoClick = {

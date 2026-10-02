@@ -10,6 +10,7 @@
 <body>
   <div class="container">
     <header class="header">
+      <img src="/mascot.png" alt="Maskot Bubakan Green" class="mascot-header">
       <h1>BUBAKAN GREEN</h1>
       <p class="subtitle">Taman Toga & Urban Farming · Kelurahan Bubakan</p>
     </header>
@@ -59,7 +60,8 @@
 
         <div class="cta-box">
           <p>Dengarkan pelafalan audio Mandarin & jelajahi koleksi tanaman lengkap di aplikasi.</p>
-          <a href="/index.html" class="btn-primary" id="btn-open-app">📲 Buka di Aplikasi BUBAKAN GREEN</a>
+          <a href="#" class="btn-primary" id="btn-open-app">📲 Buka di Aplikasi</a>
+          <a href="/index.html#download" class="btn-secondary" id="btn-download-app">📥 Download Bubakan Green</a>
         </div>
       </main>
     </div>
@@ -164,6 +166,17 @@
         });
 
       function renderPlant(f) {
+        // Check published status
+        var isPublished = true;
+        if (f.isPublished && f.isPublished.booleanValue !== undefined) {
+          isPublished = f.isPublished.booleanValue;
+        }
+        if (!isPublished) {
+          loadingEl.style.display = 'none';
+          document.getElementById('unavailable-state').style.display = 'block';
+          return;
+        }
+
         var nameId = getStringField(f, 'nameId') || plantId;
         var nameLatin = getStringField(f, 'nameLatin') || '';
         var nameMandarin = getStringField(f, 'nameMandarin') || '';
@@ -174,6 +187,11 @@
         document.title = nameId + ' — BUBAKAN GREEN';
         document.getElementById('plant-name').textContent = nameId;
         document.getElementById('plant-latin').textContent = nameLatin;
+
+        var openAppBtn = document.getElementById('btn-open-app');
+        if (openAppBtn) {
+          openAppBtn.href = 'https://bubakangreen.web.app/plant/' + encodeURIComponent(plantId);
+        }
 
         // Photo
         if (photoUrl) {

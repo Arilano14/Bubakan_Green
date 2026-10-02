@@ -156,7 +156,11 @@ class MasterPlantViewModel(
                 }
             }
 
-            val plantId = current.plantId ?: "PLANT_${System.currentTimeMillis()}"
+            val plantId = current.plantId ?: run {
+                val slug = nameIdTrim.lowercase().replace(Regex("[^a-z0-9]"), "-").trim('-').take(24)
+                val randomSuffix = java.util.UUID.randomUUID().toString().replace("-", "").take(6).lowercase()
+                if (slug.isNotBlank()) "pl-$slug-$randomSuffix" else "pl-$randomSuffix"
+            }
             val isRemote = photoUrlTrim.startsWith("https://", ignoreCase = true)
             val isLocalAsset = photoUrlTrim.startsWith("plant_") || current.imageAssetName.isNotBlank()
             val imageSourceType = when {

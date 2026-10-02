@@ -270,6 +270,39 @@ body {
   transform: scale(0.98);
 }
 
+.btn-secondary {
+  display: block;
+  width: 100%;
+  padding: 12px 20px;
+  background-color: var(--surface-white);
+  color: var(--primary-forest);
+  border: 1.5px solid var(--primary-forest);
+  text-align: center;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  border-radius: var(--radius-btn);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background-color: var(--primary-mint);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
+}
+
+.mascot-header {
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 8px;
+  display: block;
+  object-fit: contain;
+}
+
 /* ---- Feature List ---- */
 .feature-list {
   list-style: none;

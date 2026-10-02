@@ -3,6 +3,7 @@ package id.bubakangreen.app.ui.locations
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -85,6 +86,10 @@ fun LocationDetailScreen(
     val context = LocalContext.current
     val scrollState = rememberScrollState()
     var showQrDialog by remember { mutableStateOf(false) }
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     LaunchedEffect(locationId) {
         viewModel.loadLocationDetail(locationId)
