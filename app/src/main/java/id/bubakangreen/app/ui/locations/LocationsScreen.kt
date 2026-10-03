@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.ui.graphics.Color
+import id.bubakangreen.app.ui.components.BubakanMapView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -283,6 +284,7 @@ fun LocationsScreen(
                         locations = locationsState.data,
                         selectedLocation = uiState.selectedMapLocation,
                         onSelectLocation = { viewModel.selectMapLocation(it) },
+                        onDeselectLocation = { viewModel.selectMapLocation(null) },
                         onOpenDetail = { onLocationClick(it.id) },
                         onOpenExternalMap = { launchGoogleMaps(context, it) }
                     )
@@ -309,13 +311,14 @@ fun LocationsScreen(
 }
 
 /**
- * Provider-agnostic visual map container.
+ * Real interactive Leaflet Map container for LocationsScreen.
  */
 @Composable
 private fun MapVisualContainer(
     locations: List<Location>,
     selectedLocation: Location?,
     onSelectLocation: (Location) -> Unit,
+    onDeselectLocation: () -> Unit,
     onOpenDetail: (Location) -> Unit,
     onOpenExternalMap: (Location) -> Unit,
     modifier: Modifier = Modifier
@@ -323,81 +326,67 @@ private fun MapVisualContainer(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(PrimaryContainerMint.copy(alpha = 0.25f))
+            .background(Color(0xFFF4F6F4))
     ) {
-        LazyColumn(
+        // Interactive Leaflet Map
+        BubakanMapView(
+            locations = locations,
+            selectedLocationId = selectedLocation?.id,
+            onLocationSelect = onSelectLocation,
+            onMapClick = onDeselectLocation,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Non-intrusive Map Legend (Top-Start)
+        Card(
+            shape = RoundedCornerShape(16.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.94f)),
+            border = BorderStroke(1.dp, OutlineOrganic.copy(alpha = 0.6f)),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+                .align(Alignment.TopStart)
+                .padding(start = 16.dp, top = 16.dp)
         ) {
-            item {
-                Text(
-                    text = "Pilih Titik Kebun di Wilayah Bubakan:",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = OnSurfaceForestDark,
-                    modifier = Modifier.padding(vertical = 4.dp)
-                )
-            }
-
-            items(locations, key = { it.id }) { loc ->
-                val isSelected = loc.id == selectedLocation?.id
-                Card(
-                    shape = RoundedCornerShape(18.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = if (isSelected) PrimaryContainerMint else SurfaceCardWhite
-                    ),
-                    border = BorderStroke(
-                        width = if (isSelected) 2.dp else 1.dp,
-                        color = if (isSelected) PrimarySeedlingGreen else OutlineOrganic
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { onSelectLocation(loc) }
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Row(
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(CircleShape)
-                                .background(if (loc.type == LocationType.URBAN_FARMING) PrimaryContainerMint else AccentSunnyContainer),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = if (loc.type == LocationType.URBAN_FARMING) "🌱" else "🌿",
-                                fontSize = 22.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(14.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = loc.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = OnSurfaceForestDark,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = "RW ${loc.rw} • ${loc.address}",
-                                style = MaterialTheme.typography.labelSmall,
-                                color = OnSurfaceSageMuted,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
-                    }
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFF2E7D32))
+                    )
+                    Text(
+                        text = "🌱 Urban Farming",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurfaceForestDark
+                    )
                 }
-            }
 
-            item {
-                Spacer(modifier = Modifier.height(240.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFD97706))
+                    )
+                    Text(
+                        text = "🌿 Taman Toga",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = OnSurfaceForestDark
+                    )
+                }
             }
         }
 
@@ -411,24 +400,43 @@ private fun MapVisualContainer(
                 modifier = Modifier
                     .fillMaxWidth()
                     .align(Alignment.BottomCenter)
-                    .padding(20.dp)
+                    .padding(16.dp)
             ) {
                 Column(modifier = Modifier.padding(18.dp)) {
-                    Text(
-                        text = selectedLocation.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = OnSurfaceForestDark,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = "RW ${selectedLocation.rw} • ${selectedLocation.address}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceSageMuted,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = selectedLocation.name,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = OnSurfaceForestDark,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = "RW ${selectedLocation.rw} • ${selectedLocation.address.ifEmpty { "Kelurahan Bubakan" }}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = OnSurfaceSageMuted,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+
+                        // Close button for preview card
+                        Text(
+                            text = "✕",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = OnSurfaceSageMuted,
+                            modifier = Modifier
+                                .clickable { onDeselectLocation() }
+                                .padding(start = 8.dp, bottom = 8.dp)
+                        )
+                    }
 
                     Spacer(modifier = Modifier.height(14.dp))
 
@@ -437,13 +445,13 @@ private fun MapVisualContainer(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         TactileButton(
-                            text = "📍 Buka Maps",
+                            text = "📍 Rute Maps",
                             onClick = { onOpenExternalMap(selectedLocation) },
                             style = TactileButtonStyle.SECONDARY,
                             modifier = Modifier.weight(1f)
                         )
                         TactileButton(
-                            text = "Detail Kebun →",
+                            text = "Lihat Kebun →",
                             onClick = { onOpenDetail(selectedLocation) },
                             style = TactileButtonStyle.PRIMARY,
                             modifier = Modifier.weight(1.2f)

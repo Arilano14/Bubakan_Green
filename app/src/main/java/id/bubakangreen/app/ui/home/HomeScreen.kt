@@ -19,6 +19,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.ui.graphics.Color
+import id.bubakangreen.app.ui.components.BubakanMapView
+import id.bubakangreen.app.ui.theme.ForestGreen
+import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
+import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
+import id.bubakangreen.app.ui.theme.OutlineOrganic
+import id.bubakangreen.app.ui.theme.PrimaryContainerMint
+import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.outlined.Info
@@ -116,6 +129,16 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
+                // ── REKAPITULASI KEBUN BUBAKAN (Section 23) ──
+                GardenRecapSection(
+                    totalGardens = uiState.gardenSummary.totalGardens,
+                    urbanFarmingCount = uiState.gardenSummary.urbanFarmingCount,
+                    tamanTogaCount = uiState.gardenSummary.tamanTogaCount,
+                    onNavigateToLocations = onNavigateToLocations
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
                 when (val locationsState = uiState.featuredLocations) {
                     is UiState.Loading -> {
                         Row(
@@ -156,16 +179,13 @@ fun HomeScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = "Lihat Semua Lokasi →",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = PrimaryGreen,
-                    modifier = Modifier
-                        .clickable { onNavigateToLocations(null) }
-                        .padding(vertical = 8.dp)
+                // ── MINI MAP DISCOVERY (Section 24) ──
+                HomeMiniMapSection(
+                    locations = uiState.publishedLocations,
+                    onLocationClick = onLocationClick,
+                    onNavigateToLocations = { onNavigateToLocations(null) }
                 )
             }
 
@@ -502,3 +522,218 @@ private fun DailyTipSection(
         }
     }
 }
+
+/**
+ * Rekapitulasi Kebun Bubakan (Section 23).
+ * Derived dynamically from LocationRepository.getPublishedLocations().
+ * Zero hardcoded numbers.
+ */
+@Composable
+private fun GardenRecapSection(
+    totalGardens: Int,
+    urbanFarmingCount: Int,
+    tamanTogaCount: Int,
+    onNavigateToLocations: (LocationType?) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(18.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Rekapitulasi Kebun Bubakan",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = OnSurfaceForestDark
+                    )
+                    Text(
+                        text = "Data sebaran aktif kelurahan terkini",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnSurfaceSageMuted
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(PrimaryContainerMint),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(text = "🏡", fontSize = 18.sp)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                // Total Kebun
+                RecapStatBadge(
+                    count = totalGardens.toString(),
+                    label = "Total Kebun",
+                    icon = "🌾",
+                    containerColor = PrimaryContainerMint,
+                    textColor = ForestGreen,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLocations(null) }
+                )
+
+                // Urban Farming
+                RecapStatBadge(
+                    count = urbanFarmingCount.toString(),
+                    label = "Urban Farm",
+                    icon = "🌱",
+                    containerColor = Color(0xFFE8F5E9),
+                    textColor = Color(0xFF2E7D32),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLocations(LocationType.URBAN_FARMING) }
+                )
+
+                // Taman Toga
+                RecapStatBadge(
+                    count = tamanTogaCount.toString(),
+                    label = "Taman Toga",
+                    icon = "🌿",
+                    containerColor = Color(0xFFFFF8E1),
+                    textColor = Color(0xFFD97706),
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onNavigateToLocations(LocationType.TAMAN_TOGA) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun RecapStatBadge(
+    count: String,
+    label: String,
+    icon: String,
+    containerColor: Color,
+    textColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(containerColor)
+            .padding(vertical = 12.dp, horizontal = 8.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(text = icon, fontSize = 14.sp)
+                Text(
+                    text = count,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = textColor
+                )
+            }
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold,
+                color = textColor.copy(alpha = 0.85f),
+                maxLines = 1
+            )
+        }
+    }
+}
+
+/**
+ * Compact discovery mini-map for HomeScreen (Section 24).
+ * Reuses BubakanMapView. Same data, same marker logic, same category colors.
+ */
+@Composable
+private fun HomeMiniMapSection(
+    locations: List<Location>,
+    onLocationClick: (String) -> Unit,
+    onNavigateToLocations: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        shape = RoundedCornerShape(22.dp),
+        colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+        border = BorderStroke(1.5.dp, OutlineOrganic),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Peta Sebaran Interaktif",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = OnSurfaceForestDark
+                    )
+                    Text(
+                        text = "Sebaran titik urban farming & toga warga",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnSurfaceSageMuted
+                    )
+                }
+
+                // Legend preview
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(text = "🌱 Urban", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
+                    Text(text = "🌿 Toga", style = MaterialTheme.typography.labelSmall, color = Color(0xFFD97706), fontWeight = FontWeight.Bold)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Reusable BubakanMapView in a compact 190dp container
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(190.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .border(BorderStroke(1.dp, OutlineOrganic))
+            ) {
+                BubakanMapView(
+                    locations = locations,
+                    onLocationSelect = { onLocationClick(it.id) },
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+
+            Spacer(modifier = Modifier.height(10.dp))
+
+            Text(
+                text = "Lihat Semua Lokasi Pada Peta →",
+                style = MaterialTheme.typography.labelLarge,
+                fontWeight = FontWeight.Bold,
+                color = PrimaryGreen,
+                modifier = Modifier
+                    .clickable { onNavigateToLocations() }
+                    .padding(vertical = 4.dp)
+            )
+        }
+    }
+}
+

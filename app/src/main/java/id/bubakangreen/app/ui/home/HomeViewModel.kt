@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import id.bubakangreen.app.core.di.RepositoryProvider
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.domain.model.Location
+import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.domain.repository.LocationRepository
 import id.bubakangreen.app.domain.repository.PlantRepository
@@ -15,8 +16,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+data class GardenSummary(
+    val totalGardens: Int = 0,
+    val urbanFarmingCount: Int = 0,
+    val tamanTogaCount: Int = 0
+)
+
 data class HomeUiState(
     val featuredLocations: UiState<List<Location>> = UiState.Loading,
+    val publishedLocations: List<Location> = emptyList(),
+    val gardenSummary: GardenSummary = GardenSummary(),
     val popularPlants: UiState<List<MasterPlant>> = UiState.Loading,
     val isOffline: Boolean = false
 )
@@ -35,7 +44,30 @@ class HomeViewModel @JvmOverloads constructor(
 
     fun loadData() {
         loadFeaturedLocations()
+        loadPublishedLocations()
         loadPopularPlants()
+    }
+
+    private fun loadPublishedLocations() {
+        viewModelScope.launch {
+            locationRepository.getPublishedLocations().collect { result ->
+                if (result is Result.Success) {
+                    val list = result.data.filter { it.isPublished }
+                    val ufCount = list.count { it.type == LocationType.URBAN_FARMING }
+                    val togaCount = list.count { it.type == LocationType.TAMAN_TOGA }
+                    _uiState.update {
+                        it.copy(
+                            publishedLocations = list,
+                            gardenSummary = GardenSummary(
+                                totalGardens = list.size,
+                                urbanFarmingCount = ufCount,
+                                tamanTogaCount = togaCount
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     private fun loadFeaturedLocations() {

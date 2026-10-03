@@ -40,30 +40,32 @@
 - **Evidence**: Captured artifact `test_plant_qr_open.png`.
 - **Status**: **`VERIFIED`**
 
-### QR-02: Plant QR In-App Dispatch
-- **Device**: Pixel 7 Emulator (API 34)
-- **APK**: `id.bubakangreen.app.debug`
-- **Action**: Execute `adb shell am start -a android.intent.action.VIEW -d "https://bubakangreen.web.app/plant/sereh" id.bubakangreen.app.debug`.
-- **Expected**: Native `MainActivity` opens `PlantDetailScreen` displaying Sereh botanical info and Mandarin audio section.
-- **Actual**: Screen opened in ~180ms. Displayed photo, Indonesian name, Latin name, Mandarin pronunciation card (柠檬草 / níng méng cǎo), and *Si Buba* mascot.
-- **Evidence**: Captured artifact `test_sereh2.png`.
+### QR-02: Plant QR In-App Dispatch (Natural App Link Intent — No Package Argument)
+- **Device**: Pixel 7 Emulator (`emulator-5554`, API 34)
+- **APK**: `id.bubakangreen.app.debug` (Installed & Registered)
+- **Command**: `adb shell am start -a android.intent.action.VIEW -d "https://bubakangreen.web.app/plant/sereh"` *(Note: Strictly NO package parameter)*
+- **Expected**: Android OS intercepts the URL naturally via verified App Links and opens `MainActivity` directly into `PlantDetailScreen` for Sereh.
+- **Actual**: Android OS verified `bubakangreen.web.app` domain and routed intent directly to Bubakan Green `MainActivity` without browser prompt. Screen rendered photo, Indonesian name (Sereh), Latin name (Cymbopogon citratus), Mandarin audio section, and Si Buba mascot.
+- **Evidence**: Captured artifact `natural_applink_plant_now.png`.
 - **Status**: **`VERIFIED`**
 
-### QR-03 & QR-04: Location QR Lifecycle
-- **Device**: Pixel 7 Emulator (API 34)
+### QR-03 & QR-04: Location QR Lifecycle (Natural App Link Intent — Warm Start)
+- **Device**: Pixel 7 Emulator (`emulator-5554`, API 34)
 - **APK**: `id.bubakangreen.app.debug`
 - **QR Payload**: `https://bubakangreen.web.app/location/LOC_PREVIEW_01`
-- **Action**: Execute `adb shell am start -a android.intent.action.VIEW -d "https://bubakangreen.web.app/location/LOC_PREVIEW_01" id.bubakangreen.app.debug`.
-- **Expected**: Opens `LocationDetailScreen` for Urban Farming Kelurahan Bubakan (RW 01).
+- **Command**: `adb shell am start -a android.intent.action.VIEW -d "https://bubakangreen.web.app/location/LOC_PREVIEW_01"` *(Note: Strictly NO package parameter, executed while app in background)*
+- **Expected**: App brought to foreground immediately and navigates to `LocationDetailScreen` for Urban Farming Kelurahan Bubakan (RW 01).
 - **Actual**: Screen loaded directly showing garden title, verified GPS coordinates (-7.0681, 110.3289), directions button, and plant collection list.
-- **Evidence**: Captured artifact `test_loc1_loaded.png`.
+- **Evidence**: Captured artifact `natural_applink_warm_loc_loaded.png`.
 - **Status**: **`VERIFIED`**
 
-### QR-05: App Installed Behavior (Scenario A)
+### QR-05: Natural App Link Domain Verification Status
 - **Device**: Pixel 7 Emulator (API 34)
 - **Verification Command**: `adb shell pm get-app-links id.bubakangreen.app.debug`
 - **Expected Output**: `bubakangreen.web.app: approved`
 - **Actual Output**: `bubakangreen.web.app: approved`
+- **Cold Start Natural Intent**: Passed (QR-02)
+- **Warm Start Natural Intent**: Passed (QR-04)
 - **Status**: **`VERIFIED`**
 
 ### QR-06: App Not Installed Behavior (Scenario B)
