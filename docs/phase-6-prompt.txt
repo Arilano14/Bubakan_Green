@@ -1,0 +1,944 @@
+<USER_REQUEST>
+PROJECT: BUBAKAN GREEN
+
+ROLE
+----
+You are acting as:
+- Senior Product Manager
+- Senior Android Architect
+- Senior Android Developer
+- Senior Web Developer
+- Backend Architect
+- QA Engineer
+- Technical Reviewer
+
+Your responsibility is NOT to maximize code output.
+
+Your responsibility is to build the SMALLEST CORRECT, MAINTAINABLE,
+REALISTIC, VALIDATED system for Kelurahan Bubakan.
+
+==================================================
+IMPORTANT PRODUCT IDENTITY
+==================================================
+
+The product is:
+
+BUBAKAN GREEN
+Sistem Informasi Urban Farming & Taman Toga
+Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang
+
+This is a product for KELURAHAN BUBAKAN.
+
+Do NOT brand the application as:
+- KKN GIAT 17 app
+- KKN application
+- mahasiswa app
+- temporary KKN system
+
+KKN GIAT 17 is ONLY the development context.
+
+The product identity, UI copy, database concepts,
+documentation and architecture must focus on
+Kelurahan Bubakan.
+
+==================================================
+SOURCE OF TRUTH
+==================================================
+
+Use the available project documents/files as the primary source
+for requirements.
+
+Relevant source documents include:
+- PROKER INDIVIDU.docx
+- PROKER KELOMPOK.docx
+- PROKER KELOMPOK FIX / equivalent
+- Materi Perencanaan Program Kerja GIAT 17.pdf
+- KKN.pdf / survey-notes
+- other project files when relevant
+
+Do not silently invent information from these files.
+
+Distinguish every important piece of information as:
+
+[VERIFIED]
+Directly supported by project/source material.
+
+[USER-PROVIDED]
+Explicitly provided by the project owner.
+
+[FIELD-VALIDATION REQUIRED]
+Needs confirmation on the real-world site.
+
+[ASSUMPTION]
+A technical/product assumption.
+
+[UNKNOWN]
+Not enough information exists yet.
+
+Never convert ASSUMPTION or UNKNOWN into fact.
+
+Never fabricate:
+- real plants
+- exact plant quantities
+- exact GPS coordinates
+- exact locations
+- exact PIC identities
+- exact local practices
+- local claims about plant benefits
+- local administrative data
+
+If data is not known, mark it as:
+NEEDS VALIDATION
+
+==================================================
+CORE PRODUCT OBJECTIVE
+==================================================
+
+The system should primarily support:
+
+1. Urban Farming information
+2. Taman Toga information
+3. Location mapping
+4. Plant information
+5. QR-based access to plant information
+6. PIC/location management
+7. Sustainable data updating by Kelurahan/PIC
+
+The system should support actual existing and future
+Urban Farming/Taman Toga locations.
+
+A PIC should be able to:
+- update plants
+- update plant information
+- update photos
+- add plants
+- register a new Urban Farming location
+- register a new Taman Toga location
+- capture GPS coordinates for a location
+- manage only locations they are authorized to manage
+
+General public should primarily be able to:
+- browse locations
+- browse plants
+- see plant details
+- see map
+- access plant information through QR
+
+==================================================
+IMPORTANT FUTURE REQUIREMENT
+==================================================
+
+LOCATION IS A FIRST-CLASS ENTITY.
+
+Do NOT design the database as plant-only.
+
+The system relationship should conceptually be:
+
+Location
+    ↓
+Plants within Location
+    ↓
+Optional QR for selected plants
+
+A location can represent:
+- URBAN_FARMING
+- TAMAN_TOGA
+
+The system must support future creation of NEW locations.
+
+Therefore the architecture must NOT hard-code only:
+- Urban Farming Kelurahan
+- Taman Toga RW 03
+
+Those are INITIAL/FEATURED locations,
+not the permanent maximum locations.
+
+==================================================
+GPS REQUIREMENT
+==================================================
+
+PIC must be able to register a new location using GPS.
+
+Expected concept:
+
+PIC
+→ Add Location
+→ Choose Urban Farming / Taman Toga
+→ Enter location name
+→ Capture current GPS position
+→ Preview coordinates on map
+→ Confirm
+→ Save
+→ Optional admin approval
+→ Published
+
+GPS is only required for capturing a location coordinate.
+
+Do NOT implement:
+- background tracking
+- continuous GPS monitoring
+- geofencing
+- location history
+- route navigation
+- live tracking
+
+unless explicitly approved later.
+
+Use minimal location permission necessary.
+
+==================================================
+QR REQUIREMENT
+==================================================
+
+QR is intended primarily for REAL PLANTS that are actually planted
+and selected as featured/physical information targets.
+
+Do NOT generate QR for hypothetical or dummy plants.
+
+Correct workflow:
+
+FIELD INVENTORY
+→ VERIFY ACTUAL PLANTS
+→ SELECT PLANTS TO FEATURE
+→ CREATE STABLE PLANT IDs
+→ GENERATE QR
+→ PRINT LABEL
+→ FIELD TEST
+
+QR should reference a stable plant/location identifier,
+NOT contain the full plant information.
+
+The purpose is to ensure that changing data does not require
+reprinting the QR.
+
+QR flow concept:
+
+QR
+→ HTTPS App Link
+→ If app is installed:
+     open BUBAKAN GREEN
+     directly to relevant plant/location
+→ If app is not installed:
+     open lightweight web fallback
+     → download APK
+
+Do NOT create an internal QR scanner in the APK
+unless there is a validated product reason later.
+
+The default UX is:
+camera / Google Lens / phone QR scanner
+→ app link
+→ app opens.
+
+==================================================
+MANDARIN REQUIREMENT
+==================================================
+
+Plant detail may contain:
+- Indonesian name
+- Latin name
+- Mandarin name
+- Pinyin
+- Mandarin audio
+
+Mandarin audio is NOT autoplay.
+
+Expected UX:
+
+Mandarin name
+Pinyin
+[ 🔊 ]
+
+User taps the speaker icon
+→ audio plays.
+
+Do NOT implement:
+- autoplay
+- looping
+- automatic narration
+- live AI voice generation
+
+unless explicitly approved later.
+
+==================================================
+ARCHITECTURE PRINCIPLE
+==================================================
+
+DATA != APPLICATION CODE
+
+Changes to:
+- plants
+- photos
+- locations
+- quantities
+- descriptions
+- notes
+- local information
+
+must NOT require rebuilding the APK.
+
+Changes to:
+- application features
+- UI code
+- business logic
+- major technical behavior
+- bug fixes
+
+may require a new APK.
+
+==================================================
+COST PRINCIPLE
+==================================================
+
+Target infrastructure cost:
+Rp0 for MVP when technically reasonable.
+
+Prefer:
+- open-source technologies
+- free tiers
+- static hosting
+- managed backend with free tier
+- Google Drive for APK distribution
+
+Do not introduce paid infrastructure without justification.
+
+Every potentially paid technology must include:
+1. why it is necessary
+2. expected cost/free quota
+3. free alternative
+4. whether it is actually necessary for MVP
+
+==================================================
+ANTI-AI-SLOP RULE
+==================================================
+
+Never code merely because you can.
+
+Do NOT:
+- add speculative features
+- add excessive animations
+- build a full CMS
+- build a separate web admin
+- create unnecessary APIs
+- create microservices
+- add unnecessary AI
+- add unnecessary analytics
+- add unnecessary libraries
+- rewrite working code
+- create duplicate screens/components
+- create dummy infrastructure without a requirement
+
+Prefer:
+CORRECT > SIMPLE > MAINTAINABLE > BEAUTIFUL > EXTRA FEATURES
+
+If a requested feature adds disproportionate complexity,
+explain the trade-off before implementation.
+
+==================================================
+NO CODE IN PHASE 0
+==================================================
+
+PHASE 0 IS DISCOVERY, VALIDATION AND PLANNING.
+
+DO NOT:
+- build UI
+- create app screens
+- implement database
+- write Firebase rules
+- implement authentication
+- implement GPS
+- implement QR
+- implement App Links
+- write production application code
+
+during Phase 0.
+
+Repository INSPECTION IS ALLOWED.
+
+Read existing repository structure,
+configuration and current implementation if present.
+
+But do not modify production/source files in Phase 0
+unless explicitly required to document the current state.
+
+==================================================
+MANDATORY GATED WORKFLOW
+==================================================
+
+You MUST follow this state machine:
+
+STATE 0:
+INSPECT
+
+STATE 1:
+CREATE IMPLEMENTATION PLAN
+
+STATE 2:
+SELF-REVIEW PLAN
+
+STATE 3:
+WAIT FOR USER APPROVAL
+
+STATE 4:
+EXECUTE ONLY APPROVED PLAN
+
+STATE 5:
+VERIFY EXECUTION
+
+STATE 6:
+REPORT
+
+You are NOT allowed to skip states.
+
+==================================================
+GATE 0 — INSPECTION
+==================================================
+
+Before creating the plan:
+
+1. Inspect repository structure.
+2. Determine whether an existing Android project exists.
+3. Determine whether an existing web project exists.
+4. Determine existing tech stack if any.
+5. Inspect package/dependency files.
+6. Inspect existing documentation.
+7. Identify reusable components.
+8. Identify missing components.
+9. Identify conflicts between current implementation and requirements.
+10. Do not modify production files.
+
+Create:
+docs/phase-0/REPOSITORY_AUDIT.md
+
+The audit must contain:
+
+- current project state
+- existing technologies
+- existing screens/modules
+- existing backend
+- existing database
+- existing web
+- existing dependencies
+- reusable code
+- technical debt
+- missing requirements
+- risks
+- unknowns
+
+==================================================
+GATE 1 — IMPLEMENTATION PLAN
+==================================================
+
+After inspection, create:
+
+docs/phase-0/PHASE_0_IMPLEMENTATION_PLAN.md
+
+This is MANDATORY.
+
+The implementation plan must contain:
+
+1. PRODUCT DEFINITION
+2. PROBLEM STATEMENT
+3. TARGET USERS
+4. PRODUCT SCOPE
+5. MVP SCOPE
+6. OUT OF SCOPE
+7. USER ROLES
+8. INFORMATION ARCHITECTURE
+9. USER FLOWS
+10. LOCATION MODEL
+11. PLANT MODEL
+12. QR MODEL
+13. GPS FLOW
+14. MANDARIN AUDIO FLOW
+15. DATA LIFECYCLE
+16. ADMIN/PIC PERMISSION MODEL
+17. TECH STACK OPTIONS
+18. RECOMMENDED TECH STACK
+19. ARCHITECTURE DIAGRAM
+20. DATA FLOW
+21. SECURITY APPROACH
+22. OFFLINE/ONLINE STRATEGY
+23. HOSTING STRATEGY
+24. APK DISTRIBUTION STRATEGY
+25. COST ESTIMATE
+26. FIELD VALIDATION REQUIREMENTS
+27. TEST STRATEGY
+28. DEPLOYMENT STRATEGY
+29. HANDOVER STRATEGY
+30. IMPLEMENTATION PHASES
+31. ACCEPTANCE CRITERIA
+32. RISKS
+33. OPEN QUESTIONS
+34. DECISIONS REQUIRED FROM PRODUCT OWNER
+
+==================================================
+MANDATORY IMPLEMENTATION PLAN DETAIL
+==================================================
+
+For every major feature, provide:
+
+FEATURE:
+WHY:
+USER:
+INPUT:
+OUTPUT:
+DEPENDENCY:
+TECHNICAL APPROACH:
+MVP?
+SCOPE LIMIT:
+RISK:
+ACCEPTANCE CRITERIA:
+
+Example:
+
+FEATURE: Add New Location
+
+WHY:
+Allow Kelurahan/PIC to document new Urban Farming/Taman Toga areas.
+
+INPUT:
+location name
+type
+RW
+GPS
+photo
+description
+
+OUTPUT:
+new location record
+
+MVP:
+YES
+
+NOT INCLUDED:
+background GPS tracking
+navigation
+geofencing
+
+==================================================
+RECOMMENDATION DISCIPLINE
+==================================================
+
+Do NOT present multiple architectures just to appear comprehensive.
+
+Evaluate alternatives briefly.
+
+Then make ONE recommended MVP architecture.
+
+Example categories:
+
+Android:
+Kotlin + Jetpack Compose
+
+Backend:
+Firebase
+
+Database:
+Cloud Firestore
+
+Authentication:
+Firebase Authentication
+
+Static Web:
+HTML/CSS/JS
+
+Hosting:
+Firebase Hosting or another confirmed free static host
+
+APK distribution:
+Google Drive
+
+QR:
+HTTPS App Links
+
+Media:
+Choose the cheapest reliable approach
+after verifying actual current project requirements.
+
+If any chosen service may incur a charge,
+clearly flag it.
+
+==================================================
+DATA VALIDATION MATRIX
+==================================================
+
+The plan MUST create:
+
+docs/phase-0/DATA_VALIDATION_MATRIX.md
+
+Columns:
+
+DATA
+SOURCE
+STATUS
+CONFIDENCE
+REQUIRES FIELD VALIDATION?
+WHO SHOULD VERIFY?
+NOTES
+
+Examples:
+Urban Farming Kelurahan
+Taman Toga RW 03
+actual existing plants
+new plant candidates
+GPS coordinates
+PIC
+plant photos
+
+Never pretend that unverified data is verified.
+
+==================================================
+SCOPE CONTROL MATRIX
+==================================================
+
+Create:
+
+docs/phase-0/SCOPE_CONTROL.md
+
+Use:
+
+MUST HAVE
+SHOULD HAVE
+COULD HAVE
+DO NOT BUILD
+
+Explicitly identify features that are prohibited from
+MVP unless later approved.
+
+==================================================
+ARCHITECTURE DECISION RECORD
+==================================================
+
+Create:
+
+docs/phase-0/ARCHITECTURE_DECISIONS.md
+
+For each major architectural decision:
+
+DECISION
+WHY
+ALTERNATIVES CONSIDERED
+WHY NOT CHOSEN
+COST IMPACT
+MAINTENANCE IMPACT
+RISK
+
+Do not invent performance benchmarks.
+
+==================================================
+PHASE BREAKDOWN
+==================================================
+
+Create:
+
+docs/phase-0/PHASE_ROADMAP.md
+
+Suggested phases:
+
+PHASE 0
+Discovery + validation + planning
+
+PHASE 1
+Information architecture + UX
+
+PHASE 2
+Data model + backend
+
+PHASE 3
+Public Android application
+
+PHASE 4
+PIC/Admin
+
+PHASE 5
+GPS location management
+
+PHASE 6
+Real-world plant inventory + QR
+
+PHASE 7
+App Links + web fallback
+
+PHASE 8
+Mandarin audio
+
+PHASE 9
+Offline/synchronization
+
+PHASE 10
+QA + field testing
+
+PHASE 11
+Deployment + handover
+
+These phases are a starting proposal.
+You may consolidate phases when that reduces complexity,
+but you MUST explain the change.
+
+==================================================
+SELF REVIEW BEFORE USER REVIEW
+==================================================
+
+After producing the Implementation Plan,
+DO NOT EXECUTE IT YET.
+
+Instead create:
+
+docs/phase-0/PHASE_0_SELF_REVIEW.md
+
+Review the plan as a skeptical senior engineer.
+
+Check:
+
+[ ] Any invented data?
+[ ] Any unsupported assumptions?
+[ ] Any unnecessary feature?
+[ ] Any unnecessary technology?
+[ ] Any duplicate functionality?
+[ ] Any unnecessary cost?
+[ ] Any security hole?
+[ ] Any privacy concern?
+[ ] Any missing user flow?
+[ ] Any missing edge case?
+[ ] Any incorrect dependency?
+[ ] Any scope creep?
+[ ] Any feature that should be deferred?
+[ ] Any requirement that requires field validation?
+[ ] Can the project realistically be maintained after KKN?
+[ ] Can PIC operate it without developer intervention?
+[ ] Does the architecture separate data from APK code?
+[ ] Can new locations be added?
+[ ] Can new plants be added?
+[ ] Does QR use stable IDs?
+[ ] Does QR handle both installed/not-installed APK cases?
+[ ] Does Mandarin audio remain user-triggered?
+[ ] Does GPS only capture location instead of tracking?
+
+For every problem found:
+
+PROBLEM
+SEVERITY
+WHY IT MATTERS
+RECOMMENDATION
+PLAN CHANGE
+
+==================================================
+MANDATORY USER APPROVAL GATE
+==================================================
+
+After creating the Implementation Plan and Self Review:
+
+STOP.
+
+DO NOT:
+- write source code
+- create UI
+- modify architecture
+- install unnecessary packages
+- create Firebase project
+- create database
+- implement feature
+- continue to Phase 1
+
+You MUST ask the user to review the plan.
+
+Your final message at this stage must clearly say:
+
+"PHASE 0 PLAN READY — WAITING FOR APPROVAL"
+
+Then provide:
+1. files created
+2. key architectural decisions
+3. important unresolved questions
+4. risks
+5. scope decisions
+6. exact approval command
+
+The user must explicitly approve.
+
+Valid approval command:
+
+ACC PHASE 0
+
+Do NOT interpret:
+- "looks good"
+- "okay"
+- "lanjut"
+- "gas"
+- "sip"
+
+as automatic approval unless the user explicitly confirms
+that Phase 0 is approved.
+
+If approval is absent:
+STOP.
+
+==================================================
+AFTER USER APPROVAL
+==================================================
+
+Only after explicit:
+
+ACC PHASE 0
+
+you may execute the APPROVED Phase 0 plan.
+
+Do not introduce unapproved features.
+
+Do not silently expand scope.
+
+If implementation reveals a significant architectural issue:
+
+STOP AND REQUEST CHANGE APPROVAL.
+
+Create:
+
+docs/phase-0/CHANGE_REQUEST.md
+
+with:
+
+DISCOVERY
+IMPACT
+WHY EXISTING PLAN IS INSUFFICIENT
+PROPOSED CHANGE
+COST IMPACT
+TIME IMPACT
+RISK
+RECOMMENDATION
+
+Wait for explicit approval.
+
+==================================================
+EXECUTION RULE
+==================================================
+
+When approved:
+
+1. Execute exactly the approved plan.
+2. Keep a checklist.
+3. Modify only necessary files.
+4. Do not rewrite unrelated code.
+5. Do not add speculative features.
+6. Run validation after each logical unit.
+7. Report failures honestly.
+
+==================================================
+EXECUTION REPORT
+==================================================
+
+After approved execution,
+create:
+
+docs/phase-0/PHASE_0_EXECUTION_REPORT.md
+
+Include:
+
+[COMPLETED]
+[PARTIALLY COMPLETED]
+[FAILED]
+[NOT IMPLEMENTED]
+[DISCOVERED ISSUES]
+[NEW RISKS]
+[DECISIONS NEEDED]
+[NEXT PHASE]
+
+Never claim success without verification.
+
+==================================================
+QUALITY CONTROL
+==================================================
+
+At every phase, use this workflow:
+
+UNDERSTAND
+→ INSPECT
+→ PLAN
+→ REVIEW
+→ APPROVE
+→ IMPLEMENT
+→ TEST
+→ VERIFY
+→ REPORT
+
+Never:
+
+REQUEST
+→ CODE EVERYTHING
+
+==================================================
+IMPORTANT STOP CONDITIONS
+==================================================
+
+STOP and ask for clarification when:
+
+1. Two requirements conflict.
+2. Real-world data is unknown and implementation depends on it.
+3. User intent is ambiguous.
+4. A new requirement significantly changes architecture.
+5. A paid service becomes necessary.
+6. A security model is unclear.
+7. A data ownership issue is unclear.
+8. A proposed implementation creates major maintenance burden.
+
+==================================================
+PHASE 0 SUCCESS CRITERIA
+==================================================
+
+Phase 0 is considered complete only when:
+
+[ ] Repository audited
+[ ] Product definition finalized
+[ ] User roles defined
+[ ] Location model defined
+[ ] Plant model defined
+[ ] GPS flow defined
+[ ] QR flow defined
+[ ] App Link concept defined
+[ ] Web fallback defined
+[ ] Mandarin audio interaction defined
+[ ] Database concept defined
+[ ] Permission concept defined
+[ ] Offline/online strategy defined
+[ ] Cost strategy defined
+[ ] Data validation matrix created
+[ ] Scope control created
+[ ] Architecture decisions documented
+[ ] Phase roadmap created
+[ ] Self review completed
+[ ] Product owner approval obtained
+
+Until explicit approval:
+DO NOT PROCEED TO IMPLEMENTATION.
+
+==================================================
+FIRST ACTION
+==================================================
+
+Your FIRST response must NOT contain application code.
+
+Start by:
+
+1. Inspecting the project/repository.
+2. Reading relevant documentation/files.
+3. Creating REPOSITORY_AUDIT.md.
+4. Creating PHASE_0_IMPLEMENTATION_PLAN.md.
+5. Creating DATA_VALIDATION_MATRIX.md.
+6. Creating SCOPE_CONTROL.md.
+7. Creating ARCHITECTURE_DECISIONS.md.
+8. Creating PHASE_ROADMAP.md.
+9. Creating PHASE_0_SELF_REVIEW.md.
+10. STOP and request explicit approval.
+
+Do not implement anything yet.
+
+Final status should be:
+
+PHASE 0 PLAN READY — WAITING FOR APPROVAL
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-23T11:18:55+07:00.
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Claude Opus 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>
