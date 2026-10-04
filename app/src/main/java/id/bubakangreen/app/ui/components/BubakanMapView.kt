@@ -93,13 +93,17 @@ fun BubakanMapView(
     var webViewRef by remember { mutableStateOf<WebView?>(null) }
     var isMapReady by remember { mutableStateOf(false) }
 
-    // Filter valid GPS coordinates (-90..90, -180..180, non-zero)
+    // Strict Public Map Eligibility Filter (Section 10):
+    // 1. Published status
+    // 2. Non-zero, valid coordinates
+    // 3. Strictly INSIDE the official Kelurahan Bubakan administrative boundary polygon
     val validLocations = remember(locations) {
         locations.filter { loc ->
             loc.isPublished &&
                 loc.latitude in -90.0..90.0 &&
                 loc.longitude in -180.0..180.0 &&
-                !(loc.latitude == 0.0 && loc.longitude == 0.0)
+                !(loc.latitude == 0.0 && loc.longitude == 0.0) &&
+                id.bubakangreen.app.core.util.BubakanGeoValidator.isInsideBubakan(loc.latitude, loc.longitude)
         }
     }
 

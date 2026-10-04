@@ -89,7 +89,9 @@ class LocationFormViewModel(
                 is Result.Success -> {
                     val coords = result.data
                     val accuracy = coords.accuracyMeters
+                    val isInsideBubakan = id.bubakangreen.app.core.util.BubakanGeoValidator.isInsideBubakan(coords.latitude, coords.longitude)
                     val warning = when {
+                        !isInsideBubakan -> "Peringatan: Koordinat GPS berada di luar batas administratif Kelurahan Bubakan. Kebun wajib berada di wilayah Bubakan."
                         accuracy == null -> "Informasi akurasi GPS tidak tersedia. Disarankan mencoba kembali di area terbuka."
                         accuracy > 25f -> "Akurasi GPS saat ini ${accuracy.toInt()}m (>25m). Disarankan mencoba kembali di area terbuka."
                         else -> null
@@ -136,8 +138,17 @@ class LocationFormViewModel(
             _state.update { it.copy(validationError = "Deskripsi kebun tidak boleh kosong.") }
             return
         }
-        if (current.latitude == null || current.longitude == null) {
+        val lat = current.latitude
+        val lng = current.longitude
+        if (lat == null || lng == null) {
             _state.update { it.copy(validationError = "Titik koordinat GPS wajib dikunci terlebih dahulu.") }
+            return
+        }
+
+        // Strict Geospatial Administrative Boundary Validation
+        val geoValidationError = id.bubakangreen.app.core.util.BubakanGeoValidator.validateCoordinates(lat, lng)
+        if (geoValidationError != null) {
+            _state.update { it.copy(validationError = geoValidationError) }
             return
         }
 
@@ -156,8 +167,8 @@ class LocationFormViewModel(
                 rw = current.rw,
                 address = current.address.trim(),
                 description = current.description.trim(),
-                latitude = current.latitude,
-                longitude = current.longitude,
+                latitude = lat,
+                longitude = lng,
                 accuracyMeters = current.accuracyMeters,
                 capturedAt = current.capturedAt ?: System.currentTimeMillis(),
                 coordinatesStatus = CoordinatesStatus.PENDING,

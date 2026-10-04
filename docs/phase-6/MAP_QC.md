@@ -25,6 +25,10 @@
 | **MAP-12** | Responsive Layouts | Viewport Tests | Map renders flawlessly on 360dp, 393dp, 412dp, and landscape orientations without layout distortion. | **`VERIFIED ON EMULATOR`** (Tested on Pixel 7, 412dp portrait) |
 | **MAP-13** | Real-Time Sync | Firestore Listener | State updates from Firestore snapshot listener propagate to map markers within $\le 1000\text{ms}$. | **`VERIFIED`** (Reactive Compose `LaunchedEffect(locations)` updates WebView in <50ms) |
 | **MAP-14** | Home Recap & Mini-Map | `HomeScreen` & `HomeViewModel` | Live metrics (Total, Urban Farming, Taman Toga) and interactive 190dp preview map with direct link to Peta Sebaran. | **`VERIFIED ON EMULATOR`** (`test_home_view.png`) |
+| **MAP-15** | Map Administrative View Lock | `map_template.html` / Leaflet | Initial camera fits Bubakan boundary (`fitBounds(bubakanBounds)`). Movement constrained via `maxBounds(pad(0.20))` preventing panning outside Bubakan. | **`VERIFIED ON EMULATOR`** (Initial view fits 182-vertex polygon) |
+| **MAP-16** | Boundary Polygon Visualization | `map_template.html` / Leaflet | Official Kelurahan Bubakan boundary rendered with subtle organic green stroke (`#1B5E20`, weight 2, dashed) and transparent 5% fill. Roads/markers remain clear. | **`VERIFIED ON EMULATOR`** (Rendered via Leaflet GeoJSON layer) |
+| **MAP-17** | Point-in-Polygon Location Form | `BubakanGeoValidator` / Form | New garden location coordinates validated against Bubakan polygon. Outside coordinates rejected with warning & error blocking submission. | **`VERIFIED IN UNIT TESTS`** (`LocationFormViewModelTest`) |
+| **MAP-18** | Point-in-Polygon Public Map Eligibility | `BubakanMapView` / Leaflet | Public map marker eligibility strictly rejects any location with coordinates outside Bubakan boundary polygon. | **`VERIFIED IN UNIT TESTS & JS`** (`BubakanGeoValidatorTest`) |
 
 ---
 

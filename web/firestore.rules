@@ -72,5 +72,21 @@ service cloud.firestore {
       allow read: if isAuthenticated() && (request.auth.uid == userId || isAdmin());
       allow write: if isAdmin();
     }
+
+    // 7. PLANT VOICES (Botanical Mandarin Audio Metadata)
+    // Public: Read-only for active voice metadata. WRITE: DENIED.
+    // Admin: Full CRUD.
+    match /plant_voices/{plantId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // 8. PLANT QUIZ QUESTIONS (Question Bank)
+    // Public: Read-only for active questions. WRITE: DENIED.
+    // Admin: Full CRUD.
+    match /plant_quiz_questions/{questionId} {
+      allow read: if resource.data.isActive == true || isAdmin();
+      allow write: if isAdmin();
+    }
   }
 }

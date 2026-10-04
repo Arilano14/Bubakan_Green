@@ -7,21 +7,26 @@ import id.bubakangreen.app.data.remote.FirebaseAuthRepository
 import id.bubakangreen.app.data.remote.FirestoreAuditRepository
 import id.bubakangreen.app.data.remote.FirestoreLocationRepository
 import id.bubakangreen.app.data.remote.FirestorePlantRepository
+import id.bubakangreen.app.data.remote.FirestoreQuizRepository
+import id.bubakangreen.app.data.remote.FirestoreVoiceRepository
 import id.bubakangreen.app.domain.model.AuditLog
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationConditionLog
 import id.bubakangreen.app.domain.model.LocationPlant
-
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.MasterPlant
+import id.bubakangreen.app.domain.model.PlantVoice
+import id.bubakangreen.app.domain.model.QuizQuestion
 import id.bubakangreen.app.domain.model.UserRole
 import id.bubakangreen.app.domain.model.UserSession
 import id.bubakangreen.app.domain.repository.AuditRepository
 import id.bubakangreen.app.domain.repository.AuthRepository
 import id.bubakangreen.app.domain.repository.LocationRepository
 import id.bubakangreen.app.domain.repository.PlantRepository
+import id.bubakangreen.app.domain.repository.QuizRepository
+import id.bubakangreen.app.domain.repository.VoiceRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -46,6 +51,8 @@ object RepositoryProvider {
     private var plantRepo: PlantRepository? = null
     private var authRepo: AuthRepository? = null
     private var auditRepo: AuditRepository? = null
+    private var quizRepo: QuizRepository? = null
+    private var voiceRepo: VoiceRepository? = null
 
     fun getLocationRepository(): LocationRepository {
         return locationRepo ?: synchronized(this) {
@@ -68,6 +75,18 @@ object RepositoryProvider {
     fun getAuditRepository(): AuditRepository {
         return auditRepo ?: synchronized(this) {
             auditRepo ?: createAuditRepository().also { auditRepo = it }
+        }
+    }
+
+    fun getQuizRepository(): QuizRepository {
+        return quizRepo ?: synchronized(this) {
+            quizRepo ?: createQuizRepository().also { quizRepo = it }
+        }
+    }
+
+    fun getVoiceRepository(): VoiceRepository {
+        return voiceRepo ?: synchronized(this) {
+            voiceRepo ?: createVoiceRepository().also { voiceRepo = it }
         }
     }
 
@@ -106,6 +125,24 @@ object RepositoryProvider {
             UiPreviewOnlyAuditRepository
         }
     }
+
+    private fun createQuizRepository(): QuizRepository {
+        return try {
+            val firestore = FirebaseFirestore.getInstance()
+            FirestoreQuizRepository(firestore)
+        } catch (_: Exception) {
+            UiPreviewOnlyQuizRepository
+        }
+    }
+
+    private fun createVoiceRepository(): VoiceRepository {
+        return try {
+            val firestore = FirebaseFirestore.getInstance()
+            FirestoreVoiceRepository(firestore)
+        } catch (_: Exception) {
+            UiPreviewOnlyVoiceRepository
+        }
+    }
 }
 
 /**
@@ -121,8 +158,8 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
             rw = "01",
             address = "Jl. Raya Bubakan No. 1, Kel. Bubakan",
             description = "Kebun percontohan budidaya sayuran dan pangan mandiri binaan Kelurahan Bubakan.",
-            latitude = -7.0681,
-            longitude = 110.3289,
+            latitude = -7.09350,
+            longitude = 110.32150,
             coordinatesStatus = CoordinatesStatus.VERIFIED,
             featured = true,
             photoUrl = null,
@@ -136,8 +173,8 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
             rw = "03",
             address = "Lingkungan RW 03, Kelurahan Bubakan",
             description = "Taman tanaman obat keluarga warga RW 03 yang membudidayakan ragam tanaman herbal tradisional.",
-            latitude = -7.0695,
-            longitude = 110.3310,
+            latitude = -7.09050,
+            longitude = 110.32300,
             coordinatesStatus = CoordinatesStatus.VERIFIED,
             featured = true,
             photoUrl = null,
@@ -151,8 +188,8 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
             rw = "05",
             address = "Pekarangan RW 05, Kelurahan Bubakan",
             description = "Pengembangan sayur hidroponik pakcoy dan selada warga RW 05.",
-            latitude = -7.0710,
-            longitude = 110.3340,
+            latitude = -7.09600,
+            longitude = 110.31850,
             coordinatesStatus = CoordinatesStatus.PENDING,
             featured = false,
             photoUrl = null,
@@ -753,3 +790,35 @@ private object UiPreviewOnlyAuditRepository : AuditRepository {
     override fun getAuditLogs(): Flow<Result<List<AuditLog>>> =
         flowOf(Result.Success(logs.reversed()))
 }
+
+/**
+ * UI_PREVIEW_ONLY: Fixture Quiz repository using 135 canonical questions.
+ */
+private object UiPreviewOnlyQuizRepository : QuizRepository {
+    private val previewQuestions = id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions.toMutableList()
+
+    override fun getQuestionsByPlant(plantId: String): Flow<Result<List<QuizQuestion>>> =
+        flowOf(Result.Success(previewQuestions.filter { it.plantId == plantId && it.isActive }))
+
+    override suspend fun createQuestion(question: QuizQuestion): Result<String> {
+        previewQuestions.add(question)
+        return Result.Success(question.questionId)
+    }
+}
+
+/**
+ * UI_PREVIEW_ONLY: Fixture Voice repository using 9 default plant voice metadata.
+ */
+private object UiPreviewOnlyVoiceRepository : VoiceRepository {
+    private val previewVoices = id.bubakangreen.app.data.fixture.DefaultLearningData.plantVoices.toMutableList()
+
+    override fun getVoiceByPlant(plantId: String): Flow<Result<PlantVoice?>> =
+        flowOf(Result.Success(previewVoices.find { it.plantId == plantId && it.isActive }))
+
+    override suspend fun setPlantVoice(voice: PlantVoice): Result<Unit> {
+        val idx = previewVoices.indexOfFirst { it.plantId == voice.plantId }
+        if (idx != -1) previewVoices[idx] = voice else previewVoices.add(voice)
+        return Result.Success(Unit)
+    }
+}
+

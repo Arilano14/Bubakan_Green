@@ -26,6 +26,11 @@ interface AudioPlayer {
     fun play(url: String)
 
     /**
+     * Plays local Android raw audio resource once.
+     */
+    fun playRaw(resId: Int) {}
+
+    /**
      * Stops current playback and resets state to Idle.
      */
     fun stop()

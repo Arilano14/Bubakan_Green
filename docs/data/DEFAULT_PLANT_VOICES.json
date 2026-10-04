@@ -1,0 +1,74 @@
+[
+  {
+    "plantId": "sereh",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "cabai",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "kangkung",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "tomat",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "terong",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "jahe",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "kencur",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "kunyit",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  },
+  {
+    "plantId": "lidah_buaya",
+    "language": "zh-CN",
+    "audioUrl": null,
+    "isActive": true,
+    "createdAt": 1727670000000,
+    "updatedAt": 1727670000000
+  }
+]

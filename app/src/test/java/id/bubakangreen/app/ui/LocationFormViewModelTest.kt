@@ -56,13 +56,15 @@ class LocationFormViewModelTest {
     }
 
     private class FakeLocationClient(
+        var simulatedLat: Double = -7.09237,
+        var simulatedLng: Double = 110.32036,
         var simulatedAccuracy: Float = 12f
     ) : LocationClient {
         override suspend fun getCurrentLocation(): Result<Coordinates> {
             return Result.Success(
                 Coordinates(
-                    latitude = -7.0681,
-                    longitude = 110.3289,
+                    latitude = simulatedLat,
+                    longitude = simulatedLng,
                     accuracyMeters = simulatedAccuracy
                 )
             )
@@ -116,8 +118,8 @@ class LocationFormViewModelTest {
         advanceUntilIdle()
 
         val state = viewModel.state.value
-        assertThat(state.latitude).isEqualTo(-7.0681)
-        assertThat(state.longitude).isEqualTo(110.3289)
+        assertThat(state.latitude).isEqualTo(-7.09237)
+        assertThat(state.longitude).isEqualTo(110.32036)
         assertThat(state.accuracyMeters).isEqualTo(12f)
         assertThat(state.gpsWarning).isNull()
     }
@@ -132,6 +134,32 @@ class LocationFormViewModelTest {
         val state = viewModel.state.value
         assertThat(state.accuracyMeters).isEqualTo(35f)
         assertThat(state.gpsWarning).contains(">25m")
+    }
+
+    @Test
+    fun saveLocation_withCoordinatesOutsideBubakan_setsGeospatialValidationError() = runTest(testDispatcher) {
+        // Simulating GPS location in Downtown Semarang (Simpang Lima) outside Bubakan
+        val fakeClient = FakeLocationClient(
+            simulatedLat = -6.9904,
+            simulatedLng = 110.4229,
+            simulatedAccuracy = 10f
+        )
+        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
+        viewModel.onNameChange("Kebun Luar Bubakan")
+        viewModel.onAddressChange("Jl. Pahlawan Semarang")
+        viewModel.onDescriptionChange("Kebun di luar area Bubakan")
+        viewModel.captureGps()
+        advanceUntilIdle()
+
+        // Verification: GPS warning on capture should alert about outside boundary
+        assertThat(viewModel.state.value.gpsWarning).contains("di luar batas administratif Kelurahan Bubakan")
+
+        viewModel.saveLocation("pic_1")
+        advanceUntilIdle()
+
+        // Strict rejection on save
+        assertThat(viewModel.state.value.validationError).contains("di luar wilayah administratif Kelurahan Bubakan")
+        assertThat(fakeLocationRepo.createdLocations).isEmpty()
     }
 
     @Test

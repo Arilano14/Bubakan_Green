@@ -64,6 +64,56 @@ class AndroidAudioPlayer(
         }
     }
 
+    override fun playRaw(resId: Int) {
+        if (resId == 0) {
+            _state.value = AudioState.Error("Resource audio tidak valid.")
+            return
+        }
+
+        stop()
+
+        try {
+            _state.value = AudioState.Loading
+            val afd = context.resources.openRawResourceFd(resId)
+            if (afd == null) {
+                _state.value = AudioState.Error("Audio lokal belum tersedia.")
+                return
+            }
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                setDataSource(afd.fileDescriptor, afd.startOffset, afd.length)
+                afd.close()
+                isLooping = false
+
+                setOnPreparedListener { player ->
+                    _state.value = AudioState.Playing
+                    player.start()
+                }
+
+                setOnCompletionListener {
+                    _state.value = AudioState.Idle
+                    cleanUp()
+                }
+
+                setOnErrorListener { _, _, _ ->
+                    _state.value = AudioState.Error("Gagal memutar audio lokal.")
+                    cleanUp()
+                    true
+                }
+
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            _state.value = AudioState.Error(e.message ?: "Gagal memutar audio.")
+            cleanUp()
+        }
+    }
+
     override fun stop() {
         cleanUp()
         _state.value = AudioState.Idle

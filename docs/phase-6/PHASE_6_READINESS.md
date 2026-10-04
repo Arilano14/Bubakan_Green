@@ -10,11 +10,13 @@
 
 | Change Category | Target Files & Directories | Purpose / Scope | Verification Status |
 |---|---|---|---|
-| **CHANGED** | `app/src/main/assets/map/` (`leaflet.js`, `leaflet.css`, `map_template.html`) | Local Leaflet 1.9.4 map engine + CSS + custom HTML canvas (~167 KB uncompressed, ~48 KB in APK). | **`VERIFIED`** (Loaded via `file:///android_asset/map/map_template.html`) |
-| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/components/BubakanMapView.kt` | Jetpack Compose Map component wrapping WebView with bidirectional JS bridge. | **`VERIFIED`** (`mixedContentMode`, `destroy()` on dispose) |
-| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/locations/LocationsScreen.kt` | Interactive `BubakanMapView` with top floating legend and bottom garden preview card. | **`VERIFIED`** (`test_interactive_map.png`, `test_filter_toga.png`) |
+| **CHANGED** | `app/src/main/assets/map/` (`leaflet.js`, `leaflet.css`, `map_template.html`, `bubakan_boundary.geojson`) | Local Leaflet 1.9.4 engine + official 182-vertex Kelurahan Bubakan boundary GeoJSON from Pemkot Semarang geoportal. | **`VERIFIED`** (Rendered via `L.geoJSON`, initial camera locked to Bubakan bounds) |
+| **CHANGED** | `app/src/main/java/id/bubakangreen/app/core/util/BubakanGeoValidator.kt` | New Jordan Curve (Ray-Casting) point-in-polygon validator enforcing strict Bubakan administrative boundaries. | **`VERIFIED`** (`BubakanGeoValidatorTest` passing with 0 errors) |
+| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/pic/LocationFormViewModel.kt` | Enforces geospatial boundary validation on GPS capture and location creation. | **`VERIFIED`** (`LocationFormViewModelTest` rejects out-of-boundary coordinates) |
+| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/components/BubakanMapView.kt` | Jetpack Compose Map component filtering public markers strictly inside Bubakan boundary. | **`VERIFIED`** (`mixedContentMode`, `destroy()` on dispose, PIP filter) |
+| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/locations/LocationsScreen.kt` | Interactive boundary-locked map with top floating legend and bottom garden preview card. | **`VERIFIED`** (`test_peta_sebaran_boundary.png`, `test_tap_amber_pin.png`) |
 | **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/home/HomeViewModel.kt` | Adds dynamic `GardenSummary` calculation from published locations. | **`VERIFIED`** (3 total, 2 Urban Farm, 1 Taman Toga) |
-| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/home/HomeScreen.kt` | "Rekapitulasi Kebun Bubakan" badges and interactive discovery mini-map (190dp). | **`VERIFIED`** (`test_home_view.png`) |
+| **CHANGED** | `app/src/main/java/id/bubakangreen/app/ui/home/HomeScreen.kt` | "Rekapitulasi Kebun Bubakan" badges and interactive discovery mini-map (190dp). | **`VERIFIED`** (`test_home_minimap_view.png`) |
 | **UNCHANGED** | `app/src/main/java/id/bubakangreen/app/domain/model/Location.kt` | Core domain entity preserved without breaking changes. | **`INTACT`** |
 | **UNCHANGED** | `app/src/main/java/id/bubakangreen/app/domain/model/MasterPlant.kt` | Botanical encyclopedia schema remains unchanged. | **`INTACT`** |
 | **UNCHANGED** | `app/src/main/java/id/bubakangreen/app/core/util/QrUrlBuilder.kt` | Canonical URL contract (`https://bubakangreen.web.app/...`) preserved. | **`INTACT`** |
@@ -26,7 +28,7 @@
 
 In strict adherence to project principles:
 1. **QR Status**:
-   - `QrUrlBuilder` and `QrCodeGenerator` are **`VERIFIED`** via unit tests (`BUILD SUCCESSFUL in 24s`).
+   - `QrUrlBuilder` and `QrCodeGenerator` are **`VERIFIED`** via unit tests (`BUILD SUCCESSFUL`).
    - In-app Google Code Scanner is **`TESTED`** on emulator.
    - Physical hardware stickers on garden stakes remain reported honestly as **`NOT TESTED ON PHYSICAL HARDWARE`**.
 2. **App Links Status**:
@@ -36,17 +38,18 @@ In strict adherence to project principles:
    - HTML files and rewrites are **`VERIFIED`** in local codebase.
    - Live domain `bubakangreen.web.app` returns HTTP 404 and is reported honestly as **`BLOCKED`** pending project owner execution of `firebase deploy`.
 4. **Map Status**:
-   - Interactive Leaflet Map is **`VERIFIED ON EMULATOR`** on Pixel 7 (Android 14 API 34).
-   - Dynamic marker generation (`#2E7D32` Urban Farming, `#D97706` Taman Toga), filter synchronization, marker click centering, preview card display, and navigation to `LocationDetailScreen` are **`FULLY FUNCTIONAL`**.
-   - Home recap metrics and discovery mini-map are **`FULLY FUNCTIONAL`**.
+   - Interactive Administrative Boundary-Locked Map is **`VERIFIED ON EMULATOR`** on Pixel 7 (Android 14 API 34).
+   - Official administrative boundary polygon (FID: 16 from `dataspasial.semarangkota.go.id`) rendered with subtle dashed green border and 5% fill.
+   - Camera view locked to Bubakan boundary with small visual padding (`fitBounds` + `maxBounds` with 20% pad).
+   - Point-in-polygon validation enforced on location creation in `LocationFormViewModel` and on public map markers.
 
 ---
 
 ## 3. Empirical Verification Evidence
 
-- `test_interactive_map.png`: Leaflet map tiles, dual-category pins, floating legend, and selected garden card.
-- `test_filter_toga.png`: Filter chip isolation with single amber pin for Taman Toga.
-- `test_location_detail_opened.png`: Preview card CTA navigation to detail screen.
-- `test_home_view.png`: Home dynamic recap badges (3 Kebun, 2 Urban Farming, 1 Taman Toga) and mini-map.
-- `testDebugUnitTest`: 22 tasks executed/up-to-date, 0 failures.
-- `app-debug.apk`: Built and verified on device (size: 28.5 MB, asset overhead: ~48 KB).
+- `test_peta_sebaran_boundary.png`: Official Kelurahan Bubakan administrative boundary outline rendered on OpenStreetMap tiles with green/amber markers.
+- `test_tap_amber_pin.png`: Marker selection halo and preview card for Taman Toga RW 03 inside Bubakan boundary.
+- `test_detail_screen_success.png`: Direct transition from preview card CTA to `LocationDetailScreen`.
+- `test_home_minimap_view.png`: Home dynamic recap badges and boundary-locked discovery mini-map.
+- `testDebugUnitTest`: 22 tasks executed/up-to-date, 0 failures (including `BubakanGeoValidatorTest` and `LocationFormViewModelTest`).
+- `app-debug.apk`: Built and installed on Pixel 7 emulator.
