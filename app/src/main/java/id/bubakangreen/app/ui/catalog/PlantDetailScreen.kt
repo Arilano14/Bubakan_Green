@@ -29,7 +29,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Eco
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.outlined.QrCode2
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -52,6 +57,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -143,7 +149,7 @@ fun PlantDetailScreen(
                             )
                         } else {
                             PrimaryButton(
-                                text = "Selesai Mengenal Tanaman Ini ✨",
+                                text = "Selesai Mengenal Tanaman",
                                 onClick = { isLessonCompleted = true },
                                 height = 54.dp
                             )
@@ -315,7 +321,7 @@ fun PlantDetailScreen(
                                 ) {
                                     Column(modifier = Modifier.weight(1f)) {
                                         Text(
-                                            text = "Kenalan lebih dekat 🌱",
+                                            text = "Kenalan Lebih Dekat",
                                             style = MaterialTheme.typography.titleLarge,
                                             fontWeight = FontWeight.ExtraBold,
                                             color = PrimaryGreenDark
@@ -352,7 +358,7 @@ fun PlantDetailScreen(
                                     Spacer(modifier = Modifier.height(16.dp))
                                     BotanicalInfoCard(
                                         title = "Karakteristik Tanaman",
-                                        icon = "🔍",
+                                        icon = Icons.Default.Info,
                                         content = plant.characteristics
                                     )
                                 }
@@ -362,7 +368,7 @@ fun PlantDetailScreen(
                                     Spacer(modifier = Modifier.height(16.dp))
                                     BotanicalInfoCard(
                                         title = "Khasiat & Kegunaan",
-                                        icon = "✨",
+                                        icon = Icons.Default.Spa,
                                         content = usefulBenefits
                                     )
                                 }
@@ -372,48 +378,12 @@ fun PlantDetailScreen(
                                     Spacer(modifier = Modifier.height(16.dp))
                                     BotanicalInfoCard(
                                         title = "Panduan Budidaya",
-                                        icon = "🌱",
+                                        icon = Icons.Default.Eco,
                                         content = cultivation
                                     )
                                 }
 
-                                if (!plant.imageAuthor.isNullOrBlank() || !plant.imageLicense.isNullOrBlank() || plant.sourceReferences.isNotBlank()) {
-                                    Spacer(modifier = Modifier.height(16.dp))
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clip(RoundedCornerShape(14.dp))
-                                            .background(id.bubakangreen.app.ui.theme.PrimaryContainerMint.copy(alpha = 0.4f))
-                                            .padding(14.dp)
-                                    ) {
-                                        Column {
-                                            Text(
-                                                text = "Sumber & Lisensi",
-                                                style = MaterialTheme.typography.labelMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = PrimaryGreenDark
-                                            )
-                                            if (!plant.imageAuthor.isNullOrBlank() || !plant.imageLicense.isNullOrBlank()) {
-                                                Spacer(modifier = Modifier.height(4.dp))
-                                                Text(
-                                                    text = "Foto: ${plant.imageAuthor.orEmpty()} (${plant.imageLicense.orEmpty()})",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = TextSecondary
-                                                )
-                                            }
-                                            if (plant.sourceReferences.isNotBlank()) {
-                                                Spacer(modifier = Modifier.height(2.dp))
-                                                Text(
-                                                    text = "Taksonomi: ${plant.sourceReferences}",
-                                                    style = MaterialTheme.typography.bodySmall,
-                                                    color = TextSecondary
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-
-                                Spacer(modifier = Modifier.height(20.dp))
+                                Spacer(modifier = Modifier.height(16.dp))
 
                                 // Garden presence
                                 Box(
@@ -422,19 +392,25 @@ fun PlantDetailScreen(
                                         .clip(RoundedCornerShape(16.dp))
                                         .background(PrimaryGreenLight.copy(alpha = 0.5f))
                                         .padding(16.dp)
-                                    ) {
+                                ) {
                                     Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Text(text = "📍", fontSize = 24.sp)
+                                        Icon(
+                                            imageVector = Icons.Default.LocationOn,
+                                            contentDescription = null,
+                                            tint = PrimaryGreenDark,
+                                            modifier = Modifier.size(24.dp)
+                                        )
                                         Spacer(modifier = Modifier.width(12.dp))
                                         Column {
                                             Text(
-                                                text = "Di mana kamu bisa menemukannya?",
+                                                text = "Lokasi di Bubakan",
                                                 style = MaterialTheme.typography.titleSmall,
                                                 fontWeight = FontWeight.Bold,
                                                 color = PrimaryGreenDark
                                             )
+                                            Spacer(modifier = Modifier.height(2.dp))
                                             Text(
-                                                text = "Dapat ditemukan dan dipelajari langsung di Taman Toga RW 03 dan Urban Farming Bubakan.",
+                                                text = "Dapat ditemukan di kebun binaan Kelurahan Bubakan.",
                                                 style = MaterialTheme.typography.bodySmall,
                                                 color = TextSecondary
                                             )
@@ -461,33 +437,25 @@ fun PlantDetailScreen(
                                     ) {
                                         Mascot(
                                             type = MascotType.HAPPY,
-                                            size = 160.dp,
+                                            size = 140.dp,
                                             animateIdle = true
                                         )
-                                        Spacer(modifier = Modifier.height(14.dp))
+                                        Spacer(modifier = Modifier.height(12.dp))
                                         Text(
-                                            text = "Hebat! Kamu sudah mengenal tanaman ini 🎉",
+                                            text = "Kamu sudah mengenal tanaman ini",
                                             style = MaterialTheme.typography.titleMedium,
-                                            fontWeight = FontWeight.ExtraBold,
+                                            fontWeight = FontWeight.Bold,
                                             color = PrimaryGreenDark,
                                             textAlign = TextAlign.Center
                                         )
-                                        Spacer(modifier = Modifier.height(6.dp))
+                                        Spacer(modifier = Modifier.height(4.dp))
                                         Text(
-                                            text = "Terima kasih sudah belajar bersama Bubakan Green 🌱",
+                                            text = "Terima kasih sudah belajar bersama Bubakan Green",
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = TextSecondary,
                                             textAlign = TextAlign.Center
                                         )
                                     }
-                                } else {
-                                    Text(
-                                        text = "💡 Ketuk tombol di bawah setelah selesai mempelajari tanaman ini.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = TextSecondary,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
                                 }
 
                                 Spacer(modifier = Modifier.height(24.dp))
@@ -560,11 +528,24 @@ private fun PlantQuizCardSection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text(text = "🧠", fontSize = 28.sp)
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(CircleShape)
+                        .background(if (canStartQuiz) PrimaryGreen.copy(alpha = 0.15f) else Color(0xFFE0E0E0)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.School,
+                        contentDescription = null,
+                        tint = if (canStartQuiz) PrimaryGreenDark else TextSecondary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Uji Pengetahuan Tanaman 🌱",
+                        text = "Uji Pengetahuan Tanaman",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.ExtraBold,
                         color = PrimaryGreenDark
@@ -572,7 +553,7 @@ private fun PlantQuizCardSection(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = if (canStartQuiz) {
-                            "Tersedia $questionCount soal di bank materi. Jawab 5 soal acak!"
+                            "Uji pemahamanmu tentang tanaman ini."
                         } else {
                             "Kuis belum tersedia untuk tanaman ini."
                         },
@@ -586,7 +567,7 @@ private fun PlantQuizCardSection(
 
             if (canStartQuiz) {
                 PrimaryButton(
-                    text = "Mulai Kuis (5 Soal) 🚀",
+                    text = "Mulai Kuis",
                     onClick = onStartQuiz,
                     height = 48.dp
                 )
@@ -655,7 +636,7 @@ private fun QuizInteractiveView(
             }
 
             Text(
-                text = if (session.isFinished) "Hasil Kuis" else "Kuis Mengenal Tanaman",
+                text = if (session.isFinished) "Hasil Kuis" else "Kuis Tanaman",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = PrimaryGreenDark
@@ -779,11 +760,16 @@ private fun QuizInteractiveView(
                                         .padding(14.dp)
                                 ) {
                                     Row(verticalAlignment = Alignment.Top) {
-                                        Text(text = "💡", fontSize = 18.sp)
+                                        Icon(
+                                            imageVector = Icons.Default.Info,
+                                            contentDescription = null,
+                                            tint = ForestGreen,
+                                            modifier = Modifier.size(18.dp)
+                                        )
                                         Spacer(modifier = Modifier.width(8.dp))
                                         Column {
                                             Text(
-                                                text = "Fakta Pengetahuan:",
+                                                text = "Penjelasan:",
                                                 style = MaterialTheme.typography.labelMedium,
                                                 fontWeight = FontWeight.Bold,
                                                 color = ForestGreen
@@ -816,7 +802,7 @@ private fun QuizInteractiveView(
                 } else {
                     val isLast = session.currentIndex + 1 >= session.totalQuestions
                     PrimaryButton(
-                        text = if (isLast) "Lihat Hasil Kuis 🏆" else "Lanjut ke Soal Berikutnya ➔",
+                        text = if (isLast) "Lihat Hasil" else "Lanjut ke Soal Berikutnya",
                         onClick = onNextQuestion,
                         height = 52.dp
                     )
@@ -933,15 +919,15 @@ private fun QuizResultCard(
     }
 
     val feedbackTitle = when (resultState) {
-        QuizResultState.PERFECT -> "Luar Biasa, Sempurna! 🎉"
-        QuizResultState.GOOD -> "Hebat, Pengetahuanmu Bagus! 👍"
-        QuizResultState.ENCOURAGEMENT -> "Tetap Semangat Belajar! 🌱"
+        QuizResultState.PERFECT -> "Luar Biasa, Sempurna"
+        QuizResultState.GOOD -> "Bagus Sekali"
+        QuizResultState.ENCOURAGEMENT -> "Tetap Semangat Belajar"
     }
 
     val feedbackDesc = when (resultState) {
-        QuizResultState.PERFECT -> "Kamu berhasil menjawab seluruh 5 pertanyaan botani dengan tepat!"
-        QuizResultState.GOOD -> "Kamu sudah memahami sebagian besar fakta penting tanaman ini."
-        QuizResultState.ENCOURAGEMENT -> "Yuk baca kembali panduan karakteristik dan khasiat tanaman, lalu coba lagi!"
+        QuizResultState.PERFECT -> "Kamu berhasil menjawab seluruh pertanyaan dengan tepat."
+        QuizResultState.GOOD -> "Kamu sudah memahami sebagian besar materi tanaman ini."
+        QuizResultState.ENCOURAGEMENT -> "Pelajari kembali materi karakteristik tanaman dan coba lagi."
     }
 
     Card(
@@ -1013,7 +999,7 @@ private fun QuizResultCard(
             Spacer(modifier = Modifier.height(28.dp))
 
             PrimaryButton(
-                text = "Coba Lagi (Acak 5 Soal Baru) 🔄",
+                text = "Coba Lagi",
                 onClick = onRetryQuiz,
                 height = 52.dp
             )
@@ -1021,7 +1007,7 @@ private fun QuizResultCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             SecondaryButton(
-                text = "Kembali ke Materi Tanaman",
+                text = "Kembali ke Materi",
                 onClick = onExitQuiz,
                 height = 52.dp
             )
@@ -1093,7 +1079,7 @@ private fun MandarinPod(
 @Composable
 private fun BotanicalInfoCard(
     title: String,
-    icon: String,
+    icon: ImageVector,
     content: String,
     modifier: Modifier = Modifier
 ) {
@@ -1106,7 +1092,12 @@ private fun BotanicalInfoCard(
     ) {
         Column {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = icon, fontSize = 20.sp)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = PrimaryGreenDark,
+                    modifier = Modifier.size(20.dp)
+                )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = title,

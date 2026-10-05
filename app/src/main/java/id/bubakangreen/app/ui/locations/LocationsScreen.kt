@@ -26,6 +26,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -182,12 +184,12 @@ fun LocationsScreen(
                 onClick = { viewModel.setCategoryFilter(null) }
             )
             CategoryFilterChip(
-                label = "🌱 Urban Farming",
+                label = "Urban Farming",
                 selected = uiState.selectedType == LocationType.URBAN_FARMING,
                 onClick = { viewModel.setCategoryFilter(LocationType.URBAN_FARMING) }
             )
             CategoryFilterChip(
-                label = "🌿 Taman Toga",
+                label = "Taman Toga",
                 selected = uiState.selectedType == LocationType.TAMAN_TOGA,
                 onClick = { viewModel.setCategoryFilter(LocationType.TAMAN_TOGA) }
             )
@@ -226,7 +228,7 @@ fun LocationsScreen(
                                 item {
                                     Column(modifier = Modifier.padding(top = 4.dp)) {
                                         Text(
-                                            text = "🌱 KEBUN URBAN FARMING",
+                                            text = "KEBUN URBAN FARMING",
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.ExtraBold,
                                             color = PrimaryGreenDark
@@ -250,7 +252,7 @@ fun LocationsScreen(
                                 item {
                                     Column(modifier = Modifier.padding(top = 10.dp)) {
                                         Text(
-                                            text = "🌿 TAMAN TOGA & HERBAL",
+                                            text = "TAMAN TOGA & HERBAL",
                                             style = MaterialTheme.typography.titleMedium,
                                             fontWeight = FontWeight.ExtraBold,
                                             color = Color(0xFF5A4400)
@@ -363,7 +365,7 @@ private fun MapVisualContainer(
                             .background(Color(0xFF2E7D32))
                     )
                     Text(
-                        text = "🌱 Urban Farming",
+                        text = "Urban Farming",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = OnSurfaceForestDark
@@ -381,7 +383,7 @@ private fun MapVisualContainer(
                             .background(Color(0xFFD97706))
                     )
                     Text(
-                        text = "🌿 Taman Toga",
+                        text = "Taman Toga",
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = FontWeight.Bold,
                         color = OnSurfaceForestDark
@@ -445,13 +447,14 @@ private fun MapVisualContainer(
                         horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         TactileButton(
-                            text = "📍 Rute Maps",
+                            text = "Rute Maps",
+                            icon = Icons.Default.LocationOn,
                             onClick = { onOpenExternalMap(selectedLocation) },
                             style = TactileButtonStyle.SECONDARY,
                             modifier = Modifier.weight(1f)
                         )
                         TactileButton(
-                            text = "Lihat Kebun →",
+                            text = "Lihat Kebun",
                             onClick = { onOpenDetail(selectedLocation) },
                             style = TactileButtonStyle.PRIMARY,
                             modifier = Modifier.weight(1.2f)

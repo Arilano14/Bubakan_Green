@@ -33,9 +33,14 @@ import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryContainerMint
 import id.bubakangreen.app.ui.theme.SurfaceCardWhite
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Eco
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Park
+import androidx.compose.material.icons.filled.Spa
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.QrCodeScanner
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -332,7 +337,7 @@ private fun WelcomeHero(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Yuk, kenalan dengan tanaman\ndi sekitar kita 🌱",
+                        text = "Yuk, kenalan dengan tanaman\ndi sekitar kita",
                         style = MaterialTheme.typography.bodyLarge,
                         color = id.bubakangreen.app.ui.theme.TextOnColor.copy(alpha = 0.9f),
                         lineHeight = 22.sp
@@ -407,7 +412,12 @@ private fun GardenDestinations(
                 .padding(16.dp)
         ) {
             Column {
-                Text(text = "🌱", fontSize = 32.sp)
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = null,
+                    tint = PrimaryGreenDark,
+                    modifier = Modifier.size(32.dp)
+                )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Urban Farming",
@@ -424,7 +434,7 @@ private fun GardenDestinations(
                 )
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = "Kunjungi →",
+                    text = "Kunjungi",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = PrimaryGreenDark
@@ -442,7 +452,12 @@ private fun GardenDestinations(
                 .padding(16.dp)
         ) {
             Column {
-                Text(text = "🌿", fontSize = 32.sp)
+                Icon(
+                    imageVector = Icons.Default.Spa,
+                    contentDescription = null,
+                    tint = androidx.compose.ui.graphics.Color(0xFF5A4400),
+                    modifier = Modifier.size(32.dp)
+                )
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = "Taman Toga",
@@ -459,7 +474,7 @@ private fun GardenDestinations(
                 )
                 Spacer(modifier = Modifier.height(14.dp))
                 Text(
-                    text = "Kunjungi →",
+                    text = "Kunjungi",
                     style = MaterialTheme.typography.labelMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = androidx.compose.ui.graphics.Color(0xFF5A4400)
@@ -489,7 +504,7 @@ private fun DailyTipSection(
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Tahukah Kamu? 🌿",
+                    text = "Tahukah Kamu?",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
                     color = PrimaryGreenDark
@@ -569,7 +584,12 @@ private fun GardenRecapSection(
                         .background(PrimaryContainerMint),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(text = "🏡", fontSize = 18.sp)
+                    Icon(
+                        imageVector = Icons.Default.LocationOn,
+                        contentDescription = null,
+                        tint = ForestGreen,
+                        modifier = Modifier.size(20.dp)
+                    )
                 }
             }
 
@@ -583,7 +603,7 @@ private fun GardenRecapSection(
                 RecapStatBadge(
                     count = totalGardens.toString(),
                     label = "Total Kebun",
-                    icon = "🌾",
+                    icon = Icons.Default.Park,
                     containerColor = PrimaryContainerMint,
                     textColor = ForestGreen,
                     modifier = Modifier
@@ -595,7 +615,7 @@ private fun GardenRecapSection(
                 RecapStatBadge(
                     count = urbanFarmingCount.toString(),
                     label = "Urban Farm",
-                    icon = "🌱",
+                    icon = Icons.Default.Eco,
                     containerColor = Color(0xFFE8F5E9),
                     textColor = Color(0xFF2E7D32),
                     modifier = Modifier
@@ -607,7 +627,7 @@ private fun GardenRecapSection(
                 RecapStatBadge(
                     count = tamanTogaCount.toString(),
                     label = "Taman Toga",
-                    icon = "🌿",
+                    icon = Icons.Default.Spa,
                     containerColor = Color(0xFFFFF8E1),
                     textColor = Color(0xFFD97706),
                     modifier = Modifier
@@ -623,7 +643,7 @@ private fun GardenRecapSection(
 private fun RecapStatBadge(
     count: String,
     label: String,
-    icon: String,
+    icon: ImageVector,
     containerColor: Color,
     textColor: Color,
     modifier: Modifier = Modifier
@@ -640,7 +660,12 @@ private fun RecapStatBadge(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Text(text = icon, fontSize = 14.sp)
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = textColor,
+                    modifier = Modifier.size(16.dp)
+                )
                 Text(
                     text = count,
                     style = MaterialTheme.typography.titleLarge,
@@ -652,9 +677,8 @@ private fun RecapStatBadge(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                fontWeight = FontWeight.Bold,
-                color = textColor.copy(alpha = 0.85f),
-                maxLines = 1
+                color = id.bubakangreen.app.ui.theme.TextSecondary,
+                fontWeight = FontWeight.SemiBold
             )
         }
     }
