@@ -17,14 +17,10 @@ service cloud.firestore {
     }
 
     // 1. LOCATIONS
-    // Public: Read-only for published/active locations. WRITE: DENIED.
+    // Public: Read-only. WRITE: DENIED.
     // Admin: Full CRUD (CREATE, READ, UPDATE, DEACTIVATE).
     match /locations/{locationId} {
-      allow read: if resource.data.isPublished == true ||
-                     resource.data.status == 'PUBLISHED' ||
-                     resource.data.status == 'ACTIVE' ||
-                     resource.data.status == 'NEEDS_MAINTENANCE' ||
-                     isAdmin();
+      allow read: if true;
       allow write: if isAdmin();
     }
 
