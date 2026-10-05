@@ -51,6 +51,7 @@ import id.bubakangreen.app.ui.pic.PicDashboardScreen
 import id.bubakangreen.app.ui.pic.PicDashboardViewModel
 import id.bubakangreen.app.ui.pic.PlantFormScreen
 import id.bubakangreen.app.ui.pic.PlantFormViewModel
+import id.bubakangreen.app.ui.splash.SplashScreen
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 
 /**
@@ -155,7 +156,7 @@ fun BubakanAppNavHost(
                                 }
                                 if (currentDestination?.route != targetRoute) {
                                     navController.navigate(targetRoute) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
+                                        popUpTo(Screen.Home.route) {
                                             saveState = true
                                         }
                                         launchSingleTop = true
@@ -168,7 +169,7 @@ fun BubakanAppNavHost(
                         } else if (item.screen == Screen.Home) {
                             if (currentDestination?.route != Screen.Home.route) {
                                 navController.navigate(Screen.Home.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
+                                    popUpTo(Screen.Home.route) {
                                         inclusive = false
                                     }
                                     launchSingleTop = true
@@ -178,7 +179,7 @@ fun BubakanAppNavHost(
                             val destination = item.screen.route
                             if (currentDestination?.route != destination) {
                                 navController.navigate(destination) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
+                                    popUpTo(Screen.Home.route) {
                                         saveState = true
                                     }
                                     launchSingleTop = true
@@ -195,9 +196,23 @@ fun BubakanAppNavHost(
     ) { paddingValues ->
         NavHost(
             navController = navController,
-            startDestination = Screen.Home.route,
+            startDestination = Screen.Splash.route,
             modifier = Modifier.padding(paddingValues)
         ) {
+            // SPLASH: Branded Welcome Screen (±6 seconds)
+            composable(Screen.Splash.route) {
+                SplashScreen(
+                    onSplashComplete = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Splash.route) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
             // TAB 1: Beranda (Home)
             composable(Screen.Home.route) {
                 HomeScreen(
@@ -211,7 +226,7 @@ fun BubakanAppNavHost(
                         keyboardController?.hide()
                         focusManager.clearFocus()
                         navController.navigate(Screen.Locations.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(Screen.Home.route) {
                                 saveState = true
                             }
                             launchSingleTop = true
@@ -222,7 +237,7 @@ fun BubakanAppNavHost(
                         keyboardController?.hide()
                         focusManager.clearFocus()
                         navController.navigate(Screen.Catalog.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
+                            popUpTo(Screen.Home.route) {
                                 saveState = true
                             }
                             launchSingleTop = true

@@ -33,8 +33,7 @@ enum class MascotType {
     THINKING,
     WARNING,
     POINTING,
-    CTA_PROCESS,
-    SPLASH
+    CTA_PROCESS
 }
 
 /**
@@ -67,7 +66,6 @@ fun Mascot(
         MascotType.WARNING -> R.drawable.mascot_warning
         MascotType.POINTING -> R.drawable.mascot_pointing
         MascotType.CTA_PROCESS -> R.drawable.mascot_cta_process
-        MascotType.SPLASH -> R.drawable.mascot_splashscreen
     }
 
     val desc = contentDescription ?: when (type) {
@@ -79,7 +77,6 @@ fun Mascot(
         MascotType.WARNING -> "Maskot Bubakan Green Khawatir"
         MascotType.POINTING -> "Maskot Bubakan Green Menunjuk Petunjuk"
         MascotType.CTA_PROCESS -> "Maskot Bubakan Green Panduan Proses"
-        MascotType.SPLASH -> "Maskot Bubakan Green Selamat Datang"
     }
 
     val animModifier = if (animateIdle) {

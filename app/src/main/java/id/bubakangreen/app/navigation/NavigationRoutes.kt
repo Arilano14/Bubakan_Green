@@ -23,6 +23,7 @@ sealed class Screen(
     val route: String,
     val title: String = ""
 ) {
+    data object Splash : Screen("splash", "Splash")
     data object Home : Screen("home", "Beranda")
     data object Locations : Screen("locations", "Lokasi")
     data object LocationDetail : Screen("location/{locationId}", "Detail Kebun") {
