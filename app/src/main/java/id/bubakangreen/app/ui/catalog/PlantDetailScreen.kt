@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,6 +50,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -82,6 +84,7 @@ import id.bubakangreen.app.ui.theme.AquaAccent
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.BorderDivider
 import id.bubakangreen.app.ui.theme.ForestGreen
+import id.bubakangreen.app.ui.theme.OutlineOrganic
 import id.bubakangreen.app.ui.theme.PrimaryGreen
 import id.bubakangreen.app.ui.theme.PrimaryGreenDark
 import id.bubakangreen.app.ui.theme.PrimaryGreenLight
@@ -126,20 +129,20 @@ fun PlantDetailScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         bottomBar = {
             if (uiState.plant is UiState.Success && uiState.quizSession == null) {
                 Surface(
                     color = id.bubakangreen.app.ui.theme.SurfaceCard,
                     shadowElevation = 8.dp,
                     tonalElevation = 2.dp,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .navigationBarsPadding()
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 12.dp)
+                            .navigationBarsPadding()
+                            .padding(horizontal = 20.dp, vertical = 14.dp)
                     ) {
                         if (isLessonCompleted) {
                             PrimaryButton(
@@ -211,77 +214,38 @@ fun PlantDetailScreen(
 
                     is UiState.Success -> {
                         val plant = plantState.data
+                        val isScrolled by remember {
+                            derivedStateOf { scrollState.value > 60 }
+                        }
 
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .verticalScroll(scrollState)
-                        ) {
-                            // Hero plant photo with overlaid back button
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(16f / 10f)
-                                    .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
-                                    .background(PrimaryGreenLight)
-                            ) {
-                                PlantImage(
-                                    plant = plant,
-                                    contentDescription = "Foto tanaman ${plant.nameId}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-
-                                // Navigation & Action buttons overlay
-                                Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(16.dp),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Box(
-                                        modifier = Modifier
-                                            .size(48.dp)
-                                            .clip(CircleShape)
-                                            .background(Color.White.copy(alpha = 0.95f))
-                                            .clickable(onClick = onNavigateBack),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = "Kembali",
-                                            tint = TextPrimary,
-                                            modifier = Modifier.size(24.dp)
-                                        )
-                                    }
-
-                                    if (plant.isPublished) {
-                                        Box(
-                                            modifier = Modifier
-                                                .size(48.dp)
-                                                .clip(CircleShape)
-                                                .background(Color.White.copy(alpha = 0.95f))
-                                                .clickable { showQrDialog = true },
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Outlined.QrCode2,
-                                                contentDescription = "Lihat Kode QR",
-                                                tint = ForestGreen,
-                                                modifier = Modifier.size(24.dp)
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Content Column
+                        Box(modifier = Modifier.fillMaxSize()) {
                             Column(
                                 modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 20.dp, vertical = 20.dp)
+                                    .fillMaxSize()
+                                    .verticalScroll(scrollState)
                             ) {
+                                // Hero plant photo
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(16f / 10f)
+                                        .clip(RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp))
+                                        .background(PrimaryGreenLight)
+                                ) {
+                                    PlantImage(
+                                        plant = plant,
+                                        contentDescription = "Foto tanaman ${plant.nameId}",
+                                        contentScale = ContentScale.Crop,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+
+                                // Content Column
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 20.dp, vertical = 20.dp)
+                                ) {
                                 // Plant name & scientific name
                                 Text(
                                     text = plant.nameId,
@@ -461,9 +425,77 @@ fun PlantDetailScreen(
                                 Spacer(modifier = Modifier.height(24.dp))
                             }
                         }
-                    }
 
-                    is UiState.Empty -> {
+                        // Pinned Floating Top Actions: Arrow & QR button (Never scroll away)
+                        Surface(
+                            color = if (isScrolled) BackgroundWarm.copy(alpha = 0.98f) else Color.Transparent,
+                            shadowElevation = if (isScrolled) 4.dp else 0.dp,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = Color.White,
+                                    shadowElevation = 4.dp,
+                                    border = BorderStroke(1.dp, OutlineOrganic.copy(alpha = 0.6f)),
+                                    modifier = Modifier
+                                        .size(46.dp)
+                                        .clickable(onClick = onNavigateBack)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(
+                                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                            contentDescription = "Kembali",
+                                            tint = TextPrimary,
+                                            modifier = Modifier.size(22.dp)
+                                        )
+                                    }
+                                }
+
+                                if (isScrolled) {
+                                    Text(
+                                        text = plant.nameId,
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = TextPrimary,
+                                        maxLines = 1
+                                    )
+                                }
+
+                                if (plant.isPublished) {
+                                    Surface(
+                                        shape = CircleShape,
+                                        color = Color.White,
+                                        shadowElevation = 4.dp,
+                                        border = BorderStroke(1.dp, OutlineOrganic.copy(alpha = 0.6f)),
+                                        modifier = Modifier
+                                            .size(46.dp)
+                                            .clickable { showQrDialog = true }
+                                    ) {
+                                        Box(contentAlignment = Alignment.Center) {
+                                            Icon(
+                                                imageVector = Icons.Outlined.QrCode2,
+                                                contentDescription = "Lihat Kode QR",
+                                                tint = ForestGreen,
+                                                modifier = Modifier.size(22.dp)
+                                            )
+                                        }
+                                    }
+                                } else if (isScrolled) {
+                                    Spacer(modifier = Modifier.size(46.dp))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                is UiState.Empty -> {
                         EmptyState(
                             title = "Informasi Belum Tersedia",
                             message = "Data tanaman ini belum lengkap.",

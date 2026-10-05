@@ -44,9 +44,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -559,38 +569,18 @@ private fun GardenRecapSection(
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(18.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Rekapitulasi Kebun Bubakan",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = OnSurfaceForestDark
-                    )
-                    Text(
-                        text = "Data sebaran aktif kelurahan terkini",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceSageMuted
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(PrimaryContainerMint),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.LocationOn,
-                        contentDescription = null,
-                        tint = ForestGreen,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Rekapitulasi Kebun Bubakan",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = OnSurfaceForestDark
+                )
+                Text(
+                    text = "Data sebaran aktif kelurahan terkini",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceSageMuted
+                )
             }
 
             Spacer(modifier = Modifier.height(14.dp))
@@ -695,6 +685,8 @@ private fun HomeMiniMapSection(
     onNavigateToLocations: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedLocation by remember { mutableStateOf<Location?>(null) }
+
     Card(
         shape = RoundedCornerShape(22.dp),
         colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
@@ -703,45 +695,144 @@ private fun HomeMiniMapSection(
         modifier = modifier.fillMaxWidth()
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column {
-                    Text(
-                        text = "Peta Sebaran Interaktif",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = OnSurfaceForestDark
-                    )
-                    Text(
-                        text = "Sebaran titik urban farming & toga warga",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = OnSurfaceSageMuted
-                    )
-                }
-
-                // Legend preview
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(text = "🌱 Urban", style = MaterialTheme.typography.labelSmall, color = Color(0xFF2E7D32), fontWeight = FontWeight.Bold)
-                    Text(text = "🌿 Toga", style = MaterialTheme.typography.labelSmall, color = Color(0xFFD97706), fontWeight = FontWeight.Bold)
-                }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    text = "Peta Sebaran Interaktif",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = OnSurfaceForestDark
+                )
+                Text(
+                    text = "Sebaran titik urban farming & toga warga",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceSageMuted
+                )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // Reusable BubakanMapView in a compact 190dp container
+            // Highlighted selection appearing at the top of the map ("muncul paling atas")
+            AnimatedVisibility(
+                visible = selectedLocation != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                selectedLocation?.let { loc ->
+                    val isToga = loc.type == LocationType.TAMAN_TOGA
+                    val tagBg = if (isToga) Color(0xFFFFF8E1) else PrimaryContainerMint
+                    val tagText = if (isToga) "🌿 Taman Toga" else "🌱 Urban Farming"
+                    val tagColor = if (isToga) Color(0xFFD97706) else ForestGreen
+
+                    Card(
+                        shape = RoundedCornerShape(16.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isToga) Color(0xFFFFFDF5) else Color(0xFFF6FBF7)
+                        ),
+                        border = BorderStroke(1.dp, if (isToga) Color(0xFFFDE68A) else PrimaryGreenLight),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 12.dp)
+                            .clickable { onLocationClick(loc.id) }
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(tagBg)
+                                            .padding(horizontal = 6.dp, vertical = 2.dp)
+                                    ) {
+                                        Text(
+                                            text = tagText,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = tagColor
+                                        )
+                                    }
+                                    Text(
+                                        text = "RW ${loc.rw}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = OnSurfaceSageMuted
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = loc.name,
+                                    style = MaterialTheme.typography.titleSmall,
+                                    fontWeight = FontWeight.ExtraBold,
+                                    color = OnSurfaceForestDark,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = loc.address.ifEmpty { "Kelurahan Bubakan" },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = OnSurfaceSageMuted,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            // Action Button
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(if (isToga) Color(0xFFD97706) else PrimaryGreen)
+                                    .clickable { onLocationClick(loc.id) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                    contentDescription = "Buka Detail",
+                                    tint = Color.White,
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(4.dp))
+                            // Dismiss Button
+                            Box(
+                                modifier = Modifier
+                                    .size(34.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFEFEFEF))
+                                    .clickable { selectedLocation = null },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "✕",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = OnSurfaceSageMuted
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Reusable BubakanMapView in an adjusted 240dp container to fit Kelurahan Bubakan bounds
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(190.dp)
+                    .height(240.dp)
                     .clip(RoundedCornerShape(16.dp))
                     .border(BorderStroke(1.dp, OutlineOrganic))
             ) {
                 BubakanMapView(
                     locations = locations,
-                    onLocationSelect = { onLocationClick(it.id) },
+                    selectedLocationId = selectedLocation?.id,
+                    onLocationSelect = { loc -> selectedLocation = loc },
+                    onMapClick = { selectedLocation = null },
                     modifier = Modifier.fillMaxSize()
                 )
             }

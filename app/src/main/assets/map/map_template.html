@@ -163,7 +163,9 @@
         map = L.map('map', {
           zoomControl: false,
           attributionControl: true,
-          minZoom: 13,
+          zoomSnap: 0.25,
+          zoomDelta: 0.5,
+          minZoom: 13.75,
           maxZoom: 19
         });
 
@@ -174,27 +176,35 @@
           attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> | Batas: Pemkot Semarang'
         }).addTo(map);
 
-        // Section 7: Render subtle official administrative boundary outline
+        // Section 7: Render official administrative boundary outline with prominent highlight
         bubakanGeoLayer = L.geoJSON(BUBAKAN_BOUNDARY, {
           style: {
             color: '#1B5E20',       // Dark emerald border
-            weight: 2,              // Clear boundary stroke
-            opacity: 0.85,
-            dashArray: '5, 5',      // Administrative boundary dashed style
+            weight: 3,              // Clear prominent boundary stroke
+            opacity: 0.95,
+            dashArray: '6, 4',      // Administrative boundary dashed style
             fillColor: '#2E7D32',   // Emerald green tint
-            fillOpacity: 0.05       // 5% subtle transparent fill
+            fillOpacity: 0.14       // Clear visible tint so Bubakan is prominently highlighted
           },
           interactive: false
         }).addTo(map);
 
         bubakanBounds = bubakanGeoLayer.getBounds();
 
-        // Section 6: Camera View Lock
-        // Initial view MUST fit the Bubakan administrative boundary
-        map.fitBounds(bubakanBounds, { padding: [15, 15] });
+        // Fit entire Bubakan boundary inside frame (neither too zoomed in nor out)
+        function fitBubakanView() {
+          if (!map || !bubakanBounds) return;
+          map.fitBounds(bubakanBounds, {
+            padding: [4, 4],
+            animate: false
+          });
+        }
+        window.fitBubakanBounds = fitBubakanView;
 
-        // Movement constraint: maxBounds with 20% visual padding to allow road context
-        map.setMaxBounds(bubakanBounds.pad(0.20));
+        fitBubakanView();
+
+        // Movement constraint: strictly locked so only Bubakan is highlighted and reachable
+        map.setMaxBounds(bubakanBounds.pad(0.04));
 
         map.on('click', function(e) {
           if (Date.now() - lastMarkerClickTime < 400) return;
@@ -209,8 +219,18 @@
         });
 
         // Trigger size invalidation to ensure map fills container properly
-        setTimeout(function() { if (map) map.invalidateSize(); }, 150);
-        setTimeout(function() { if (map) map.invalidateSize(); }, 500);
+        setTimeout(function() {
+          if (map) {
+            map.invalidateSize();
+            if (!selectedLocationId) fitBubakanView();
+          }
+        }, 150);
+        setTimeout(function() {
+          if (map) {
+            map.invalidateSize();
+            if (!selectedLocationId) fitBubakanView();
+          }
+        }, 400);
 
         if (pendingMarkers) {
           window.setMarkers(pendingMarkers);
@@ -240,11 +260,7 @@
         currentMarkers = {};
 
         if (!locations || locations.length === 0) {
-          if (bubakanBounds) {
-            map.fitBounds(bubakanBounds, { padding: [15, 15] });
-          } else {
-            map.setView([BUBAKAN_CENTER_LAT, BUBAKAN_CENTER_LNG], 15);
-          }
+          fitBubakanView();
           map.invalidateSize();
           return;
         }
@@ -291,13 +307,10 @@
           bounds.push([lat, lng]);
         });
 
-        // Always keep bounds framed within or centered on Bubakan
-        if (bounds.length > 0) {
-          map.fitBounds(bubakanBounds, { padding: [15, 15] });
-        } else {
-          map.fitBounds(bubakanBounds, { padding: [15, 15] });
+        // Always keep camera view fitted cleanly to Bubakan administrative bounds
+        if (!selectedLocationId) {
+          fitBubakanView();
         }
-
         map.invalidateSize();
       } catch (err) {
         console.error('Error in setMarkers:', err);
@@ -318,12 +331,15 @@
         var marker = currentMarkers[locId];
         var el = marker.getElement();
         if (el) el.classList.add('selected');
-        map.panTo(marker.getLatLng(), { animate: true, duration: 0.5 });
+        map.panTo(marker.getLatLng(), { animate: true, duration: 0.3 });
       }
     };
 
     window.addEventListener('resize', function() {
-      if (map) map.invalidateSize();
+      if (map) {
+        map.invalidateSize();
+        if (!selectedLocationId) fitBubakanView();
+      }
     });
 
     if (document.readyState === 'loading') {

@@ -3,6 +3,11 @@ package id.bubakangreen.app.ui.locations
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +70,7 @@ import id.bubakangreen.app.ui.components.TactileButtonStyle
 import id.bubakangreen.app.ui.theme.AccentSunnyContainer
 import id.bubakangreen.app.ui.theme.BackgroundWarm
 import id.bubakangreen.app.ui.theme.BorderDivider
+import id.bubakangreen.app.ui.theme.ForestGreen
 import id.bubakangreen.app.ui.theme.OnSurfaceForestDark
 import id.bubakangreen.app.ui.theme.OnSurfaceSageMuted
 import id.bubakangreen.app.ui.theme.OutlineOrganic
@@ -339,15 +345,15 @@ private fun MapVisualContainer(
             modifier = Modifier.fillMaxSize()
         )
 
-        // Non-intrusive Map Legend (Top-Start)
+        // Non-intrusive Map Legend (Bottom-Start)
         Card(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.94f)),
             border = BorderStroke(1.dp, OutlineOrganic.copy(alpha = 0.6f)),
             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 16.dp, top = 16.dp)
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 20.dp)
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
@@ -392,73 +398,106 @@ private fun MapVisualContainer(
             }
         }
 
-        // Floating preview card
-        if (selectedLocation != null) {
-            Card(
-                shape = RoundedCornerShape(22.dp),
-                colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
-                border = BorderStroke(1.5.dp, OutlineOrganic),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .padding(16.dp)
-            ) {
-                Column(modifier = Modifier.padding(18.dp)) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = selectedLocation.name,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = OnSurfaceForestDark,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            Text(
-                                text = "RW ${selectedLocation.rw} • ${selectedLocation.address.ifEmpty { "Kelurahan Bubakan" }}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = OnSurfaceSageMuted,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
+        // Floating preview card — prominently positioned at the TOP ("paling atas") with instant slide-in
+        AnimatedVisibility(
+            visible = selectedLocation != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            if (selectedLocation != null) {
+                val isToga = selectedLocation.type == LocationType.TAMAN_TOGA
+                val tagBg = if (isToga) Color(0xFFFFF8E1) else PrimaryContainerMint
+                val tagText = if (isToga) "🌿 Taman Toga" else "🌱 Urban Farming"
+                val tagColor = if (isToga) Color(0xFFD97706) else ForestGreen
+
+                Card(
+                    shape = RoundedCornerShape(22.dp),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceCardWhite),
+                    border = BorderStroke(1.5.dp, OutlineOrganic),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(tagBg)
+                                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                            ) {
+                                Text(
+                                    text = tagText,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = tagColor
+                                )
+                            }
+
+                            // Close button for preview card
+                            Box(
+                                modifier = Modifier
+                                    .size(30.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFF2F2F2))
+                                    .clickable { onDeselectLocation() },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = "✕",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = OnSurfaceSageMuted
+                                )
+                            }
                         }
 
-                        // Close button for preview card
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         Text(
-                            text = "✕",
+                            text = selectedLocation.name,
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = OnSurfaceForestDark,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        Text(
+                            text = "RW ${selectedLocation.rw} • ${selectedLocation.address.ifEmpty { "Kelurahan Bubakan" }}",
+                            style = MaterialTheme.typography.bodySmall,
                             color = OnSurfaceSageMuted,
-                            modifier = Modifier
-                                .clickable { onDeselectLocation() }
-                                .padding(start = 8.dp, bottom = 8.dp)
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
-                    }
 
-                    Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp)
-                    ) {
-                        TactileButton(
-                            text = "Rute Maps",
-                            icon = Icons.Default.LocationOn,
-                            onClick = { onOpenExternalMap(selectedLocation) },
-                            style = TactileButtonStyle.SECONDARY,
-                            modifier = Modifier.weight(1f)
-                        )
-                        TactileButton(
-                            text = "Lihat Kebun",
-                            onClick = { onOpenDetail(selectedLocation) },
-                            style = TactileButtonStyle.PRIMARY,
-                            modifier = Modifier.weight(1.2f)
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            TactileButton(
+                                text = "Rute Maps",
+                                icon = Icons.Default.LocationOn,
+                                onClick = { onOpenExternalMap(selectedLocation) },
+                                style = TactileButtonStyle.SECONDARY,
+                                height = 42.dp,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TactileButton(
+                                text = "Lihat Kebun",
+                                onClick = { onOpenDetail(selectedLocation) },
+                                style = TactileButtonStyle.PRIMARY,
+                                height = 42.dp,
+                                modifier = Modifier.weight(1.2f)
+                            )
+                        }
                     }
                 }
             }
