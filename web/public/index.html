@@ -3,100 +3,449 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BUBAKAN GREEN — Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan</title>
-  <meta name="description" content="Aplikasi resmi Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang untuk dokumentasi kebun pangan mandiri (Urban Farming) dan tanaman obat keluarga (Taman Toga).">
+  <title>Bubakan Green — Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan</title>
+  <meta name="description" content="Aplikasi resmi untuk mengenal tanaman obat keluarga (Taman Toga) dan kebun pangan mandiri (Urban Farming) di Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang.">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <!-- Preconnect and Modern Fonts: Plus Jakarta Sans & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <div class="container">
-    <header class="header">
-      <img src="/mascot.png" alt="Maskot Bubakan Green" class="mascot-header">
-      <h1>BUBAKAN GREEN</h1>
-      <p class="subtitle">Taman Toga & Urban Farming · Kelurahan Bubakan</p>
+  <div class="site-wrapper">
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="site-nav">
+      <div class="nav-container">
+        <a href="/" class="nav-brand">
+          <picture>
+            <source srcset="/assets/brand/new-logo.webp" type="image/webp">
+            <img src="/assets/brand/new-logo.png" alt="Logo Bubakan Green" class="nav-logo" width="44" height="44">
+          </picture>
+          <span class="nav-title">Bubakan Green</span>
+        </a>
+
+        <nav>
+          <ul class="nav-menu">
+            <li><a href="#explore" class="nav-link">Eksplorasi</a></li>
+            <li><a href="#features" class="nav-link">Fitur Aplikasi</a></li>
+            <li><a href="#download" class="nav-link">Unduh APK</a></li>
+          </ul>
+        </nav>
+
+        <div>
+          <a href="#download" class="btn btn-primary btn-pill-sm">
+            <span class="svg-icon svg-icon-sm" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </span>
+            <span class="nav-btn-desktop">Pasang Aplikasi</span>
+            <span class="nav-btn-mobile">Pasang</span>
+          </a>
+        </div>
+      </div>
     </header>
 
-    <main class="content">
-      <div class="hero-photo">
-        <span class="emoji-placeholder">🌿</span>
-      </div>
+    <main>
+      <!-- ================= HERO SECTION ================= -->
+      <section class="hero-section">
+        <div class="container-narrow">
+          <div class="hero-grid">
+            <div class="hero-content">
+              <div class="hero-header-row">
+                <span class="section-badge">
+                  <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M12 2a9 9 0 0 1 9 9c0 4.97-4.03 9-9 9a9 9 0 0 1-9-9 9 9 0 0 1 9-9z"/><path d="M12 2v20"/><path d="M12 7a5 5 0 0 1 5 5"/></svg>
+                  </span>
+                  Urban Farming & Taman Toga · Kelurahan Bubakan
+                </span>
+              </div>
 
-      <h2 class="plant-title" style="text-align: center; margin-top: 4px;">Selamat Datang</h2>
-      <p class="desc-text" style="margin-top: 8px; text-align: center; color: var(--text-muted); font-size: 14px;">
-        Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang.
-      </p>
+              <h1 class="hero-title">Bubakan Green</h1>
+              <p class="hero-subtitle">
+                Satu aplikasi untuk mengenal tanaman herbal, sayuran pangan mandiri, dan menemukan kebun percontohan di Kelurahan Bubakan.
+              </p>
 
-      <div class="section-label" style="margin-top: 24px;">Fitur Aplikasi Mobile</div>
+              <div class="hero-cta-group">
+                <a href="#download" class="btn btn-primary" id="hero-btn-install">
+                  <span class="svg-icon svg-icon-md" aria-hidden="true">
+                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                  </span>
+                  Unduh APK (Testing)
+                </a>
+                <a href="#explore" class="btn btn-secondary">
+                  Jelajah Kebun & Fitur
+                </a>
+              </div>
 
-      <ul class="feature-list">
-        <li>
-          <span class="feature-icon">🗺️</span>
-          <span>Eksplorasi lokasi kebun di wilayah RW Kelurahan Bubakan dengan petunjuk arah GPS.</span>
-        </li>
-        <li>
-          <span class="feature-icon">🌿</span>
-          <span>Katalog tanaman obat lengkap dengan khasiat herbal & panduan rawat.</span>
-        </li>
-        <li>
-          <span class="feature-icon">🀄</span>
-          <span>Pelafalan audio nama tanaman dalam Bahasa Mandarin beserta karakter & pinyin.</span>
-        </li>
-        <li>
-          <span class="feature-icon">📷</span>
-          <span>Pindai label QR pada tanaman di kebun fisik untuk informasi instan.</span>
-        </li>
-        <li>
-          <span class="feature-icon">👥</span>
-          <span>Dikelola petugas PIC dan Admin Kelurahan Bubakan secara resmi.</span>
-        </li>
-      </ul>
+              <div class="hero-note">
+                <img src="/assets/mascot/mascot-greeting.webp" alt="" class="hero-mascot-companion" aria-hidden="true" width="58" height="78">
+                <span>Panduan digital interaktif resmi untuk warga Kelurahan Bubakan.</span>
+              </div>
+            </div>
 
-      <div class="section-label">Tentang Bubakan Green</div>
-      <p class="desc-text" style="font-size: 14px;">
-        Bubakan Green adalah inisiatif Kelurahan Bubakan untuk mendokumentasikan
-        kebun pangan mandiri dan koleksi tanaman obat keluarga (TOGA) secara digital.
-        Seluruh data diverifikasi langsung dari lapangan oleh petugas resmi kelurahan.
-      </p>
+            <!-- Mockup Preview Composition with Mobile Switcher -->
+            <div class="hero-mockup-wrapper">
+              <div class="device-composition" id="device-wrapper">
+                <!-- Device Left (Lokasi Kebun) -->
+                <div class="device-frame device-left" id="mockup-frame-left">
+                  <img src="/assets/mockups/mockup-location.webp" alt="Pratinjau Layar Lokasi Kebun Bubakan Green" width="393" height="831" loading="eager">
+                </div>
 
-      <div class="cta-box">
-        <p>Gunakan aplikasi Android resmi untuk pengalaman penjelajahan dan audio interaktif lengkap.</p>
-        <a href="#download" class="btn-primary" id="btn-download">📲 Unduh Aplikasi BUBAKAN GREEN</a>
-      </div>
+                <!-- Device Center (Beranda Utama) -->
+                <div class="device-frame device-center" id="mockup-frame-center">
+                  <img src="/assets/mockups/mockup-home.webp" id="center-mockup-img" alt="Pratinjau Layar Beranda Aplikasi Bubakan Green" width="393" height="831" loading="eager">
+                </div>
 
-      <div id="download" class="info-card" style="margin-top: 24px;">
-        <div class="info-card-title">📥 Unduh APK Resmi Bubakan Green</div>
-        
-        <div style="background: #FFF8E1; border: 1px solid #FFE082; border-radius: 10px; padding: 12px; margin-top: 10px; font-size: 13px; color: #795548;">
-          <div style="font-weight: 700; margin-bottom: 4px; color: #5D4037;">🟡 Status Rilis Publik: Belum Tersedia</div>
-          Berkas APK rilis produksi bertanda tangan (signed release) sedang dalam proses verifikasi keamanan dan keystore produksi. APK produksi akan dipublikasikan secara resmi setelah verifikasi selesai.
+                <!-- Device Right (Katalog Botani) -->
+                <div class="device-frame device-right" id="mockup-frame-right">
+                  <img src="/assets/mockups/mockup-catalog.webp" alt="Pratinjau Layar Katalog Tanaman Bubakan Green" width="400" height="831" loading="eager">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mobile Screen Switcher Controls -->
+          <div class="mobile-device-controls" aria-label="Pilih pratinjau layar aplikasi">
+            <div class="screen-switcher-tabs" role="tablist">
+              <button class="screen-tab-btn active" role="tab" aria-selected="true" data-screen="home">
+                Beranda
+              </button>
+              <button class="screen-tab-btn" role="tab" aria-selected="false" data-screen="location">
+                Peta Kebun
+              </button>
+              <button class="screen-tab-btn" role="tab" aria-selected="false" data-screen="catalog">
+                Katalog
+              </button>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div style="margin: 14px 0; font-size: 13px; color: var(--text-muted); line-height: 1.8;">
-          <div><strong>Versi Target:</strong> v1.0.0 (Release)</div>
-          <div><strong>Nama Berkas:</strong> <code>bubakan-green-v1.0.0.apk</code></div>
-        </div>
+      <!-- ================= BENTO GRID SECTION (EKSPLORASI BOTANI) ================= -->
+      <section id="explore" class="bento-section section-padding">
+        <div class="container-narrow">
+          <div class="text-center">
+            <span class="section-badge badge-warm">
+              <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </span>
+              EKSPLORASI BOTANI & KEBUN
+            </span>
+            <h2 class="section-title">Semua Kebutuhan Botani Warga dalam Satu Sentuhan</h2>
+            <p class="section-desc mx-auto">
+              Dokumentasi terstruktur tanaman obat keluarga dan kebun pangan mandiri binaan Kelurahan Bubakan, Mijen, Kota Semarang.
+            </p>
+          </div>
 
-        <div style="margin: 14px 0; text-align: center;">
-          <button disabled class="btn-primary" style="opacity: 0.6; cursor: not-allowed; display: inline-block; padding: 14px 24px; font-weight: bold; background-color: #9E9E9E;">
-            ⏳ Berkas Rilis Publik Belum Tersedia
-          </button>
-        </div>
+          <div class="bento-grid">
+            <!-- Bento 1: Katalog 9 Tanaman Unggulan (Span 7) -->
+            <div class="bento-card bento-span-7">
+              <div>
+                <div class="bento-card-header">
+                  <div class="bento-icon-wrapper">
+                    <span class="svg-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    </span>
+                  </div>
+                  <span class="plant-chip-badge">9 Tanaman Terverifikasi</span>
+                </div>
+                <h3 class="bento-card-title">Katalog Lengkap Tanaman Toga & Sayuran</h3>
+                <p class="bento-card-desc">
+                  Setiap tanaman dilengkapi nama ilmiah Latin, khasiat herbal keluarga, panduan budidaya, serta pelafalan audio Bahasa Mandarin untuk edukasi multibahasa.
+                </p>
+              </div>
 
-        <div style="background: rgba(46, 125, 50, 0.08); border-radius: 12px; padding: 14px; margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--text-color);">
-          <strong>Petunjuk Instalasi di HP Android (Sideloading):</strong>
-          <ol style="margin: 8px 0 0 16px; padding: 0;">
-            <li>Unduh berkas APK resmi Bubakan Green setelah tersedia.</li>
-            <li>Buka berkas APK yang telah diunduh dari notifikasi atau folder <em>Download</em>.</li>
-            <li>Ikuti petunjuk instalasi Android (pilih <strong>Setelan &rarr; Izinkan dari sumber ini</strong> jika diminta).</li>
-            <li>Tekan <strong>Instal</strong>.</li>
-            <li>Buka aplikasi Bubakan Green.</li>
-          </ol>
+              <div class="bento-plant-chips">
+                <span class="plant-chip">Cabai</span>
+                <span class="plant-chip">Jahe</span>
+                <span class="plant-chip">Kangkung</span>
+                <span class="plant-chip">Kencur</span>
+                <span class="plant-chip">Kunyit</span>
+                <span class="plant-chip">Lidah Buaya</span>
+                <span class="plant-chip">Sereh</span>
+                <span class="plant-chip">Terong</span>
+                <span class="plant-chip">Tomat</span>
+              </div>
+            </div>
+
+            <!-- Bento 2: Pemetaan Kebun RW (Span 5) -->
+            <div class="bento-card bento-span-5">
+              <div>
+                <div class="bento-card-header">
+                  <div class="bento-icon-wrapper icon-orange">
+                    <span class="svg-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </span>
+                  </div>
+                  <span class="plant-chip-badge">GPS Akurat</span>
+                </div>
+                <h3 class="bento-card-title">Pemetaan Kebun RW</h3>
+                <p class="bento-card-desc">
+                  Temukan lokasi kebun percontohan Urban Farming (RW 01) dan Taman Toga (RW 03) dengan koordinat terhubung langsung ke Google Maps.
+                </p>
+              </div>
+
+              <div style="background: var(--surface-card-warm); border: 1px solid var(--border-soft); border-radius: var(--radius-sm); padding: 12px 14px; margin-top: 18px; font-size: 13px; color: var(--text-secondary);">
+                <strong>Titik Pusat:</strong> Kelurahan Bubakan (-7.0935, 110.3215)
+              </div>
+            </div>
+
+            <!-- Bento 3: Edukasi QR Interaktif (Span 5) -->
+            <div class="bento-card bento-span-5">
+              <div>
+                <div class="bento-card-header">
+                  <div class="bento-icon-wrapper icon-warm">
+                    <span class="svg-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </span>
+                  </div>
+                </div>
+                <h3 class="bento-card-title">Pindai Label QR di Kebun</h3>
+                <p class="bento-card-desc">
+                  Pindai label fisik pada tanaman di kebun untuk membaca fun fact botani dan khasiat herbal seketika dari peramban ponsel.
+                </p>
+              </div>
+
+              <div class="bento-mascot-visual">
+                <img src="/assets/mascot/mascot-learning.webp" alt="Maskot belajar botani" class="bento-mascot-img" width="72" height="94">
+                <div class="bento-mascot-text">
+                  "Kenali fun fact unik dan khasiat tanaman di sekitar lingkungan kita!"
+                </div>
+              </div>
+            </div>
+
+            <!-- Bento 4: Ringan, Aman & Komunitas (Span 7) -->
+            <div class="bento-card bento-span-7">
+              <div>
+                <div class="bento-card-header">
+                  <div class="bento-icon-wrapper">
+                    <span class="svg-icon" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    </span>
+                  </div>
+                  <span class="plant-chip-badge">Bebas Iklan</span>
+                </div>
+                <h3 class="bento-card-title">Dibuat Khusus untuk Warga</h3>
+                <p class="bento-card-desc">
+                  Tanpa iklan komersial, tanpa pelacakan data pribadi, dan tanpa biaya langganan. Aplikasi berukuran ringkas (~30.2 MB) yang dirancang ringan di semua tipe ponsel Android.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 14px; margin-top: 20px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-forest);">
+                  <span class="svg-icon svg-icon-sm"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  Akses Offline Lancar
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-forest);">
+                  <span class="svg-icon svg-icon-sm"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  Data Resmi Kelurahan
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--color-forest);">
+                  <span class="svg-icon svg-icon-sm"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></span>
+                  Audio Pengucapan Jelas
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
+
+      <!-- ================= APP SHOWCASE SECTION ================= -->
+      <section id="features" class="section-padding">
+        <div class="container-narrow">
+          <div class="text-center">
+            <span class="section-badge">
+              <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+              </span>
+              ANTARMUKA RESMI APLIKASI
+            </span>
+            <h2 class="section-title">Pengalaman Bersih & Ramah Pemula</h2>
+            <p class="section-desc mx-auto">
+              Tangkapan layar asli dari aplikasi Android Bubakan Green yang dapat Anda pasang langsung di perangkat ponsel.
+            </p>
+          </div>
+
+          <div class="showcase-grid">
+            <div class="showcase-card">
+              <div class="showcase-device">
+                <img src="/assets/mockups/mockup-location.webp" alt="Layar Jelajah Kebun RW" width="393" height="831" loading="lazy">
+              </div>
+              <h3>Jelajah Kebun RW</h3>
+              <p>Pemetaan kebun Urban Farming dan Taman Toga dengan data pengelola (PIC) serta petunjuk arah navigasi.</p>
+            </div>
+
+            <div class="showcase-card">
+              <div class="showcase-device">
+                <img src="/assets/mockups/mockup-home.webp" alt="Layar Beranda Interaktif" width="393" height="831" loading="lazy">
+              </div>
+              <h3>Beranda Interaktif</h3>
+              <p>Sambutan ramah maskot, pembaruan kebun terkini, dan akses pemindai QR untuk eksplorasi cepat di lapangan.</p>
+            </div>
+
+            <div class="showcase-card">
+              <div class="showcase-device">
+                <img src="/assets/mockups/mockup-catalog.webp" alt="Layar Katalog Botani" width="400" height="831" loading="lazy">
+              </div>
+              <h3>Katalog & Audio Mandarin</h3>
+              <p>Pelajari 9 tanaman obat keluarga dan sayuran mandiri dengan pelafalan audio Mandarin yang interaktif.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= HONEST APK DOWNLOAD SECTION ================= -->
+      <section id="download" class="download-section section-padding">
+        <div class="container-narrow">
+          <div class="download-box">
+            <div>
+              <span class="section-badge">
+                <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </span>
+                INSTALASI LANGSUNG
+              </span>
+              <h2 class="section-title">Pasang Bubakan Green di Ponsel Android Anda</h2>
+              <p class="section-desc">
+                Unduh berkas instalasi resmi (APK) untuk menikmati pengalaman edukasi botani yang lengkap tanpa memerlukan koneksi internet stabil di kebun.
+              </p>
+
+              <div class="download-action-area">
+                <div style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+                  <a href="/downloads/bubakan-green.apk" download class="btn btn-primary" id="btn-download-apk">
+                    <span class="svg-icon svg-icon-md" aria-hidden="true">
+                      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </span>
+                    Unduh Berkas APK (~30.2 MB)
+                  </a>
+                </div>
+
+                <div class="download-meta-chips">
+                  <span class="meta-chip">Versi Pengujian (Testing)</span>
+                  <span class="meta-chip chip-status">Distribusi Google Play Store sedang dipersiapkan</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Streamlined 3-Step Sideloading Guide -->
+            <div class="sideload-steps-wrapper">
+              <h3 class="sideload-steps-title">
+                <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                </span>
+                3 Langkah Cepat Pemasangan:
+              </h3>
+              <ol class="sideload-list">
+                <li class="sideload-item">
+                  <span class="sideload-num">1</span>
+                  <div class="sideload-text">
+                    <strong>Unduh Berkas APK:</strong> Klik tombol hijau di atas dan tunggu unduhan selesai.
+                  </div>
+                </li>
+                <li class="sideload-item">
+                  <span class="sideload-num">2</span>
+                  <div class="sideload-text">
+                    <strong>Izinkan Instalasi:</strong> Jika muncul peringatan keamanan, pilih <em>"Tetap Download"</em> lalu aktifkan <em>"Izinkan dari sumber ini"</em>.
+                  </div>
+                </li>
+                <li class="sideload-item">
+                  <span class="sideload-num">3</span>
+                  <div class="sideload-text">
+                    <strong>Buka & Gunakan:</strong> Pasang aplikasi dan Anda siap menjelajahi kebun serta tanaman toga!
+                  </div>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
-    <footer class="footer">
-      &copy; Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang
+    <!-- ================= FOOTER ================= -->
+    <footer class="site-footer">
+      <div class="container-narrow">
+        <div class="footer-grid">
+          <div>
+            <h3 class="footer-brand-title">Bubakan Green</h3>
+            <p class="footer-brand-desc">
+              Sistem Informasi Urban Farming & Taman Toga Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang. Inisiatif ketahanan pangan mandiri dan konservasi tanaman obat keluarga warga.
+            </p>
+            <div style="margin-top: 18px; font-size: 13.5px; color: #A9C2A5;">
+              Kolaborasi bersama Tim KKN GIAT 17 Universitas Negeri Semarang.
+            </div>
+          </div>
+
+          <div>
+            <h4 class="footer-col-title">Kontor Kelurahan Bubakan</h4>
+            <ul class="footer-contact-list">
+              <li class="footer-contact-item">
+                <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span>Jl. Raya Bubakan No. 1, Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang, Jawa Tengah 50216</span>
+              </li>
+              <li class="footer-contact-item">
+                <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span>Senin – Jumat: 08.00 – 16.00 WIB</span>
+              </li>
+              <li class="footer-contact-item">
+                <span class="svg-icon svg-icon-sm" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </span>
+                <span>Data geospasial terverifikasi Portal Spasial Pemerintah Kota Semarang.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <span>&copy; 2026 Kelurahan Bubakan, Kecamatan Mijen, Kota Semarang. Seluruh hak cipta dilindungi.</span>
+          <span>Inisiatif Digitalisasi Urban Farming & Taman Toga</span>
+        </div>
+      </div>
     </footer>
+
   </div>
+
+  <!-- Mobile Mockup Switcher Script -->
+  <script>
+    (function() {
+      var switcherButtons = document.querySelectorAll('.screen-tab-btn');
+      var centerMockupImg = document.getElementById('center-mockup-img');
+      var screenMap = {
+        'home': '/assets/mockups/mockup-home.webp',
+        'location': '/assets/mockups/mockup-location.webp',
+        'catalog': '/assets/mockups/mockup-catalog.webp'
+      };
+
+      switcherButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var targetScreen = btn.getAttribute('data-screen');
+          if (!screenMap[targetScreen]) return;
+
+          switcherButtons.forEach(function(b) {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          if (centerMockupImg) {
+            centerMockupImg.style.opacity = '0';
+            centerMockupImg.style.transform = 'scale(0.96)';
+            setTimeout(function() {
+              centerMockupImg.src = screenMap[targetScreen];
+              centerMockupImg.style.opacity = '1';
+              centerMockupImg.style.transform = 'scale(1)';
+            }, 120);
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

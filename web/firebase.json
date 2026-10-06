@@ -19,16 +19,21 @@
             "value": "application/json"
           }
         ]
+      },
+      {
+        "source": "/downloads/**",
+        "headers": [
+          {
+            "key": "Content-Type",
+            "value": "application/vnd.android.package-archive"
+          }
+        ]
       }
     ],
     "rewrites": [
       {
         "source": "/plant/**",
-        "destination": "/plant.html"
-      },
-      {
-        "source": "/location/**",
-        "destination": "/location.html"
+        "destination": "/index.html"
       },
       {
         "source": "**",
