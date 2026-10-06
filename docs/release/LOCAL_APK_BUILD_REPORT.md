@@ -16,8 +16,8 @@
 - **Target SDK:** `35` (Android 15)
 - **Source APK:** `C:\Users\Arilano\Downloads\Project ARICE\Bubakan Green\app\build\outputs\apk\debug\app-debug.apk`
 - **Exported APK:** `C:\Users\Arilano\Downloads\Project ARICE\Bubakan-Green-v1.0.0-debug.apk`
-- **File Size:** `31,680,056 bytes` (~30.2 MB)
-- **SHA-256 Digest:** `63594447702B750F26A91445942AD1794C90E340594F74829C1503C958A5FB15`
+- **File Size:** `31,828,129 bytes` (~30.3 MB)  
+- **SHA-256 Digest:** `72C35B59A5C6EA9628CA20F80C9AE15E84A3C6D7C28B9A75BF46C88F0CC28D81`  
 
 ---
 
@@ -25,8 +25,8 @@
 
 | Location | Path | SHA-256 Checksum | Match Status |
 |---|---|---|---|
-| **Build Output** | `app/build/outputs/apk/debug/app-debug.apk` | `63594447702B750F26A91445942AD1794C90E340594F74829C1503C958A5FB15` | Baseline Source |
-| **Exported Location** | `C:\Users\Arilano\Downloads\Project ARICE\Bubakan-Green-v1.0.0-debug.apk` | `63594447702B750F26A91445942AD1794C90E340594F74829C1503C958A5FB15` | **100% IDENTICAL** |
+| **Build Output** | `app/build/outputs/apk/debug/app-debug.apk` | `72C35B59A5C6EA9628CA20F80C9AE15E84A3C6D7C28B9A75BF46C88F0CC28D81` | Baseline Source |
+| **Exported Location** | `C:\Users\Arilano\Downloads\Project ARICE\Bubakan-Green-v1.0.0-debug.apk` | `72C35B59A5C6EA9628CA20F80C9AE15E84A3C6D7C28B9A75BF46C88F0CC28D81` | **100% IDENTICAL** |
 
 ---
 
