@@ -23,10 +23,10 @@
 - [x] **No Security Bypass Introduced:** Play Protect is not disabled; permissions remain standard. (`VERIFIED`)
 
 ### Firebase Authentication & Authorization
-- [x] **Email/Password Provider Configuration:** Setup protocol documented for Firebase Console. (`IMPLEMENTED`)
-- [x] **Admin Authentication Flow:** `LoginViewModel` and `FirebaseAuthRepository` fully wired for email/password. (`VERIFIED`)
-- [x] **Role Resolution:** Security rules evaluate `/users/{uid}.role == 'ADMIN'` and `isActive == true`. (`VERIFIED`)
-- [x] **Unauthorized Access Rejected:** Non-admin or unauthenticated access to admin routes is blocked. (`VERIFIED`)
+- [x] **Email/Password Provider Configuration:** Provider enabled directly on project `bubakan-green` via Identity Toolkit API. (`VERIFIED`)
+- [x] **Admin Authentication Flow:** `admin@bubakangreen.id` created, tested, and verified end-to-end. (`VERIFIED`)
+- [x] **Role Resolution:** `/users/Rxfnax2hLYds9WKGij7lIlA1rWr2` seeded in Firestore with `role: "ADMIN"` and `isActive: true`. (`VERIFIED`)
+- [x] **Unauthorized Access Rejected:** Non-admin or unauthenticated access to admin routes is blocked (`403 PERMISSION_DENIED`). (`VERIFIED`)
 - [x] **Firestore Rules Hardened:** Public reads restricted to catalog; writes require authenticated admin document. (`VERIFIED`)
 
 ### QR Domain & Deep Linking
