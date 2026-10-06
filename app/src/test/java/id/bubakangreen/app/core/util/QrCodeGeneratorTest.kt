@@ -51,7 +51,7 @@ class QrCodeGeneratorTest {
 
     @Test
     fun generateQrBitMatrix_andDecode_returnsExactCanonicalUrl() {
-        val canonicalUrl = "https://bubakangreen.web.app/plant/pl-cabai-rawit"
+        val canonicalUrl = "https://bubakan-green.web.app/plant/pl-cabai-rawit"
         val bitMatrix = QrCodeGenerator.generateQrBitMatrix(canonicalUrl, sizePx = 256)
         assertThat(bitMatrix).isNotNull()
 

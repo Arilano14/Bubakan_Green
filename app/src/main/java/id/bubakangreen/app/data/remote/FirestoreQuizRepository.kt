@@ -26,9 +26,23 @@ class FirestoreQuizRepository(
             .snapshots()
             .map { snapshot ->
                 val list = snapshot.documents.mapNotNull { it.toQuizQuestion() }
-                Result.Success(list) as Result<List<QuizQuestion>>
+                val finalList = if (list.isEmpty()) {
+                    id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
+                        .filter { it.plantId == plantId && it.isActive }
+                } else {
+                    list
+                }
+                Result.Success(finalList) as Result<List<QuizQuestion>>
             }
-            .catch { emit(Result.Error(it, it.localizedMessage)) }
+            .catch { error ->
+                val fallback = id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
+                    .filter { it.plantId == plantId && it.isActive }
+                if (fallback.isNotEmpty()) {
+                    emit(Result.Success(fallback))
+                } else {
+                    emit(Result.Error(error, error.localizedMessage))
+                }
+            }
     }
 
     override suspend fun createQuestion(question: QuizQuestion): Result<String> {

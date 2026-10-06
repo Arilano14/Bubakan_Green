@@ -37,11 +37,11 @@
 
                 <data
                     android:scheme="https"
-                    android:host="bubakangreen.web.app"
+                    android:host="bubakan-green.web.app"
                     android:pathPrefix="/plant/" />
                 <data
                     android:scheme="https"
-                    android:host="bubakangreen.web.app"
+                    android:host="bubakan-green.web.app"
                     android:pathPrefix="/location/" />
             </intent-filter>
         </activity>

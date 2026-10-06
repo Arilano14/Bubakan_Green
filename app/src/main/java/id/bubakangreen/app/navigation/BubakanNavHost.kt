@@ -288,7 +288,7 @@ fun BubakanAppNavHost(
                     navArgument("locationId") { type = NavType.StringType }
                 ),
                 deepLinks = listOf(
-                    navDeepLink { uriPattern = "https://bubakangreen.web.app/location/{locationId}" },
+                    navDeepLink { uriPattern = "https://bubakan-green.web.app/location/{locationId}" },
                     navDeepLink { uriPattern = "https://bubakangreen.app/location/{locationId}" }
                 )
             ) { backStackEntry ->
@@ -321,7 +321,7 @@ fun BubakanAppNavHost(
                     navArgument("plantId") { type = NavType.StringType }
                 ),
                 deepLinks = listOf(
-                    navDeepLink { uriPattern = "https://bubakangreen.web.app/plant/{plantId}" },
+                    navDeepLink { uriPattern = "https://bubakan-green.web.app/plant/{plantId}" },
                     navDeepLink { uriPattern = "https://bubakangreen.app/plant/{plantId}" }
                 )
             ) { backStackEntry ->

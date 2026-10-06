@@ -13,11 +13,11 @@ sealed class ParsedQrResult {
  * Enforces the approved Phase 5 contract:
  * - QR encodes solely an HTTPS URL with an immutable stable ID.
  * - Allowed paths: /plant/<id> and /location/<id>.
- * - Canonical domain: bubakangreen.web.app.
+ * - Canonical domain: bubakan-green.web.app.
  */
 object QrUrlBuilder {
-    const val DEFAULT_DOMAIN = "bubakangreen.web.app"
-    private val VALID_DOMAINS = setOf("bubakangreen.web.app", "bubakangreen.app")
+    const val DEFAULT_DOMAIN = "bubakan-green.web.app"
+    private val VALID_DOMAINS = setOf("bubakan-green.web.app", "bubakan-green.firebaseapp.com", "bubakangreen.app")
     private val STABLE_ID_REGEX = Regex("^[a-zA-Z0-9_-]+$")
 
     fun buildPlantUrl(masterPlantId: String, domain: String = DEFAULT_DOMAIN): String {

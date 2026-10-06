@@ -84,6 +84,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   width: 100%;
+  padding-top: 72px;
 }
 
 img {
@@ -282,6 +283,54 @@ h1, h2, h3, h4 {
   transform: translateY(-2px);
 }
 
+/* Glowing Backlight Effect for Hero Download Button */
+.hero-download-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-download-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: -6px -10px;
+  background: radial-gradient(ellipse at center, rgba(91, 155, 74, 0.75) 0%, rgba(255, 217, 106, 0.55) 45%, rgba(91, 155, 74, 0) 75%);
+  border-radius: var(--radius-pill);
+  filter: blur(14px);
+  z-index: 0;
+  opacity: 0.85;
+  animation: heroGlowPulse 2.8s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+@keyframes heroGlowPulse {
+  0% {
+    opacity: 0.6;
+    transform: scale(0.96);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.05);
+    filter: blur(18px);
+  }
+}
+
+.btn-glow {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(135deg, #3F7337 0%, #2A5024 100%);
+  border: 1.5px solid rgba(255, 217, 106, 0.5);
+  box-shadow: 0 4px 18px rgba(63, 115, 55, 0.35), 0 0 20px rgba(255, 217, 106, 0.3);
+}
+
+.btn-glow:hover {
+  background: linear-gradient(135deg, #4D873E 0%, #325E2B 100%);
+  box-shadow: 0 6px 24px rgba(63, 115, 55, 0.45), 0 0 32px rgba(255, 217, 106, 0.45);
+  transform: translateY(-2px);
+}
+
 .btn-pill-sm {
   min-height: 40px;
   padding: 8px 18px;
@@ -289,18 +338,20 @@ h1, h2, h3, h4 {
 }
 
 /* ==========================================================
-   STICKY NAVBAR
+   FIXED NAVBAR (JANGAN IKUT TERSCROLL / TETAP MENEMPEL DI ATAS)
    ========================================================== */
 .site-nav {
-  position: sticky;
+  position: fixed;
   top: 0;
-  z-index: 100;
-  background: rgba(255, 249, 236, 0.92);
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: rgba(255, 249, 236, 0.95);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   border-bottom: 1px solid var(--border-soft);
-  transition: all var(--transition-normal);
   width: 100%;
+  box-shadow: 0 2px 10px rgba(30, 51, 27, 0.05);
 }
 
 .nav-container {
@@ -338,6 +389,12 @@ h1, h2, h3, h4 {
   white-space: nowrap;
 }
 
+.nav-actions-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
 .nav-menu {
   display: flex;
   align-items: center;
@@ -357,8 +414,28 @@ h1, h2, h3, h4 {
   color: var(--color-leaf-dark);
 }
 
-.nav-btn-mobile {
-  display: none;
+.nav-btn-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--color-forest);
+  color: var(--text-white);
+  padding: 8px 18px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-family-display);
+  font-weight: 700;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgba(63, 115, 55, 0.25);
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  text-decoration: none;
+}
+
+.nav-btn-download:hover {
+  background-color: var(--color-forest-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(63, 115, 55, 0.35);
+  color: var(--text-white);
 }
 
 /* ==========================================================
@@ -537,6 +614,146 @@ h1, h2, h3, h4 {
   background-color: var(--color-forest);
   color: var(--text-white);
   box-shadow: 0 2px 8px rgba(63, 115, 55, 0.25);
+}
+
+/* ==========================================================
+   TREASURE DISCOVERY SECTION (DYNAMIC PLANT SPOTLIGHT)
+   "Anda Mendapatkan Tanaman!" — Gamified Botanical Unlock
+   ========================================================== */
+.treasure-section {
+  display: none;
+  padding: 44px 0 60px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 217, 106, 0.4) 0%, rgba(255, 249, 236, 0) 70%),
+              linear-gradient(180deg, #FFF6D9 0%, #FFFDF5 100%);
+  border-bottom: 2px solid rgba(255, 217, 106, 0.5);
+  position: relative;
+  overflow: hidden;
+}
+
+.treasure-box {
+  background: var(--surface-card);
+  border: 2px solid rgba(255, 217, 106, 0.7);
+  border-radius: 28px;
+  padding: 38px 40px;
+  box-shadow: 0 16px 40px -10px rgba(146, 88, 5, 0.15), var(--shadow-md);
+  position: relative;
+}
+
+.treasure-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 36px;
+  align-items: start;
+}
+
+.treasure-visual-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.treasure-photo-frame {
+  width: 100%;
+  aspect-ratio: 16 / 11;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--surface-card-warm);
+  border: 2px solid var(--border-card);
+  box-shadow: var(--shadow-sm);
+  position: relative;
+}
+
+.treasure-photo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.treasure-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.treasure-congrats-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #FFD96A 0%, #FFEBA3 100%);
+  color: #633C02;
+  font-family: var(--font-family-display);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 2px 6px rgba(146, 88, 5, 0.15);
+  max-width: fit-content;
+}
+
+.treasure-plant-title {
+  font-size: clamp(28px, 3.8vw, 42px);
+  font-weight: 800;
+  color: var(--color-forest-dark);
+  margin-top: 4px;
+  margin-bottom: 2px;
+}
+
+.treasure-plant-latin {
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+.treasure-mascot-cheer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--color-warm-yellow-light);
+  border: 1px solid rgba(255, 217, 106, 0.5);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+
+.treasure-mascot-img {
+  width: 52px;
+  height: auto;
+  flex-shrink: 0;
+  animation: mascotBreathe 3.5s ease-in-out infinite;
+}
+
+.treasure-mascot-quote {
+  font-size: 13.5px;
+  color: #593703;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+.treasure-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 6px;
+}
+
+@media (max-width: 1024px) {
+  .treasure-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .treasure-box {
+    padding: 24px 18px;
+    border-radius: 22px;
+  }
+  .treasure-plant-title {
+    font-size: 26px;
+  }
 }
 
 /* ==========================================================
@@ -862,9 +1079,22 @@ h1, h2, h3, h4 {
 
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
-  gap: 48px;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  gap: 36px;
   margin-bottom: 48px;
+}
+
+.footer-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #B8CEB5;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.footer-social-link:hover {
+  color: #FFFFFF;
 }
 
 .footer-brand-title {
@@ -1080,6 +1310,58 @@ h1, h2, h3, h4 {
   font-weight: 500;
 }
 
+/* Dynamic 3 Random Facts List */
+.random-facts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.random-fact-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255, 217, 106, 0.4);
+  font-size: 14px;
+  color: #4A3305;
+  line-height: 1.55;
+  transition: transform var(--transition-fast), background var(--transition-fast);
+}
+
+.random-fact-item:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateX(3px);
+}
+
+.random-fact-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  color: var(--color-forest);
+  margin-top: 2px;
+}
+
+.random-fact-icon svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.random-fact-text {
+  flex: 1;
+}
+
 /* Benefits Card */
 .benefits-card {
   background: var(--surface-card-warm);
@@ -1274,6 +1556,9 @@ h1, h2, h3, h4 {
 }
 
 @media (max-width: 480px) {
+  body {
+    padding-top: 60px;
+  }
   .nav-container {
     height: 60px;
     padding: 0 14px;

@@ -9,13 +9,13 @@ class QrUrlBuilderTest {
     @Test
     fun buildPlantUrl_producesDeterministicContractUrl() {
         val url = QrUrlBuilder.buildPlantUrl("TEST_PLANT_123")
-        assertThat(url).isEqualTo("https://bubakangreen.web.app/plant/TEST_PLANT_123")
+        assertThat(url).isEqualTo("https://bubakan-green.web.app/plant/TEST_PLANT_123")
     }
 
     @Test
     fun buildLocationUrl_producesDeterministicContractUrl() {
         val url = QrUrlBuilder.buildLocationUrl("TEST_LOC_456")
-        assertThat(url).isEqualTo("https://bubakangreen.web.app/location/TEST_LOC_456")
+        assertThat(url).isEqualTo("https://bubakan-green.web.app/location/TEST_LOC_456")
     }
 
     @Test
@@ -34,21 +34,21 @@ class QrUrlBuilderTest {
 
     @Test
     fun parseCanonicalUrl_validPlantUrl_returnsPlant() {
-        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/pl-a84f21c9")
+        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/plant/pl-a84f21c9")
         assertThat(result).isInstanceOf(ParsedQrResult.Plant::class.java)
         assertThat((result as ParsedQrResult.Plant).stableId).isEqualTo("pl-a84f21c9")
     }
 
     @Test
     fun parseCanonicalUrl_validLocationUrl_returnsLocation() {
-        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/location/loc-91af7b23")
+        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/location/loc-91af7b23")
         assertThat(result).isInstanceOf(ParsedQrResult.Location::class.java)
         assertThat((result as ParsedQrResult.Location).stableId).isEqualTo("loc-91af7b23")
     }
 
     @Test
     fun parseCanonicalUrl_insecureHttpScheme_returnsInvalid() {
-        val result = QrUrlBuilder.parseCanonicalUrl("http://bubakangreen.web.app/plant/pl-123")
+        val result = QrUrlBuilder.parseCanonicalUrl("http://bubakan-green.web.app/plant/pl-123")
         assertThat(result).isInstanceOf(ParsedQrResult.Invalid::class.java)
         assertThat((result as ParsedQrResult.Invalid).reason).contains("Insecure")
     }
@@ -62,7 +62,7 @@ class QrUrlBuilderTest {
 
     @Test
     fun parseCanonicalUrl_malformedPath_returnsInvalid() {
-        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/unknown_route/pl-123")
+        val result = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/unknown_route/pl-123")
         assertThat(result).isInstanceOf(ParsedQrResult.Invalid::class.java)
     }
 
@@ -77,13 +77,13 @@ class QrUrlBuilderTest {
 
     @Test
     fun parseCanonicalUrl_pathTraversalOrQuery_returnsInvalid() {
-        val traversalResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/../secret")
+        val traversalResult = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/plant/../secret")
         assertThat(traversalResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
 
-        val queryResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/pl-cabai?hack=true")
+        val queryResult = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/plant/pl-cabai?hack=true")
         assertThat(queryResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
 
-        val fragmentResult = QrUrlBuilder.parseCanonicalUrl("https://bubakangreen.web.app/plant/pl-cabai#fragment")
+        val fragmentResult = QrUrlBuilder.parseCanonicalUrl("https://bubakan-green.web.app/plant/pl-cabai#fragment")
         assertThat(fragmentResult).isInstanceOf(ParsedQrResult.Invalid::class.java)
     }
 
@@ -100,7 +100,7 @@ class QrUrlBuilderTest {
         // URL must depend strictly on stableId, invariant to metadata changes
         val urlAfterUpdate = QrUrlBuilder.buildPlantUrl(stableId)
         assertThat(urlAfterUpdate).isEqualTo(originalUrl)
-        assertThat(urlAfterUpdate).isEqualTo("https://bubakangreen.web.app/plant/pl-sereh-01")
+        assertThat(urlAfterUpdate).isEqualTo("https://bubakan-green.web.app/plant/pl-sereh-01")
     }
 
     @Test
@@ -114,7 +114,6 @@ class QrUrlBuilderTest {
 
         val urlAfterUpdate = QrUrlBuilder.buildLocationUrl(stableId)
         assertThat(urlAfterUpdate).isEqualTo(originalUrl)
-        assertThat(urlAfterUpdate).isEqualTo("https://bubakangreen.web.app/location/loc-urban-farming-01")
+        assertThat(urlAfterUpdate).isEqualTo("https://bubakan-green.web.app/location/loc-urban-farming-01")
     }
 }
-
