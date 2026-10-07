@@ -9,6 +9,7 @@ import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.domain.model.RegionTag
 import id.bubakangreen.app.domain.repository.AuditRepository
 import id.bubakangreen.app.domain.repository.LocationRepository
 import id.bubakangreen.app.ui.pic.LocationFormViewModel
@@ -163,28 +164,57 @@ class LocationFormViewModelTest {
     }
 
     @Test
-    fun saveLocation_success_createsPendingLocationAndAuditLog() = runTest(testDispatcher) {
+    fun saveLocation_success_createsPublishedLocationAndAuditLog() = runTest(testDispatcher) {
         val fakeClient = FakeLocationClient(simulatedAccuracy = 10f)
         val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
         viewModel.onNameChange("Kebun Toga Herbal RW 02")
         viewModel.onAddressChange("Jl. Melati RW 02")
         viewModel.onDescriptionChange("Koleksi tanaman obat keluarga warga RW 02")
+        viewModel.onRegionTagChange(RegionTag.RW_02)
         viewModel.captureGps()
         advanceUntilIdle()
 
-        viewModel.saveLocation("pic_rw02")
+        viewModel.saveLocation("admin_super")
         advanceUntilIdle()
 
         assertThat(fakeLocationRepo.createdLocations).hasSize(1)
         val created = fakeLocationRepo.createdLocations.first()
         assertThat(created.name).isEqualTo("Kebun Toga Herbal RW 02")
-        assertThat(created.status).isEqualTo(LocationStatus.PENDING_APPROVAL)
-        assertThat(created.coordinatesStatus).isEqualTo(CoordinatesStatus.PENDING)
-        assertThat(created.picUid).isEqualTo("pic_rw02")
+        assertThat(created.status).isEqualTo(LocationStatus.PUBLISHED)
+        assertThat(created.coordinatesStatus).isEqualTo(CoordinatesStatus.VERIFIED)
+        assertThat(created.regionTag).isEqualTo("RW_02")
+        assertThat(created.displayRegionTag).isEqualTo("RW 02")
 
         assertThat(fakeAuditRepo.recordedLogs).hasSize(1)
         val audit = fakeAuditRepo.recordedLogs.first()
         assertThat(audit.action).isEqualTo("LOCATION_CREATED")
-        assertThat(audit.actorRole).isEqualTo("PIC")
+        assertThat(audit.actorRole).isEqualTo("ADMIN")
+    }
+
+    @Test
+    fun photoManagement_enforcesMaxThreePhotos_andSupportsReplaceAndRemove() = runTest(testDispatcher) {
+        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo)
+        
+        // Add 1st photo
+        viewModel.onAddPhoto("photo_1.jpg")
+        assertThat(viewModel.state.value.photos).containsExactly("photo_1.jpg")
+
+        // Add 2nd and 3rd photos
+        viewModel.onAddPhoto("photo_2.jpg")
+        viewModel.onAddPhoto("photo_3.jpg")
+        assertThat(viewModel.state.value.photos).hasSize(3)
+
+        // Attempting to add 4th photo must be rejected (capped at 3)
+        viewModel.onAddPhoto("photo_4.jpg")
+        assertThat(viewModel.state.value.photos).hasSize(3)
+
+        // Replace 2nd photo (index 1)
+        viewModel.onReplacePhoto(1, "photo_replaced.jpg")
+        assertThat(viewModel.state.value.photos).containsExactly("photo_1.jpg", "photo_replaced.jpg", "photo_3.jpg").inOrder()
+
+        // Remove 1st photo (index 0)
+        viewModel.onRemovePhoto(0)
+        assertThat(viewModel.state.value.photos).containsExactly("photo_replaced.jpg", "photo_3.jpg").inOrder()
+        assertThat(viewModel.state.value.photos).hasSize(2)
     }
 }

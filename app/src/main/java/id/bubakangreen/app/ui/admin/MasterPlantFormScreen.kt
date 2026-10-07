@@ -1,6 +1,15 @@
 package id.bubakangreen.app.ui.admin
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,18 +22,27 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
@@ -36,16 +54,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import coil.compose.AsyncImage
+import id.bubakangreen.app.core.util.ImageCompressor
+import id.bubakangreen.app.ui.components.PrimaryButton
 import id.bubakangreen.app.ui.theme.BackgroundLight
+import id.bubakangreen.app.ui.theme.BorderCard
+import id.bubakangreen.app.ui.theme.ForestGreen
+import id.bubakangreen.app.ui.theme.FriendlyRed
 import id.bubakangreen.app.ui.theme.OnPrimaryWhite
 import id.bubakangreen.app.ui.theme.OnSurfaceDark
 import id.bubakangreen.app.ui.theme.OutlineGrey
 import id.bubakangreen.app.ui.theme.PrimaryForest
+import id.bubakangreen.app.ui.theme.SurfaceCard
 import id.bubakangreen.app.ui.theme.SurfaceWhite
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +92,63 @@ fun MasterPlantFormScreen(
     modifier: Modifier = Modifier
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    var isProcessingPhoto by remember { mutableStateOf(false) }
+    var photoNoticeMessage by remember { mutableStateOf<String?>(null) }
+    var showUrlInput by remember { mutableStateOf(false) }
+
+    // Camera Launcher
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { bitmap: Bitmap? ->
+        if (bitmap != null) {
+            scope.launch {
+                isProcessingPhoto = true
+                try {
+                    val compressed = ImageCompressor.compressBitmap(bitmap, maxDimension = 1600, quality = 80)
+                    val cachedPath = ImageCompressor.saveCompressedToAppCache(context, compressed, "plant")
+                    viewModel.onPhotoUrlChange(cachedPath)
+                } catch (e: Exception) {
+                    photoNoticeMessage = "Gagal memproses foto kamera: ${e.localizedMessage}"
+                } finally {
+                    isProcessingPhoto = false
+                }
+            }
+        }
+    }
+
+    // Camera Permission Launcher
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            cameraLauncher.launch(null)
+        } else {
+            photoNoticeMessage = "Izin kamera belum diberikan. Anda tetap dapat memilih foto dari galeri."
+        }
+    }
+
+    // Photo Picker Launcher
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        if (uri != null) {
+            scope.launch {
+                isProcessingPhoto = true
+                try {
+                    val compressed = ImageCompressor.compressAndResizeImage(context, uri, maxDimension = 1600, quality = 80)
+                    val cachedPath = ImageCompressor.saveCompressedToAppCache(context, compressed, "plant")
+                    viewModel.onPhotoUrlChange(cachedPath)
+                } catch (e: Exception) {
+                    photoNoticeMessage = "Gagal memproses gambar galeri: ${e.localizedMessage}"
+                } finally {
+                    isProcessingPhoto = false
+                }
+            }
+        }
+    }
 
     LaunchedEffect(plantId) {
         viewModel.loadPlant(plantId)
@@ -85,10 +177,10 @@ fun MasterPlantFormScreen(
                         .imePadding()
                         .padding(horizontal = 16.dp, vertical = 14.dp)
                 ) {
-                    id.bubakangreen.app.ui.components.PrimaryButton(
+                    PrimaryButton(
                         text = if (plantId != null) "Perbarui Ensiklopedia" else "Simpan ke Ensiklopedia",
                         onClick = { viewModel.savePlant(adminUid) },
-                        enabled = !state.isSaving,
+                        enabled = !state.isSaving && !isProcessingPhoto,
                         loading = state.isSaving,
                         height = 54.dp,
                         shapeRadius = 27.dp
@@ -151,7 +243,42 @@ fun MasterPlantFormScreen(
                 }
             }
 
-            // Nama Indonesia
+            // Photo processing error/notice banner
+            if (photoNoticeMessage != null) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    color = MaterialTheme.colorScheme.tertiaryContainer,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = photoNoticeMessage ?: "",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = MaterialTheme.colorScheme.onTertiaryContainer
+                            ),
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = { photoNoticeMessage = null },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Tutup",
+                                tint = MaterialTheme.colorScheme.onTertiaryContainer,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
+                    }
+                }
+            }
+
+            // 1. Nama Indonesia (WAJIB *)
             Text(
                 text = "Nama Tanaman (Bahasa Indonesia) *",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
@@ -174,9 +301,169 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Nama Latin
+            // 2. Foto Tanaman (WAJIB *)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Foto Tanaman *",
+                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
+                )
+                if (isProcessingPhoto) {
+                    CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp)
+                }
+            }
+            Spacer(modifier = Modifier.height(6.dp))
+
+            if (state.primaryPhotoUrl.isNotBlank()) {
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, BorderCard),
+                    colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(12.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(BackgroundLight)
+                        ) {
+                            AsyncImage(
+                                model = state.primaryPhotoUrl,
+                                contentDescription = "Foto Tanaman",
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            OutlinedButton(
+                                onClick = {
+                                    photoPickerLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp), tint = ForestGreen)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Ganti Foto", color = ForestGreen, fontSize = 13.sp)
+                            }
+                            OutlinedButton(
+                                onClick = { viewModel.onPhotoUrlChange("") },
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp), tint = FriendlyRed)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Hapus", color = FriendlyRed, fontSize = 13.sp)
+                            }
+                        }
+                    }
+                }
+            } else {
+                Surface(
+                    shape = RoundedCornerShape(10.dp),
+                    color = SurfaceWhite,
+                    border = BorderStroke(1.dp, OutlineGrey),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Pilih atau ambil foto tanaman untuk ensiklopedia",
+                            style = MaterialTheme.typography.bodySmall.copy(color = OutlineGrey)
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Button(
+                                onClick = {
+                                    val hasPermission = ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                    if (hasPermission) {
+                                        cameraLauncher.launch(null)
+                                    } else {
+                                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryForest),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(16.dp), tint = OnPrimaryWhite)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Kamera", fontSize = 13.sp, color = OnPrimaryWhite)
+                            }
+
+                            Button(
+                                onClick = {
+                                    photoPickerLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = ForestGreen),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.PhotoLibrary, contentDescription = null, modifier = Modifier.size(16.dp), tint = OnPrimaryWhite)
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Galeri", fontSize = 13.sp, color = OnPrimaryWhite)
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedButton(
+                            onClick = { showUrlInput = !showUrlInput },
+                            shape = RoundedCornerShape(8.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Default.Link, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryForest)
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(if (showUrlInput) "Sembunyikan Input URL" else "Input URL / Aset Gambar", fontSize = 13.sp, color = PrimaryForest)
+                        }
+
+                        if (showUrlInput) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = state.primaryPhotoUrl,
+                                onValueChange = viewModel::onPhotoUrlChange,
+                                placeholder = { Text("https://... atau plant_sereh") },
+                                singleLine = true,
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = PrimaryForest,
+                                    unfocusedBorderColor = OutlineGrey,
+                                    focusedContainerColor = BackgroundLight,
+                                    unfocusedContainerColor = BackgroundLight
+                                ),
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // 3. Nama Latin (Opsional)
             Text(
-                text = "Nama Ilmiah (Latin) *",
+                text = "Nama Ilmiah (Latin) (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -197,9 +484,9 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Nama Mandarin (Hanzi) & Pinyin
+            // 4. Aksara Mandarin (Hanzi) & Pinyin (Opsional)
             Text(
-                text = "Aksara Mandarin (Hanzi) & Pinyin",
+                text = "Aksara Mandarin (Hanzi) & Pinyin (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -235,9 +522,9 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Deskripsi Singkat
+            // 5. Deskripsi Tanaman (Opsional)
             Text(
-                text = "Deskripsi Tanaman *",
+                text = "Deskripsi Tanaman (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -258,9 +545,9 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Karakteristik Morfologi
+            // 6. Karakteristik Morfologi Tanaman (Opsional)
             Text(
-                text = "Karakteristik Morfologi Tanaman",
+                text = "Karakteristik Morfologi Tanaman (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -281,9 +568,9 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Manfaat & Penggunaan
+            // 7. Manfaat & Penggunaan (Opsional)
             Text(
-                text = "Manfaat & Penggunaan (Kuliner / Herbal Tradisional)",
+                text = "Manfaat & Penggunaan (Kuliner / Herbal Tradisional) (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -304,9 +591,9 @@ fun MasterPlantFormScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Panduan Budidaya
+            // 8. Panduan Budidaya (Opsional)
             Text(
-                text = "Panduan Budidaya & Perawatan",
+                text = "Panduan Budidaya & Perawatan (Opsional)",
                 style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
             )
             Spacer(modifier = Modifier.height(6.dp))
@@ -315,101 +602,6 @@ fun MasterPlantFormScreen(
                 onValueChange = viewModel::onCultivationNotesChange,
                 placeholder = { Text("Kebutuhan sinar matahari, media tanam, penyiraman...") },
                 minLines = 2,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryForest,
-                    unfocusedBorderColor = OutlineGrey,
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite
-                ),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Foto URL Referensi (Remote URL)
-            Text(
-                text = "URL Foto Referensi (Wajib HTTPS jika URL web)",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = state.primaryPhotoUrl,
-                onValueChange = viewModel::onPhotoUrlChange,
-                placeholder = { Text("https://upload.wikimedia.org/.../plant.jpg atau plant_sereh") },
-                singleLine = true,
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = PrimaryForest,
-                    unfocusedBorderColor = OutlineGrey,
-                    focusedContainerColor = SurfaceWhite,
-                    unfocusedContainerColor = SurfaceWhite
-                ),
-                shape = RoundedCornerShape(10.dp),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Lisensi & Pembuat Foto
-            Row(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Fotografer / Pembuat",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    OutlinedTextField(
-                        value = state.imageAuthor,
-                        onValueChange = viewModel::onImageAuthorChange,
-                        placeholder = { Text("Contoh: Wouter Hagens") },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryForest,
-                            unfocusedBorderColor = OutlineGrey,
-                            focusedContainerColor = SurfaceWhite,
-                            unfocusedContainerColor = SurfaceWhite
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-                Spacer(modifier = Modifier.size(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "Lisensi Foto",
-                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    OutlinedTextField(
-                        value = state.imageLicense,
-                        onValueChange = viewModel::onImageLicenseChange,
-                        placeholder = { Text("CC BY-SA 4.0 / CC0") },
-                        singleLine = true,
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = PrimaryForest,
-                            unfocusedBorderColor = OutlineGrey,
-                            focusedContainerColor = SurfaceWhite,
-                            unfocusedContainerColor = SurfaceWhite
-                        ),
-                        shape = RoundedCornerShape(10.dp),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Referensi Taksonomi Ilmiah
-            Text(
-                text = "Referensi Taksonomi Ilmiah",
-                style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold, color = OnSurfaceDark)
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            OutlinedTextField(
-                value = state.sourceReferences,
-                onValueChange = viewModel::onSourceReferencesChange,
-                placeholder = { Text("Contoh: Royal Botanic Gardens, Kew (POWO)") },
-                singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = PrimaryForest,
                     unfocusedBorderColor = OutlineGrey,

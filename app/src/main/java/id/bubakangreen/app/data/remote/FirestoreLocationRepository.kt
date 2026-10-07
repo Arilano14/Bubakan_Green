@@ -9,6 +9,7 @@ import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationConditionLog
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.domain.model.RegionTag
 import id.bubakangreen.app.domain.repository.LocationRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -217,14 +218,16 @@ class FirestoreLocationRepository(
             "name" to name,
             "type" to type.name,
             "rw" to rw,
+            "regionTag" to regionTag,
             "address" to address,
             "description" to description,
             "latitude" to latitude,
             "longitude" to longitude,
             "coordinatesStatus" to coordinatesStatus.name,
             "featured" to featured,
-            "coverPhotoUrl" to coverPhotoUrl,
-            "photoUrl" to (photoUrl ?: coverPhotoUrl),
+            "photos" to photos,
+            "coverPhotoUrl" to (photos.firstOrNull() ?: coverPhotoUrl),
+            "photoUrl" to (photos.firstOrNull() ?: photoUrl ?: coverPhotoUrl),
             "conditionNote" to conditionNote,
             "conditionUpdatedAt" to conditionUpdatedAt,
             "conditionUpdatedBy" to conditionUpdatedBy,
@@ -246,6 +249,7 @@ class FirestoreLocationRepository(
             val typeStr = getString("type") ?: LocationType.URBAN_FARMING.name
             val type = runCatching { LocationType.valueOf(typeStr) }.getOrDefault(LocationType.URBAN_FARMING)
             val rw = getString("rw") ?: ""
+            val regionTag = getString("regionTag") ?: (RegionTag.fromCodeOrRw(rw)?.code ?: rw)
             val address = getString("address") ?: ""
             val description = getString("description") ?: ""
             val latitude = getDouble("latitude") ?: 0.0
@@ -253,7 +257,9 @@ class FirestoreLocationRepository(
             val coordStatusStr = getString("coordinatesStatus") ?: CoordinatesStatus.PENDING.name
             val coordinatesStatus = runCatching { CoordinatesStatus.valueOf(coordStatusStr) }.getOrDefault(CoordinatesStatus.PENDING)
             val featured = getBoolean("featured") ?: false
-            val coverPhotoUrl = getString("coverPhotoUrl") ?: getString("photoUrl")
+            val photosList = (get("photos") as? List<*>)?.mapNotNull { it?.toString() }
+                ?: listOfNotNull(getString("coverPhotoUrl") ?: getString("photoUrl"))
+            val coverPhotoUrl = photosList.firstOrNull() ?: getString("coverPhotoUrl") ?: getString("photoUrl")
             val photoUrl = coverPhotoUrl
             val conditionNote = getString("conditionNote") ?: ""
             val conditionUpdatedAt = getLong("conditionUpdatedAt")
@@ -274,12 +280,14 @@ class FirestoreLocationRepository(
                 name = name,
                 type = type,
                 rw = rw,
+                regionTag = regionTag,
                 address = address,
                 description = description,
                 latitude = latitude,
                 longitude = longitude,
                 coordinatesStatus = coordinatesStatus,
                 featured = featured,
+                photos = photosList,
                 coverPhotoUrl = coverPhotoUrl,
                 photoUrl = photoUrl,
                 conditionNote = conditionNote,

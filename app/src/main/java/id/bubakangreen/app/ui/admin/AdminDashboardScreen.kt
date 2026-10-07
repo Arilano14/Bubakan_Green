@@ -91,7 +91,6 @@ import id.bubakangreen.app.ui.theme.WarmYellowLight
 @Composable
 fun AdminDashboardScreen(
     viewModel: AdminDashboardViewModel,
-    onNavigateToApprovalQueue: () -> Unit,
     onNavigateToLocationForm: (String?) -> Unit,
     onNavigateToPlantForm: (String) -> Unit,
     onNavigateToMasterPlantForm: (String?) -> Unit,
@@ -228,8 +227,7 @@ fun AdminDashboardScreen(
                             AdminOverviewContent(
                                 data = data,
                                 onOpenPlants = { activeSection = AdminSection.PLANTS },
-                                onOpenLocations = { activeSection = AdminSection.LOCATIONS },
-                                onOpenApprovals = onNavigateToApprovalQueue
+                                onOpenLocations = { activeSection = AdminSection.LOCATIONS }
                             )
                         }
 
@@ -279,8 +277,7 @@ private enum class AdminSection {
 private fun AdminOverviewContent(
     data: AdminDashboardData,
     onOpenPlants: () -> Unit,
-    onOpenLocations: () -> Unit,
-    onOpenApprovals: () -> Unit
+    onOpenLocations: () -> Unit
 ) {
     LazyColumn(
         modifier = Modifier
@@ -336,35 +333,49 @@ private fun AdminOverviewContent(
 
         // ── SUMMARY STAT PILLS ──
         item {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SummaryPill(
-                    label = "Spesies",
-                    value = "${data.totalMasterPlants}",
-                    color = ForestGreen,
-                    bgColor = LeafGreenLight,
-                    modifier = Modifier.weight(1f)
-                )
-                SummaryPill(
-                    label = "Kebun",
-                    value = "${data.activeLocations}/${data.totalLocations}",
-                    color = LeafGreen,
-                    bgColor = LeafGreenLight,
-                    modifier = Modifier.weight(1f)
-                )
-                SummaryPill(
-                    label = "Antrean",
-                    value = "${data.pendingLocations.size}",
-                    color = if (data.pendingLocations.isNotEmpty()) AlertOrange else NaturalGreen,
-                    bgColor = if (data.pendingLocations.isNotEmpty()) WarmYellowLight else LeafGreenLight,
-                    modifier = Modifier.weight(1f)
-                )
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SummaryPill(
+                        label = "Tanaman",
+                        value = "${data.totalMasterPlants}",
+                        color = ForestGreen,
+                        bgColor = LeafGreenLight,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SummaryPill(
+                        label = "Total Lahan",
+                        value = "${data.activeLocations}/${data.totalLocations}",
+                        color = LeafGreen,
+                        bgColor = LeafGreenLight,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    SummaryPill(
+                        label = "Urban Farming",
+                        value = "${data.totalUrbanFarming}",
+                        color = ForestGreen,
+                        bgColor = LeafGreenLight,
+                        modifier = Modifier.weight(1f)
+                    )
+                    SummaryPill(
+                        label = "Taman Toga",
+                        value = "${data.totalTamanToga}",
+                        color = LeafGreen,
+                        bgColor = LeafGreenLight,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
             }
         }
 
-        // ── PRIMARY ACTION 1: KELOLA TANAMAN (Section 8) ──
+        // ── PRIMARY ACTION 1: KELOLA TANAMAN ──
         item {
             AdminPrimaryActionCard(
                 title = "Kelola Tanaman",
@@ -377,35 +388,16 @@ private fun AdminOverviewContent(
             )
         }
 
-        // ── PRIMARY ACTION 2: KELOLA LOKASI (Section 8) ──
+        // ── PRIMARY ACTION 2: KELOLA LAHAN ──
         item {
             AdminPrimaryActionCard(
-                title = "Kelola Lokasi",
-                description = "${data.totalLocations} kebun binaan terdaftar (Urban Farming & Taman Toga).",
+                title = "Kelola Lahan",
+                description = "${data.totalLocations} lahan binaan terdaftar (Urban Farming & Taman Toga).",
                 icon = Icons.Default.Place,
                 iconTint = LeafGreen,
                 iconBg = LeafGreenLight,
-                buttonText = "Buka Kelola Lokasi",
+                buttonText = "Buka Kelola Lahan",
                 onClick = onOpenLocations
-            )
-        }
-
-        // ── PRIMARY ACTION 3: PERSETUJUAN (Section 8) ──
-        item {
-            val pendingCount = data.pendingLocations.size
-            AdminPrimaryActionCard(
-                title = "Persetujuan",
-                description = if (pendingCount > 0) {
-                    "$pendingCount pengajuan kebun baru siap untuk diverifikasi."
-                } else {
-                    "Semua pengajuan kebun telah ditinjau dan terverifikasi."
-                },
-                badgeText = if (pendingCount > 0) "$pendingCount Perlu Ditinjau" else null,
-                icon = Icons.AutoMirrored.Filled.FactCheck,
-                iconTint = if (pendingCount > 0) AlertOrange else NaturalGreen,
-                iconBg = if (pendingCount > 0) WarmYellowLight else LeafGreenLight,
-                buttonText = "Buka Antrean Persetujuan",
-                onClick = onOpenApprovals
             )
         }
 
@@ -694,7 +686,7 @@ private fun AdminLocationsListContent(
             }
 
             Text(
-                text = "Daftar Kebun (${locations.size})",
+                text = "Daftar Lahan (${locations.size})",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = TextPrimary,
@@ -740,7 +732,7 @@ private fun AdminLocationsListContent(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = "RW ${loc.rw} • ${if (loc.type == LocationType.URBAN_FARMING) "Urban Farming" else "Taman Toga"}",
+                                text = "${loc.displayRegionTag} • ${if (loc.type == LocationType.URBAN_FARMING) "Urban Farming" else "Taman Toga"}",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = TextSecondary,
                                 maxLines = 1,
@@ -752,7 +744,7 @@ private fun AdminLocationsListContent(
                                 color = if (loc.status == LocationStatus.PUBLISHED || loc.status == LocationStatus.ACTIVE) LeafGreenLight else WarmYellowLight
                             ) {
                                 Text(
-                                    text = if (loc.status == LocationStatus.PUBLISHED || loc.status == LocationStatus.ACTIVE) "Aktif / Terbit" else "Menunggu",
+                                    text = if (loc.status == LocationStatus.PUBLISHED || loc.status == LocationStatus.ACTIVE) "Aktif / Terbit" else "Nonaktif",
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = if (loc.status == LocationStatus.PUBLISHED || loc.status == LocationStatus.ACTIVE) ForestGreen else AlertOrange,
@@ -769,7 +761,7 @@ private fun AdminLocationsListContent(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit Kebun ${loc.name}",
+                                contentDescription = "Edit Lahan ${loc.name}",
                                 tint = ForestGreen
                             )
                         }

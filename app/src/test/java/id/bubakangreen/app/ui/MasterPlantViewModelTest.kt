@@ -39,6 +39,7 @@ class MasterPlantViewModelTest {
         mandarinPinyin = "níng méng cǎo",
         pinyin = "níng méng cǎo",
         description = "Tanaman rumput aromatik beraroma sitrun segar.",
+        primaryPhotoUrl = "plant_sereh",
         imageSourceType = "LOCAL",
         imageAssetName = "plant_sereh"
     )
@@ -107,6 +108,7 @@ class MasterPlantViewModelTest {
         // Canonical match: "Cymbopogon citratus" with different casing and whitespace
         viewModel.onNameLatinChange("  cymbopogon   citratus  ")
         viewModel.onDescriptionChange("Deskripsi sereh dapur uji.")
+        viewModel.onPhotoUrlChange("plant_sereh")
 
         viewModel.savePlant("admin_tester")
         advanceUntilIdle()
@@ -128,6 +130,7 @@ class MasterPlantViewModelTest {
         viewModel.onNameIdChange("sereh") // duplicate case-insensitive common name
         viewModel.onNameLatinChange("Cymbopogon nardus") // distinct Latin name
         viewModel.onDescriptionChange("Minyak atsiri sereh wangi.")
+        viewModel.onPhotoUrlChange("plant_sereh")
 
         viewModel.savePlant("admin_tester")
         advanceUntilIdle()
@@ -136,6 +139,64 @@ class MasterPlantViewModelTest {
         assertThat(state.validationError).isNotNull()
         assertThat(state.validationError).contains("sudah terdaftar")
         assertThat(fakePlantRepo.masterPlants).hasSize(1)
+    }
+
+    @Test
+    fun `savePlant without photo is rejected with validation error`() = runTest {
+        val fakePlantRepo = FakePlantRepo(listOf(defaultSereh))
+        val fakeAuditRepo = FakeAuditRepo()
+        val viewModel = MasterPlantViewModel(fakePlantRepo, fakeAuditRepo)
+
+        viewModel.onNameIdChange("Kunyit Putih")
+        viewModel.onPhotoUrlChange("") // missing photo
+
+        viewModel.savePlant("admin_tester")
+        advanceUntilIdle()
+
+        val state = viewModel.state.value
+        assertThat(state.validationError).contains("Foto tanaman wajib disertakan")
+        assertThat(fakePlantRepo.masterPlants).hasSize(1)
+    }
+
+    @Test
+    fun `savePlant with only required fields (nameId and photoUrl) succeeds`() = runTest {
+        val fakePlantRepo = FakePlantRepo(listOf(defaultSereh))
+        val fakeAuditRepo = FakeAuditRepo()
+        val viewModel = MasterPlantViewModel(fakePlantRepo, fakeAuditRepo)
+
+        // Only fill required fields
+        viewModel.onNameIdChange("Brotowali")
+        viewModel.onPhotoUrlChange("plant_brotowali")
+
+        viewModel.savePlant("admin_tester")
+        advanceUntilIdle()
+
+        assertThat(fakePlantRepo.masterPlants).hasSize(2)
+        val created = fakePlantRepo.masterPlants.find { it.nameId == "Brotowali" }
+        assertThat(created).isNotNull()
+        assertThat(created!!.primaryPhotoUrl).isEqualTo("plant_brotowali")
+        assertThat(created.nameLatin).isEmpty()
+        assertThat(created.description).isEmpty()
+    }
+
+    @Test
+    fun `updatePlant preserves stable plantId`() = runTest {
+        val fakePlantRepo = FakePlantRepo(listOf(defaultSereh))
+        val fakeAuditRepo = FakeAuditRepo()
+        val viewModel = MasterPlantViewModel(fakePlantRepo, fakeAuditRepo)
+
+        viewModel.loadPlant("sereh")
+        advanceUntilIdle()
+
+        // Edit attributes
+        viewModel.onNameIdChange("Sereh Wangi Super")
+        viewModel.savePlant("admin_tester")
+        advanceUntilIdle()
+
+        assertThat(fakePlantRepo.masterPlants).hasSize(1)
+        val updated = fakePlantRepo.masterPlants.first()
+        assertThat(updated.id).isEqualTo("sereh") // Preserved stable ID!
+        assertThat(updated.nameId).isEqualTo("Sereh Wangi Super")
     }
 
     @Test

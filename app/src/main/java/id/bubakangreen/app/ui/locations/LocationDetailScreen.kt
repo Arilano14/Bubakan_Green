@@ -85,7 +85,6 @@ fun LocationDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
     val scrollState = rememberScrollState()
-    var showQrDialog by remember { mutableStateOf(false) }
 
     BackHandler {
         onNavigateBack()
@@ -105,9 +104,7 @@ fun LocationDetailScreen(
                 canNavigateBack = true,
                 onNavigateBack = onNavigateBack,
                 onInfoClick = onInfoClick,
-                onQrClick = if (currentLocation?.isPublished == true) {
-                    { showQrDialog = true }
-                } else null
+                onQrClick = null
             )
         },
         containerColor = id.bubakangreen.app.ui.theme.BackgroundWarm,
@@ -359,18 +356,6 @@ fun LocationDetailScreen(
                 }
             }
         }
-    }
-
-    if (showQrDialog && currentLocation != null) {
-        val canonicalUrl = remember(currentLocation.id) {
-            id.bubakangreen.app.core.util.QrUrlBuilder.buildLocationUrl(currentLocation.id)
-        }
-        id.bubakangreen.app.ui.components.QrCodeDisplayDialog(
-            title = currentLocation.name,
-            subtitle = "RW ${currentLocation.rw} • Kelurahan Bubakan",
-            canonicalUrl = canonicalUrl,
-            onDismiss = { showQrDialog = false }
-        )
     }
 }
 

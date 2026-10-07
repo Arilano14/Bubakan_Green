@@ -104,26 +104,20 @@ class MasterPlantViewModel(
         val photoUrlTrim = current.primaryPhotoUrl.trim()
 
         if (nameIdTrim.isBlank()) {
-            _state.update { it.copy(validationError = "Nama tanaman (Indonesia) tidak boleh kosong.") }
+            _state.update { it.copy(validationError = "Nama tanaman (Indonesia) wajib diisi.") }
             return
         }
-        if (nameLatinTrim.isBlank()) {
-            _state.update { it.copy(validationError = "Nama ilmiah (Latin) tidak boleh kosong.") }
-            return
-        }
-        if (descriptionTrim.isBlank()) {
-            _state.update { it.copy(validationError = "Deskripsi manfaat tanaman tidak boleh kosong.") }
+        if (photoUrlTrim.isBlank()) {
+            _state.update { it.copy(validationError = "Foto tanaman wajib disertakan.") }
             return
         }
 
         // HTTPS validation for remote image URLs
-        if (photoUrlTrim.isNotBlank() && !photoUrlTrim.startsWith("plant_")) {
-            if (!photoUrlTrim.startsWith("https://", ignoreCase = true)) {
-                _state.update {
-                    it.copy(validationError = "URL foto jarak jauh harus menggunakan protokol HTTPS resmi yang aman (diawali https://).")
-                }
-                return
+        if (photoUrlTrim.startsWith("http://", ignoreCase = true)) {
+            _state.update {
+                it.copy(validationError = "URL foto web harus menggunakan protokol HTTPS yang aman (diawali https://).")
             }
+            return
         }
 
         viewModelScope.launch {

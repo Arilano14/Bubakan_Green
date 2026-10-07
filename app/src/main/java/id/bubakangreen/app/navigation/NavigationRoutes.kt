@@ -38,7 +38,7 @@ sealed class Screen(
     // Authenticated Management Screens
     data object Login : Screen("login", "Masuk Petugas")
     data object PicDashboard : Screen("pic_dashboard", "Dashboard Petugas")
-    data object LocationForm : Screen("location_form?locationId={locationId}", "Form Kebun") {
+    data object LocationForm : Screen("location_form?locationId={locationId}", "Kelola Lahan") {
         fun createRoute(locationId: String? = null): String =
             if (locationId != null) "location_form?locationId=$locationId" else "location_form"
     }
@@ -46,6 +46,7 @@ sealed class Screen(
         fun createRoute(locationId: String): String = "plant_form/$locationId"
     }
     data object AdminDashboard : Screen("admin_dashboard", "Admin Kelurahan")
+    @Deprecated("Approval workflow removed per Phase Admin Remediation")
     data object LocationApproval : Screen("location_approval", "Persetujuan Kebun")
     data object MasterPlantForm : Screen("master_plant_form?plantId={plantId}", "Master Tanaman") {
         fun createRoute(plantId: String? = null): String =

@@ -7,6 +7,7 @@ import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationConditionLog
 import id.bubakangreen.app.domain.model.LocationPlant
 import id.bubakangreen.app.domain.model.LocationStatus
+import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.domain.model.PlantCondition
 import id.bubakangreen.app.domain.model.UserSession
@@ -23,6 +24,8 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+import kotlinx.coroutines.flow.combine
+
 data class AdminDashboardData(
     val totalLocations: Int,
     val activeLocations: Int,
@@ -32,7 +35,9 @@ data class AdminDashboardData(
     val masterPlants: List<MasterPlant>,
     val pendingLocations: List<Location> = emptyList(),
     val totalPublished: Int = activeLocations,
-    val totalMasterPlants: Int = masterPlants.size
+    val totalMasterPlants: Int = masterPlants.size,
+    val totalUrbanFarming: Int = 0,
+    val totalTamanToga: Int = 0
 )
 
 class AdminDashboardViewModel(
@@ -61,17 +66,19 @@ class AdminDashboardViewModel(
     fun loadData() {
         viewModelScope.launch {
             _uiState.value = UiState.Loading
-            authRepository.currentUserSession.collect { userSession ->
+            combine(
+                locationRepository.getAllLocations(),
+                plantRepository.getAllMasterPlants(),
+                authRepository.currentUserSession
+            ) { allLocationsResult, plantsResult, userSession ->
                 _session.value = userSession
 
-                val allLocationsResult = locationRepository.getAllLocations().firstOrNull()
                 val allLocations = (allLocationsResult as? Result.Success)?.data ?: emptyList()
-
                 val activeCount = allLocations.count { it.status == LocationStatus.ACTIVE || it.status == LocationStatus.PUBLISHED }
                 val needsMaintCount = allLocations.count { it.status == LocationStatus.NEEDS_MAINTENANCE }
-                val pendingList = allLocations.filter { it.status == LocationStatus.PENDING_APPROVAL }
+                val urbanFarmingCount = allLocations.count { it.type == LocationType.URBAN_FARMING && (it.status == LocationStatus.ACTIVE || it.status == LocationStatus.PUBLISHED) }
+                val tamanTogaCount = allLocations.count { it.type == LocationType.TAMAN_TOGA && (it.status == LocationStatus.ACTIVE || it.status == LocationStatus.PUBLISHED) }
 
-                val plantsResult = plantRepository.getAllMasterPlants().firstOrNull()
                 val masterPlants = (plantsResult as? Result.Success)?.data ?: emptyList()
 
                 val mostRecentLocation = allLocations.maxByOrNull { it.conditionUpdatedAt ?: it.updatedAt }
@@ -83,19 +90,21 @@ class AdminDashboardViewModel(
                     "Belum ada pembaruan"
                 }
 
-                _uiState.value = UiState.Success(
-                    AdminDashboardData(
-                        totalLocations = allLocations.size,
-                        activeLocations = activeCount,
-                        needsMaintenanceLocations = needsMaintCount,
-                        latestUpdateText = latestText,
-                        locations = allLocations,
-                        masterPlants = masterPlants,
-                        pendingLocations = pendingList,
-                        totalPublished = activeCount,
-                        totalMasterPlants = masterPlants.size
-                    )
+                AdminDashboardData(
+                    totalLocations = allLocations.size,
+                    activeLocations = activeCount,
+                    needsMaintenanceLocations = needsMaintCount,
+                    latestUpdateText = latestText,
+                    locations = allLocations,
+                    masterPlants = masterPlants,
+                    pendingLocations = emptyList(),
+                    totalPublished = activeCount,
+                    totalMasterPlants = masterPlants.size,
+                    totalUrbanFarming = urbanFarmingCount,
+                    totalTamanToga = tamanTogaCount
                 )
+            }.collect { data ->
+                _uiState.value = UiState.Success(data)
             }
         }
     }

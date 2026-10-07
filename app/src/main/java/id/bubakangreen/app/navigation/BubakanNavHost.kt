@@ -38,8 +38,6 @@ import kotlinx.coroutines.launch
 import id.bubakangreen.app.ui.about.AboutScreen
 import id.bubakangreen.app.ui.admin.AdminDashboardScreen
 import id.bubakangreen.app.ui.admin.AdminDashboardViewModel
-import id.bubakangreen.app.ui.admin.LocationApprovalScreen
-import id.bubakangreen.app.ui.admin.LocationApprovalViewModel
 import id.bubakangreen.app.ui.admin.MasterPlantFormScreen
 import id.bubakangreen.app.ui.admin.MasterPlantViewModel
 import id.bubakangreen.app.ui.auth.LoginScreen
@@ -474,9 +472,6 @@ fun BubakanAppNavHost(
                 }
                 AdminDashboardScreen(
                     viewModel = adminDashboardViewModel,
-                    onNavigateToApprovalQueue = {
-                        navController.navigate(Screen.LocationApproval.route)
-                    },
                     onNavigateToLocationForm = { locId ->
                         navController.navigate(Screen.LocationForm.createRoute(locId))
                     },
@@ -491,22 +486,6 @@ fun BubakanAppNavHost(
                             popUpTo(Screen.Home.route)
                         }
                     }
-                )
-            }
-
-
-            // SCR-ADM-02: Location Approval Queue
-            composable(Screen.LocationApproval.route) {
-                val approvalViewModel = viewModel {
-                    LocationApprovalViewModel(
-                        RepositoryProvider.getLocationRepository(),
-                        RepositoryProvider.getAuditRepository()
-                    )
-                }
-                LocationApprovalScreen(
-                    viewModel = approvalViewModel,
-                    adminUid = "admin_kelurahan",
-                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 
