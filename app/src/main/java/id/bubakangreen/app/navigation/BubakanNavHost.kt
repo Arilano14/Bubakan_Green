@@ -425,9 +425,11 @@ fun BubakanAppNavHost(
                 val locationId = backStackEntry.arguments?.getString("locationId")
                 val locationFormViewModel = viewModel {
                     LocationFormViewModel(
-                        RepositoryProvider.getLocationRepository(),
-                        RepositoryProvider.getAuditRepository(),
-                        AndroidLocationClient(context)
+                        locationRepository = RepositoryProvider.getLocationRepository(),
+                        auditRepository = RepositoryProvider.getAuditRepository(),
+                        plantRepository = RepositoryProvider.getPlantRepository(),
+                        storageRepository = RepositoryProvider.getStorageRepository(),
+                        locationClient = AndroidLocationClient(context)
                     )
                 }
                 LocationFormScreen(

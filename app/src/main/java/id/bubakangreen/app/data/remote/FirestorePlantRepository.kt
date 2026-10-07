@@ -82,6 +82,75 @@ class FirestorePlantRepository(
         }
     }
 
+    override suspend fun addPlantsToLocation(locationId: String, plantIds: List<String>): Result<Int> {
+        return try {
+            val uniqueIds = plantIds.distinct().filter { it.isNotBlank() }
+            if (uniqueIds.isEmpty()) return Result.Success(0)
+
+            val batch = firestore.batch()
+            val now = System.currentTimeMillis()
+            var count = 0
+
+            uniqueIds.forEach { plantId ->
+                val relationId = "${locationId}_${plantId}"
+                val docRef = locationPlantsCollection.document(relationId)
+                val relation = LocationPlant(
+                    id = relationId,
+                    locationId = locationId,
+                    plantId = plantId,
+                    masterPlantId = plantId,
+                    condition = PlantCondition.GOOD,
+                    quantity = 1,
+                    isPresent = true,
+                    status = PlantStatus.ACTIVE,
+                    createdAt = now,
+                    updatedAt = now
+                )
+                batch.set(docRef, relation.toMap())
+                count++
+            }
+            batch.commit().await()
+            Result.Success(count)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override suspend fun createMasterPlantWithLocation(plant: MasterPlant, locationId: String): Result<String> {
+        return try {
+            val plantDocRef = if (plant.id.isNotBlank()) {
+                masterPlantsCollection.document(plant.id)
+            } else {
+                masterPlantsCollection.document()
+            }
+            val finalPlant = plant.copy(id = plantDocRef.id)
+            val relationId = "${locationId}_${finalPlant.id}"
+            val relDocRef = locationPlantsCollection.document(relationId)
+            val now = System.currentTimeMillis()
+            val relation = LocationPlant(
+                id = relationId,
+                locationId = locationId,
+                plantId = finalPlant.id,
+                masterPlantId = finalPlant.id,
+                condition = PlantCondition.GOOD,
+                quantity = 1,
+                isPresent = true,
+                status = PlantStatus.ACTIVE,
+                createdAt = now,
+                updatedAt = now
+            )
+
+            val batch = firestore.batch()
+            batch.set(plantDocRef, finalPlant.toMap())
+            batch.set(relDocRef, relation.toMap())
+            batch.commit().await()
+
+            Result.Success(finalPlant.id)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
     override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> {
         return try {
             locationPlantsCollection.document(locationPlant.id).set(locationPlant.toMap()).await()
@@ -102,21 +171,14 @@ class FirestorePlantRepository(
 
     override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> {
         return try {
-            // Soft delete/deactivate presence per Section 12 & 13
-            val now = System.currentTimeMillis()
-            locationPlantsCollection.document(locationPlantId).update(
-                mapOf(
-                    "isPresent" to false,
-                    "condition" to PlantCondition.NOT_AVAILABLE.name,
-                    "status" to PlantStatus.ARCHIVED.name,
-                    "updatedAt" to now
-                )
-            ).await()
+            // Delete junction document only; master_plants document remains 100% untouched
+            locationPlantsCollection.document(locationPlantId).delete().await()
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)
         }
     }
+
 
     companion object {
         fun MasterPlant.toMap(): Map<String, Any?> = mapOf(
@@ -143,6 +205,8 @@ class FirestorePlantRepository(
             "imageLicense" to imageLicense,
             "imageAuthor" to imageAuthor,
             "sourceReferences" to sourceReferences,
+            "profileCompleteness" to profileCompleteness,
+            "createdFrom" to createdFrom,
             "mandarinAudioUrl" to mandarinAudioUrl,
             "isPublished" to isPublished,
             "createdAt" to createdAt,
@@ -171,10 +235,16 @@ class FirestorePlantRepository(
             val imageLicense = getString("imageLicense")
             val imageAuthor = getString("imageAuthor")
             val sourceReferences = getString("sourceReferences") ?: ""
+            val profileCompleteness = getString("profileCompleteness") ?: "COMPLETE"
+            val createdFrom = getString("createdFrom")
             val mandarinAudioUrl = getString("mandarinAudioUrl")
-            val isPublished = getBoolean("isPublished") ?: true
-            val createdAt = getLong("createdAt") ?: System.currentTimeMillis()
-            val updatedAt = getLong("updatedAt") ?: System.currentTimeMillis()
+            val isPublished = runCatching { getBoolean("isPublished") }.getOrNull() ?: true
+            val createdAt = runCatching { getLong("createdAt") }.getOrNull()
+                ?: runCatching { getString("createdAt")?.toLongOrNull() }.getOrNull()
+                ?: System.currentTimeMillis()
+            val updatedAt = runCatching { getLong("updatedAt") }.getOrNull()
+                ?: runCatching { getString("updatedAt")?.toLongOrNull() }.getOrNull()
+                ?: System.currentTimeMillis()
 
             return MasterPlant(
                 id = id,
@@ -200,12 +270,15 @@ class FirestorePlantRepository(
                 imageLicense = imageLicense,
                 imageAuthor = imageAuthor,
                 sourceReferences = sourceReferences,
+                profileCompleteness = profileCompleteness,
+                createdFrom = createdFrom,
                 mandarinAudioUrl = mandarinAudioUrl,
                 isPublished = isPublished,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
         }
+
 
         fun LocationPlant.toMap(): Map<String, Any?> = mapOf(
             "id" to id,

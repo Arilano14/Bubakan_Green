@@ -26,17 +26,19 @@ class FirestoreQuizRepository(
             .snapshots()
             .map { snapshot ->
                 val list = snapshot.documents.mapNotNull { it.toQuizQuestion() }
+                val cleanPlantId = plantId.lowercase().removePrefix("pl-").substringBefore("-")
                 val finalList = if (list.isEmpty()) {
                     id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
-                        .filter { it.plantId == plantId && it.isActive }
+                        .filter { (it.plantId.equals(plantId, ignoreCase = true) || it.plantId.equals(cleanPlantId, ignoreCase = true)) && it.isActive }
                 } else {
                     list
                 }
                 Result.Success(finalList) as Result<List<QuizQuestion>>
             }
             .catch { error ->
+                val cleanPlantId = plantId.lowercase().removePrefix("pl-").substringBefore("-")
                 val fallback = id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
-                    .filter { it.plantId == plantId && it.isActive }
+                    .filter { (it.plantId.equals(plantId, ignoreCase = true) || it.plantId.equals(cleanPlantId, ignoreCase = true)) && it.isActive }
                 if (fallback.isNotEmpty()) {
                     emit(Result.Success(fallback))
                 } else {

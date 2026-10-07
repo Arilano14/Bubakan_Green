@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import id.bubakangreen.app.navigation.BottomNavItem
+import id.bubakangreen.app.navigation.Screen
 import id.bubakangreen.app.navigation.bottomNavigationItems
 import id.bubakangreen.app.ui.theme.BorderCard
 import id.bubakangreen.app.ui.theme.ForestGreen
@@ -46,10 +47,10 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 /**
  * AppBottomBar: 4-item Duolingo-inspired botanical footer navigation.
  * Order:
- * 1. Admin (Dashboard) — leftmost
- * 2. Beranda (Home)
- * 3. Lokasi (Explore)
- * 4. Katalog (LocalFlorist)
+ * 1. Beranda (Home)
+ * 2. Lokasi (Explore)
+ * 3. Katalog (LocalFlorist)
+ * 4. Manajemen (Dashboard) — rightmost
  * - Always anchored at the bottom of the screen
  * - Minimum 48dp touch target per item (Fitts's Law)
  * - Safe from gesture bars via navigationBarsPadding()
@@ -61,6 +62,15 @@ fun AppBottomBar(
     onItemClick: (BottomNavItem) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val navigationItems = remember {
+        listOf(
+            bottomNavigationItems.first { it.screen == Screen.Home },
+            bottomNavigationItems.first { it.screen == Screen.Locations },
+            bottomNavigationItems.first { it.screen == Screen.Catalog },
+            bottomNavigationItems.first { it.screen == Screen.AdminDashboard }.copy(label = "Manajemen")
+        )
+    }
+
     Surface(
         color = SurfaceCard,
         shadowElevation = 8.dp,
@@ -88,7 +98,7 @@ fun AppBottomBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                bottomNavigationItems.forEach { item ->
+                navigationItems.forEach { item ->
                     val isSelected = currentRoute == item.screen.route
 
                     AppBottomBarItem(

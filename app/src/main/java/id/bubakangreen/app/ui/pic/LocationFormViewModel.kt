@@ -2,26 +2,31 @@ package id.bubakangreen.app.ui.pic
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import id.bubakangreen.app.core.di.RepositoryProvider
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.data.location.LocationClient
 import id.bubakangreen.app.domain.model.AuditLog
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
+import id.bubakangreen.app.domain.model.LocationPlant
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
+import id.bubakangreen.app.domain.model.MasterPlant
+import id.bubakangreen.app.domain.model.RegionTag
 import id.bubakangreen.app.domain.repository.AuditRepository
 import id.bubakangreen.app.domain.repository.LocationRepository
+import id.bubakangreen.app.domain.repository.PlantRepository
+import id.bubakangreen.app.domain.repository.StorageRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
-import id.bubakangreen.app.domain.model.RegionTag
 
 data class LocationFormState(
     val locationId: String? = null,
@@ -40,12 +45,21 @@ data class LocationFormState(
     val gpsWarning: String? = null,
     val isSaving: Boolean = false,
     val validationError: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+
+    // Lahan Inventory Tanaman State
+    val assignedPlants: List<MasterPlant> = emptyList(),
+    val allMasterPlants: List<MasterPlant> = emptyList(),
+    val isInventoryLoading: Boolean = false,
+    val isSavingInventory: Boolean = false,
+    val inventoryFeedback: String? = null
 )
 
 class LocationFormViewModel(
-    private val locationRepository: LocationRepository,
-    private val auditRepository: AuditRepository,
+    private val locationRepository: LocationRepository = RepositoryProvider.getLocationRepository(),
+    private val auditRepository: AuditRepository = RepositoryProvider.getAuditRepository(),
+    private val plantRepository: PlantRepository = RepositoryProvider.getPlantRepository(),
+    private val storageRepository: StorageRepository = RepositoryProvider.getStorageRepository(),
     private val locationClient: LocationClient? = null
 ) : ViewModel() {
 
@@ -79,6 +93,36 @@ class LocationFormViewModel(
                         longitude = loc.longitude,
                         accuracyMeters = loc.accuracyMeters,
                         capturedAt = loc.capturedAt
+                    )
+                }
+            }
+
+            // Observe inventory relations and master plants reactively (in-memory join, zero N+1)
+            observeLocationInventory(locationId)
+        }
+    }
+
+    private fun observeLocationInventory(locationId: String) {
+        viewModelScope.launch {
+            _state.update { it.copy(isInventoryLoading = true) }
+            combine(
+                plantRepository.getPlantsAtLocation(locationId),
+                plantRepository.getAllMasterPlants()
+            ) { locPlantsRes, allPlantsRes ->
+                val locPlants = (locPlantsRes as? Result.Success)?.data ?: emptyList()
+                val allPlants = (allPlantsRes as? Result.Success)?.data ?: emptyList()
+
+                val assignedIds = locPlants.filter { it.isPresent }.map { it.plantId }.toSet()
+                val assignedList = allPlants.filter { it.id in assignedIds }
+                    .sortedBy { it.nameId.lowercase() }
+
+                Pair(assignedList, allPlants.sortedBy { it.nameId.lowercase() })
+            }.collect { (assigned, all) ->
+                _state.update {
+                    it.copy(
+                        assignedPlants = assigned,
+                        allMasterPlants = all,
+                        isInventoryLoading = false
                     )
                 }
             }
@@ -131,9 +175,33 @@ class LocationFormViewModel(
         _state.update {
             if (index in it.photos.indices) {
                 val updated = it.photos.toMutableList()
-                updated.removeAt(index)
+                val removed = updated.removeAt(index)
+                // Clean up through storage repository abstraction if needed
+                viewModelScope.launch { storageRepository.deleteImage(removed) }
                 it.copy(photos = updated, validationError = null)
             } else it
+        }
+    }
+
+    fun saveCompressedPhotoBytes(bytes: ByteArray, replaceIndex: Int? = null, onComplete: (String) -> Unit) {
+        viewModelScope.launch {
+            val locId = _state.value.locationId ?: "new"
+            val filename = "lahan_${locId}_${System.currentTimeMillis()}.jpg"
+            when (val uploadResult = storageRepository.uploadImage(bytes, filename, "lahan")) {
+                is Result.Success -> {
+                    val path = uploadResult.data
+                    if (replaceIndex != null) {
+                        onReplacePhoto(replaceIndex, path)
+                    } else {
+                        onAddPhoto(path)
+                    }
+                    onComplete(path)
+                }
+                is Result.Error -> {
+                    _state.update { it.copy(validationError = uploadResult.message ?: "Gagal menyimpan foto lahan.") }
+                }
+                is Result.Loading -> {}
+            }
         }
     }
 
@@ -271,5 +339,199 @@ class LocationFormViewModel(
                 }
             }
         }
+    }
+
+    // ==========================================================
+    // LAHAN INVENTORY OPERATIONS (PHASE 4 & 5)
+    // ==========================================================
+
+    fun addSelectedPlantsToLahan(selectedPlantIds: Set<String>, adminUid: String = "admin_kelurahan") {
+        val locationId = _state.value.locationId ?: return
+        val currentlyAssignedIds = _state.value.assignedPlants.map { it.id }.toSet()
+        val toAdd = selectedPlantIds.filter { it !in currentlyAssignedIds }
+
+        if (toAdd.isEmpty()) {
+            _state.update { it.copy(inventoryFeedback = "Semua tanaman terpilih sudah ada di lahan ini.") }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSavingInventory = true, inventoryFeedback = null) }
+            when (val res = plantRepository.addPlantsToLocation(locationId, toAdd)) {
+                is Result.Success -> {
+                    auditRepository.recordAction(
+                        AuditLog(
+                            id = "AUDIT_${System.currentTimeMillis()}",
+                            action = "PLANTS_BATCH_ADDED_TO_LAHAN",
+                            targetEntityId = locationId,
+                            targetEntityType = "LOCATION_PLANT",
+                            actorUid = adminUid,
+                            actorRole = "ADMIN",
+                            details = "Menambahkan ${res.data} tanaman ke lahan $locationId"
+                        )
+                    )
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = "${res.data} tanaman berhasil ditambahkan ke lahan."
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = res.message ?: "Gagal menambahkan tanaman ke lahan."
+                        )
+                    }
+                }
+                is Result.Loading -> {}
+            }
+        }
+    }
+
+    fun removePlantFromLahan(plantId: String, adminUid: String = "admin_kelurahan") {
+        val locationId = _state.value.locationId ?: return
+        val relationId = "${locationId}_${plantId}"
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSavingInventory = true) }
+            when (val res = plantRepository.removePlantFromLocation(relationId)) {
+                is Result.Success -> {
+                    auditRepository.recordAction(
+                        AuditLog(
+                            id = "AUDIT_${System.currentTimeMillis()}",
+                            action = "PLANT_REMOVED_FROM_LAHAN",
+                            targetEntityId = relationId,
+                            targetEntityType = "LOCATION_PLANT",
+                            actorUid = adminUid,
+                            actorRole = "ADMIN",
+                            details = "Melepas relasi tanaman $plantId dari lahan $locationId"
+                        )
+                    )
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = "Tanaman berhasil dilepas dari lahan ini."
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = res.message ?: "Gagal melepas tanaman dari lahan."
+                        )
+                    }
+                }
+                is Result.Loading -> {}
+            }
+        }
+    }
+
+    fun createMinimalPlantAndAssign(
+        name: String,
+        photoBytes: ByteArray,
+        adminUid: String = "admin_kelurahan",
+        onSuccess: () -> Unit
+    ) {
+        val locationId = _state.value.locationId ?: return
+        val nameTrim = name.trim()
+        if (nameTrim.length < 2) {
+            _state.update { it.copy(inventoryFeedback = "Nama tanaman minimal 2 karakter.") }
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSavingInventory = true, inventoryFeedback = null) }
+
+            // 1. Generate stable plant ID
+            val slug = nameTrim.lowercase().replace(Regex("[^a-z0-9]"), "-").trim('-').take(24)
+            val suffix = (System.currentTimeMillis() % 10000).toString()
+            val plantId = if (slug.isNotBlank()) "pl-$slug-$suffix" else "pl-plant-$suffix"
+
+            // 2. Upload photo via StorageRepository abstraction
+            val photoFilename = "${plantId}.jpg"
+            val uploadRes = storageRepository.uploadImage(photoBytes, photoFilename, "plants")
+            if (uploadRes !is Result.Success) {
+                _state.update {
+                    it.copy(
+                        isSavingInventory = false,
+                        inventoryFeedback = "Gagal memproses foto tanaman: ${(uploadRes as? Result.Error)?.message}"
+                    )
+                }
+                return@launch
+            }
+            val photoPath = uploadRes.data
+
+            // 3. Construct Minimal MasterPlant entity
+            val now = System.currentTimeMillis()
+            val minimalPlant = MasterPlant(
+                id = plantId,
+                name = nameTrim,
+                nameId = nameTrim,
+                scientificName = "",
+                nameLatin = "",
+                mandarinName = null,
+                nameMandarin = null,
+                mandarinPinyin = null,
+                pinyin = null,
+                description = "",
+                characteristics = "",
+                commonUses = "",
+                cultivationNotes = "",
+                benefits = "",
+                plantingGuide = "",
+                defaultPhotoUrl = photoPath,
+                primaryPhotoUrl = photoPath,
+                imageSourceType = "LOCAL",
+                imageAssetName = null,
+                sourceReferences = "",
+                profileCompleteness = "MINIMAL",
+                createdFrom = "LOCATION_INVENTORY",
+                isPublished = true,
+                createdAt = now,
+                updatedAt = now
+            )
+
+            // 4. ATOMIC CREATION: Writes MasterPlant + LocationPlant together in single batch
+            when (val createRes = plantRepository.createMasterPlantWithLocation(minimalPlant, locationId)) {
+                is Result.Success -> {
+                    auditRepository.recordAction(
+                        AuditLog(
+                            id = "AUDIT_${System.currentTimeMillis()}",
+                            action = "MINIMAL_PLANT_CREATED_FROM_LAHAN",
+                            targetEntityId = plantId,
+                            targetEntityType = "MASTER_PLANT",
+                            actorUid = adminUid,
+                            actorRole = "ADMIN",
+                            details = "Pembuatan minimal tanaman '$nameTrim' langsung dari lahan $locationId"
+                        )
+                    )
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = "Tanaman baru '$nameTrim' berhasil dibuat dan ditambahkan."
+                        )
+                    }
+                    onSuccess()
+                }
+                is Result.Error -> {
+                    // Safe failure recovery: delete uploaded image
+                    storageRepository.deleteImage(photoPath)
+                    _state.update {
+                        it.copy(
+                            isSavingInventory = false,
+                            inventoryFeedback = createRes.message ?: "Gagal membuat tanaman baru."
+                        )
+                    }
+                }
+                is Result.Loading -> {}
+            }
+        }
+    }
+
+    fun clearInventoryFeedback() {
+        _state.update { it.copy(inventoryFeedback = null) }
     }
 }

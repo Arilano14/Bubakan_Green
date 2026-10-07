@@ -3,6 +3,7 @@ package id.bubakangreen.app.ui.catalog
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import id.bubakangreen.app.R
 import id.bubakangreen.app.core.audio.AndroidAudioPlayer
 import id.bubakangreen.app.core.audio.AudioPlayer
 import id.bubakangreen.app.core.audio.AudioState
@@ -31,14 +32,9 @@ data class PlantDetailUiState(
     val quizSession: QuizSession? = null,
     val locationsGrowing: List<Location> = emptyList(),
     val audioState: AudioState = AudioState.Idle,
-    val isOffline: Boolean = false
+    val isOffline: Boolean = false,
+    val hasChineseVoice: Boolean = false
 ) {
-    val hasChineseVoice: Boolean
-        get() {
-            val audioUrl = voice?.audioUrl ?: (plant as? UiState.Success)?.data?.mandarinAudioUrl
-            return !audioUrl.isNullOrBlank()
-        }
-
     val canStartQuiz: Boolean
         get() = activeQuestions.size >= 5
 }
@@ -54,6 +50,45 @@ class PlantDetailViewModel @JvmOverloads constructor(
 
     private val _uiState = MutableStateFlow(PlantDetailUiState())
     val uiState: StateFlow<PlantDetailUiState> = _uiState.asStateFlow()
+
+    companion object {
+        fun getLocalPlantRawRes(plantId: String, nameId: String): Int? {
+            val idNorm = plantId.lowercase().removePrefix("pl-").replace("-", "_")
+            val nameNorm = nameId.lowercase().trim().replace(" ", "_").replace("daun_", "")
+            return when {
+                idNorm == "cabai" || nameNorm == "cabai" -> R.raw.audio_plant_cabai
+                idNorm == "jahe" || nameNorm == "jahe" -> R.raw.audio_plant_jahe
+                idNorm == "kangkung" || nameNorm == "kangkung" -> R.raw.audio_plant_kangkung
+                idNorm == "kemangi" || nameNorm == "kemangi" -> R.raw.audio_plant_kemangi
+                idNorm == "kencur" || nameNorm == "kencur" -> R.raw.audio_plant_kencur
+                idNorm == "kunyit" || nameNorm == "kunyit" -> R.raw.audio_plant_kunyit
+                idNorm.contains("lidah") || nameNorm.contains("lidah") -> R.raw.audio_plant_lidah_buaya
+                idNorm.contains("pegag") || nameNorm.contains("pegag") -> R.raw.audio_plant_pegagan
+                idNorm == "sereh" || nameNorm == "sereh" || idNorm == "serai" || nameNorm == "serai" -> R.raw.audio_plant_sereh
+                idNorm.contains("sirih") || nameNorm.contains("sirih") -> R.raw.audio_plant_sirih
+                idNorm == "terong" || nameNorm == "terong" -> R.raw.audio_plant_terong
+                idNorm == "tomat" || nameNorm == "tomat" -> R.raw.audio_plant_tomat
+                else -> null
+            }
+        }
+
+        fun getFeedbackRawRes(score: Int): Int {
+            return when {
+                score == 100 -> R.raw.audio_feedback_perfect
+                score >= 80 -> R.raw.audio_feedback_excellent
+                score >= 60 -> R.raw.audio_feedback_good
+                score > 0 -> R.raw.audio_feedback_low
+                else -> R.raw.audio_feedback_retry
+            }
+        }
+    }
+
+    private fun computeHasChineseVoice(plant: MasterPlant?, voice: PlantVoice?): Boolean {
+        val audioUrl = voice?.audioUrl?.ifBlank { null } ?: plant?.mandarinAudioUrl?.ifBlank { null }
+        if (!audioUrl.isNullOrBlank()) return true
+        if (plant == null) return false
+        return getLocalPlantRawRes(plant.id, plant.nameId) != null
+    }
 
     init {
         viewModelScope.launch {
@@ -81,7 +116,12 @@ class PlantDetailViewModel @JvmOverloads constructor(
                                     it.copy(plant = UiState.Empty("Informasi tanaman tidak ditemukan."))
                                 }
                             } else {
-                                _uiState.update { it.copy(plant = UiState.Success(plant)) }
+                                _uiState.update {
+                                    it.copy(
+                                        plant = UiState.Success(plant),
+                                        hasChineseVoice = computeHasChineseVoice(plant, it.voice)
+                                    )
+                                }
                             }
                         }
                         is Result.Error -> {
@@ -101,7 +141,14 @@ class PlantDetailViewModel @JvmOverloads constructor(
             launch {
                 voiceRepository.getVoiceByPlant(plantId).collect { result ->
                     if (result is Result.Success) {
-                        _uiState.update { it.copy(voice = result.data) }
+                        val v = result.data
+                        _uiState.update {
+                            val currentPlant = (it.plant as? UiState.Success)?.data
+                            it.copy(
+                                voice = v,
+                                hasChineseVoice = computeHasChineseVoice(currentPlant, v)
+                            )
+                        }
                     }
                 }
             }
@@ -125,11 +172,21 @@ class PlantDetailViewModel @JvmOverloads constructor(
         val audioUrl = _uiState.value.voice?.audioUrl?.ifBlank { null }
             ?: currentPlant.mandarinAudioUrl?.ifBlank { null }
 
-        if (!audioUrl.isNullOrBlank()) {
+        android.util.Log.i("PlantDetailViewModel", "playMandarinAudio invoked for plant: id=${currentPlant.id}, nameId=${currentPlant.nameId}, audioUrl=$audioUrl")
+
+        if (!audioUrl.isNullOrBlank() && audioUrl.startsWith("http", ignoreCase = true)) {
             audioPlayer.play(audioUrl)
         } else {
-            _uiState.update {
-                it.copy(audioState = AudioState.Error("Audio pelafalan belum tersedia untuk tanaman ini."))
+            val resId = getLocalPlantRawRes(currentPlant.id, currentPlant.nameId)
+            android.util.Log.i("PlantDetailViewModel", "getLocalPlantRawRes returned resId=$resId")
+            if (resId != null) {
+                audioPlayer.playRaw(resId)
+            } else if (!audioUrl.isNullOrBlank()) {
+                audioPlayer.play(audioUrl)
+            } else {
+                _uiState.update {
+                    it.copy(audioState = AudioState.Error("Audio pelafalan belum tersedia untuk tanaman ini."))
+                }
             }
         }
     }
@@ -229,17 +286,8 @@ class PlantDetailViewModel @JvmOverloads constructor(
     }
 
     private fun handleQuizResultAudio(score: Int) {
-        val context = getApplication<Application>().applicationContext
-        val resName = when {
-            score == 100 -> "quiz_perfect_zh"
-            score <= 60 -> "quiz_encouragement_zh"
-            else -> null
-        } ?: return
-
-        val resId = context.resources.getIdentifier(resName, "raw", context.packageName)
-        if (resId != 0) {
-            audioPlayer.playRaw(resId)
-        }
+        val resId = getFeedbackRawRes(score)
+        audioPlayer.playRaw(resId)
     }
 
     fun stopAudio() {

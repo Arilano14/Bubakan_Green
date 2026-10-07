@@ -345,27 +345,48 @@ fun MasterPlantFormScreen(
                         Spacer(modifier = Modifier.height(10.dp))
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
+                            OutlinedButton(
+                                onClick = {
+                                    val hasPermission = ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                    if (hasPermission) {
+                                        cameraLauncher.launch(null)
+                                    } else {
+                                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                    }
+                                },
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(15.dp), tint = PrimaryForest)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Kamera", color = PrimaryForest, fontSize = 12.sp)
+                            }
                             OutlinedButton(
                                 onClick = {
                                     photoPickerLauncher.launch(
                                         PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                     )
                                 },
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(16.dp), tint = ForestGreen)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Ganti Foto", color = ForestGreen, fontSize = 13.sp)
+                                Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(15.dp), tint = ForestGreen)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Galeri", color = ForestGreen, fontSize = 12.sp)
                             }
                             OutlinedButton(
                                 onClick = { viewModel.onPhotoUrlChange("") },
-                                shape = RoundedCornerShape(8.dp)
+                                shape = RoundedCornerShape(8.dp),
+                                modifier = Modifier.weight(1f)
                             ) {
-                                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(16.dp), tint = FriendlyRed)
-                                Spacer(modifier = Modifier.width(6.dp))
-                                Text("Hapus", color = FriendlyRed, fontSize = 13.sp)
+                                Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = FriendlyRed)
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text("Hapus", color = FriendlyRed, fontSize = 12.sp)
                             }
                         }
                     }

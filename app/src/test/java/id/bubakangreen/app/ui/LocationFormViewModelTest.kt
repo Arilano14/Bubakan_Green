@@ -114,7 +114,7 @@ class LocationFormViewModelTest {
     @Test
     fun captureGps_withHighAccuracy_setsCoordinatesAndNoWarning() = runTest(testDispatcher) {
         val fakeClient = FakeLocationClient(simulatedAccuracy = 12f)
-        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
+        val viewModel = LocationFormViewModel(locationRepository = fakeLocationRepo, auditRepository = fakeAuditRepo, locationClient = fakeClient)
         viewModel.captureGps()
         advanceUntilIdle()
 
@@ -128,7 +128,7 @@ class LocationFormViewModelTest {
     @Test
     fun captureGps_withLowAccuracy_setsWarningPromptingRetry() = runTest(testDispatcher) {
         val fakeClient = FakeLocationClient(simulatedAccuracy = 35f)
-        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
+        val viewModel = LocationFormViewModel(locationRepository = fakeLocationRepo, auditRepository = fakeAuditRepo, locationClient = fakeClient)
         viewModel.captureGps()
         advanceUntilIdle()
 
@@ -145,7 +145,7 @@ class LocationFormViewModelTest {
             simulatedLng = 110.4229,
             simulatedAccuracy = 10f
         )
-        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
+        val viewModel = LocationFormViewModel(locationRepository = fakeLocationRepo, auditRepository = fakeAuditRepo, locationClient = fakeClient)
         viewModel.onNameChange("Kebun Luar Bubakan")
         viewModel.onAddressChange("Jl. Pahlawan Semarang")
         viewModel.onDescriptionChange("Kebun di luar area Bubakan")
@@ -166,7 +166,7 @@ class LocationFormViewModelTest {
     @Test
     fun saveLocation_success_createsPublishedLocationAndAuditLog() = runTest(testDispatcher) {
         val fakeClient = FakeLocationClient(simulatedAccuracy = 10f)
-        val viewModel = LocationFormViewModel(fakeLocationRepo, fakeAuditRepo, fakeClient)
+        val viewModel = LocationFormViewModel(locationRepository = fakeLocationRepo, auditRepository = fakeAuditRepo, locationClient = fakeClient)
         viewModel.onNameChange("Kebun Toga Herbal RW 02")
         viewModel.onAddressChange("Jl. Melati RW 02")
         viewModel.onDescriptionChange("Koleksi tanaman obat keluarga warga RW 02")

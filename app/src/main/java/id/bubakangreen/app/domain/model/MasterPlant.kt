@@ -31,9 +31,12 @@ data class MasterPlant(
     val imageLicense: String? = null,
     val imageAuthor: String? = null,
     val sourceReferences: String = "",
+    val profileCompleteness: String = "COMPLETE",
+    val createdFrom: String? = null,
     val isPublished: Boolean = true,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )
+
 
 

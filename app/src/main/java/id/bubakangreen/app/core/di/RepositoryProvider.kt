@@ -17,15 +17,19 @@ import id.bubakangreen.app.domain.model.LocationPlant
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.MasterPlant
+import id.bubakangreen.app.domain.model.PlantStatus
 import id.bubakangreen.app.domain.model.PlantVoice
 import id.bubakangreen.app.domain.model.QuizQuestion
 import id.bubakangreen.app.domain.model.UserRole
 import id.bubakangreen.app.domain.model.UserSession
+import id.bubakangreen.app.data.local.LocalStorageRepository
+import id.bubakangreen.app.data.remote.FirebaseStorageRepository
 import id.bubakangreen.app.domain.repository.AuditRepository
 import id.bubakangreen.app.domain.repository.AuthRepository
 import id.bubakangreen.app.domain.repository.LocationRepository
 import id.bubakangreen.app.domain.repository.PlantRepository
 import id.bubakangreen.app.domain.repository.QuizRepository
+import id.bubakangreen.app.domain.repository.StorageRepository
 import id.bubakangreen.app.domain.repository.VoiceRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,6 +57,37 @@ object RepositoryProvider {
     private var auditRepo: AuditRepository? = null
     private var quizRepo: QuizRepository? = null
     private var voiceRepo: VoiceRepository? = null
+    private var storageRepo: StorageRepository? = null
+
+    // PRE-BLAZE CONFIGURATION: Kept false until Cloud Billing is activated
+    const val USE_FIREBASE_STORAGE = false
+
+    fun getStorageRepository(): StorageRepository {
+        return storageRepo ?: synchronized(this) {
+            storageRepo ?: createStorageRepository().also { storageRepo = it }
+        }
+    }
+
+    private fun createStorageRepository(): StorageRepository {
+        return if (USE_FIREBASE_STORAGE) {
+            FirebaseStorageRepository()
+        } else {
+            val ctx = appContext
+            if (ctx != null) {
+                LocalStorageRepository(ctx)
+            } else {
+                object : StorageRepository {
+                    override suspend fun uploadImage(bytes: ByteArray, filename: String, folder: String): Result<String> {
+                        return Result.Success("/mock_storage/$folder/$filename")
+                    }
+                    override suspend fun deleteImage(pathOrUrl: String): Result<Unit> {
+                        return Result.Success(Unit)
+                    }
+                    override fun getImageUrl(pathOrUrl: String): String = pathOrUrl
+                }
+            }
+        }
+    }
 
     fun getLocationRepository(): LocationRepository {
         return locationRepo ?: synchronized(this) {
@@ -532,6 +567,75 @@ private object UiPreviewOnlyPlantRepository : PlantRepository {
             imageAuthor = "Ji-Elle",
             sourceReferences = "Royal Botanic Gardens, Kew (POWO); Pharmacopoeia of the People's Republic of China",
             isPublished = true
+        ),
+        MasterPlant(
+            id = "sirih",
+            name = "Sirih",
+            nameId = "Sirih",
+            scientificName = "Piper betle L.",
+            nameLatin = "Piper betle L.",
+            mandarinName = "蒌叶",
+            nameMandarin = "蒌叶",
+            mandarinPinyin = "lóu yè",
+            pinyin = "lóu yè",
+            description = "Tanaman merambat herba perennial dengan daun berbentuk hati beraroma aromatik khas dan rasa getir hangat menyegarkan.",
+            characteristics = "Batang bulat kehijauan beruas-ruas dengan akar lekat; daun tunggal berseling menyerupai jantung runcing berurat melengkung 5–7; kaya kelenjar minyak atsiri.",
+            commonUses = "Antiseptik alami, antibakteri pembersih mulut dan tenggorokan, seduhan pereda batuk tradisional, serta bahan racikan kunyah sirih.",
+            cultivationNotes = "Tumbuh merambat di tiang rambat/ajir; naungan parsial 60–70%; tanah gembur subur kaya humus berdrainase baik; penyiraman teratur 1–2 kali sehari tanpa genangan.",
+            benefits = "Antiseptik alami, antibakteri pembersih mulut dan tenggorokan, seduhan pereda batuk tradisional, serta bahan racikan kunyah sirih.",
+            plantingGuide = "Tumbuh merambat di tiang rambat/ajir; naungan parsial 60–70%; tanah gembur subur kaya humus berdrainase baik; penyiraman teratur 1–2 kali sehari tanpa genangan.",
+            defaultPhotoUrl = "plant_sirih",
+            primaryPhotoUrl = "plant_sirih",
+            imageSourceType = "LOCAL",
+            imageAssetName = "plant_sirih",
+            profileCompleteness = "COMPLETE",
+            isPublished = true
+        ),
+        MasterPlant(
+            id = "pegagan",
+            name = "Pegagan",
+            nameId = "Pegagan",
+            scientificName = "Centella asiatica (L.) Urb.",
+            nameLatin = "Centella asiatica (L.) Urb.",
+            mandarinName = "积雪草",
+            nameMandarin = "积雪草",
+            mandarinPinyin = "jī xuě cǎo",
+            pinyin = "jī xuě cǎo",
+            description = "Herba merayap menahun tanpa batang tegak dengan stolon ramping dan daun berbentuk ginjal atau kipas bertepi beringgit.",
+            characteristics = "Daun tunggal tersusun dalam roset akar, tangkai panjang melengkung, tepi helaian berlekuk dangkal, peruratan menjari.",
+            commonUses = "Meningkatkan sirkulasi darah mikro, memperbaiki konsentrasi daya ingat, antiinflamasi, dan mempercepat regenerasi jaringan kulit.",
+            cultivationNotes = "Menyukai tanah lembap subur dengan pencahayaan penuh hingga naungan ringan; perbanyakan mudah dengan anakan stolon; jaga kelembapan tanah konstan.",
+            benefits = "Meningkatkan sirkulasi darah mikro, memperbaiki konsentrasi daya ingat, antiinflamasi, dan mempercepat regenerasi jaringan kulit.",
+            plantingGuide = "Menyukai tanah lembap subur dengan pencahayaan penuh hingga naungan ringan; perbanyakan mudah dengan anakan stolon; jaga kelembapan tanah konstan.",
+            defaultPhotoUrl = "plant_pegagan",
+            primaryPhotoUrl = "plant_pegagan",
+            imageSourceType = "LOCAL",
+            imageAssetName = "plant_pegagan",
+            profileCompleteness = "COMPLETE",
+            isPublished = true
+        ),
+        MasterPlant(
+            id = "kemangi",
+            name = "Kemangi",
+            nameId = "Kemangi",
+            scientificName = "Ocimum basilicum var. anisatum",
+            nameLatin = "Ocimum basilicum var. anisatum",
+            mandarinName = "罗勒",
+            nameMandarin = "罗勒",
+            mandarinPinyin = "luó lè",
+            pinyin = "luó lè",
+            description = "Terna semak tegak bercabang banyak dengan daun hijau cerah beraroma wangi sitrun khas dan rasa segar sedikit pedas.",
+            characteristics = "Batang beralur empat segi kehijauan, daun bulat telur berujung runcing dengan tepi bergerigi halus, bunga majemuk tersusun dalam tandan terminal.",
+            commonUses = "Lalapan segar penambah aroma kuliner nusantara, karminatif pereda perut kembung, penyegar aroma napas, dan penolak nyamuk alami.",
+            cultivationNotes = "Membutuhkan sinar matahari penuh sepanjang hari; tanah remah gembur berdrainase baik; pangkas pucuk bunga secara berkala untuk merangsang rimbun daun.",
+            benefits = "Lalapan segar penambah aroma kuliner nusantara, karminatif pereda perut kembung, penyegar aroma napas, dan penolak nyamuk alami.",
+            plantingGuide = "Membutuhkan sinar matahari penuh sepanjang hari; tanah remah gembur berdrainase baik; pangkas pucuk bunga secara berkala untuk merangsang rimbun daun.",
+            defaultPhotoUrl = "plant_kemangi",
+            primaryPhotoUrl = "plant_kemangi",
+            imageSourceType = "LOCAL",
+            imageAssetName = "plant_kemangi",
+            profileCompleteness = "COMPLETE",
+            isPublished = true
         )
     )
 
@@ -698,6 +802,43 @@ private object UiPreviewOnlyPlantRepository : PlantRepository {
         val idx = previewLocationPlants.indexOfFirst { it.id == locationPlant.id }
         if (idx != -1) previewLocationPlants[idx] = locationPlant
         return Result.Success(Unit)
+    }
+
+    override suspend fun addPlantsToLocation(locationId: String, plantIds: List<String>): Result<Int> {
+        var added = 0
+        plantIds.distinct().forEach { pid ->
+            val relId = "${locationId}_${pid}"
+            if (previewLocationPlants.none { it.id == relId }) {
+                previewLocationPlants.add(
+                    LocationPlant(
+                        id = relId,
+                        locationId = locationId,
+                        plantId = pid,
+                        masterPlantId = pid,
+                        isPresent = true,
+                        status = PlantStatus.ACTIVE
+                    )
+                )
+                added++
+            }
+        }
+        return Result.Success(added)
+    }
+
+    override suspend fun createMasterPlantWithLocation(plant: MasterPlant, locationId: String): Result<String> {
+        previewPlants.add(plant)
+        val relId = "${locationId}_${plant.id}"
+        previewLocationPlants.add(
+            LocationPlant(
+                id = relId,
+                locationId = locationId,
+                plantId = plant.id,
+                masterPlantId = plant.id,
+                isPresent = true,
+                status = PlantStatus.ACTIVE
+            )
+        )
+        return Result.Success(plant.id)
     }
 
     override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> {

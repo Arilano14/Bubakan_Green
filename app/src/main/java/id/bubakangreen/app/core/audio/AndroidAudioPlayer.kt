@@ -65,6 +65,7 @@ class AndroidAudioPlayer(
     }
 
     override fun playRaw(resId: Int) {
+        android.util.Log.i("AndroidAudioPlayer", "playRaw requested for resId=$resId")
         if (resId == 0) {
             _state.value = AudioState.Error("Resource audio tidak valid.")
             return
@@ -76,6 +77,7 @@ class AndroidAudioPlayer(
             _state.value = AudioState.Loading
             val afd = context.resources.openRawResourceFd(resId)
             if (afd == null) {
+                android.util.Log.w("AndroidAudioPlayer", "openRawResourceFd returned null for resId=$resId")
                 _state.value = AudioState.Error("Audio lokal belum tersedia.")
                 return
             }
@@ -91,16 +93,19 @@ class AndroidAudioPlayer(
                 isLooping = false
 
                 setOnPreparedListener { player ->
+                    android.util.Log.i("AndroidAudioPlayer", "MediaPlayer prepared and starting playback")
                     _state.value = AudioState.Playing
                     player.start()
                 }
 
                 setOnCompletionListener {
+                    android.util.Log.i("AndroidAudioPlayer", "MediaPlayer completed playback")
                     _state.value = AudioState.Idle
                     cleanUp()
                 }
 
-                setOnErrorListener { _, _, _ ->
+                setOnErrorListener { _, what, extra ->
+                    android.util.Log.e("AndroidAudioPlayer", "MediaPlayer error: what=$what extra=$extra")
                     _state.value = AudioState.Error("Gagal memutar audio lokal.")
                     cleanUp()
                     true
@@ -109,6 +114,7 @@ class AndroidAudioPlayer(
                 prepareAsync()
             }
         } catch (e: Exception) {
+            android.util.Log.e("AndroidAudioPlayer", "Exception in playRaw", e)
             _state.value = AudioState.Error(e.message ?: "Gagal memutar audio.")
             cleanUp()
         }

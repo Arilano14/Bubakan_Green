@@ -73,10 +73,11 @@ fun PlantImage(
             contentScale = contentScale,
             modifier = modifier
         )
-    } else if (!primaryPhotoUrl.isNullOrBlank() && primaryPhotoUrl.startsWith("http")) {
+    } else if (!primaryPhotoUrl.isNullOrBlank()) {
+        val modelData = if (primaryPhotoUrl.startsWith("/")) java.io.File(primaryPhotoUrl) else primaryPhotoUrl
         AsyncImage(
             model = ImageRequest.Builder(context)
-                .data(primaryPhotoUrl)
+                .data(modelData)
                 .crossfade(true)
                 .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                 .diskCachePolicy(coil.request.CachePolicy.ENABLED)
