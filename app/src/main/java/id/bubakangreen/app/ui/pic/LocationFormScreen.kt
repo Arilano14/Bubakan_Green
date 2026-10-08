@@ -19,7 +19,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import id.bubakangreen.app.ui.components.PlantImage
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -38,6 +40,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.CameraAlt
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
@@ -329,6 +332,7 @@ fun LocationFormScreen(
                         )
                     }
                 },
+                windowInsets = WindowInsets(0, 0, 0, 0),
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = SurfaceWhite)
             )
         }
@@ -338,7 +342,7 @@ fun LocationFormScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(20.dp)
+                .padding(horizontal = 20.dp, vertical = 12.dp)
         ) {
             // Error Banner
             if (state.validationError != null) {
@@ -556,7 +560,7 @@ fun LocationFormScreen(
                 ) {
                     Icon(imageVector = Icons.Default.Link, contentDescription = null, modifier = Modifier.size(16.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("+ Tautan URL", fontSize = 12.sp)
+                    Text("Tautan URL", fontSize = 12.sp)
                 }
             }
 
@@ -576,13 +580,14 @@ fun LocationFormScreen(
                     ) {
                         Text(
                             text = "Belum ada foto lahan.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = OnSurfaceVariant
+                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Medium),
+                            color = OnSurfaceDark
                         )
+                        Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = "Dapat menambahkan hingga maksimal 3 foto.",
                             style = MaterialTheme.typography.labelSmall,
-                            color = PrimaryForest
+                            color = OnSurfaceVariant
                         )
                     }
                 }
@@ -822,9 +827,8 @@ fun LocationFormScreen(
             }
 
             // 8. Koleksi Tanaman pada Lahan (PHASE 4 & 5)
-            if (locationId != null) {
-                Spacer(modifier = Modifier.height(24.dp))
-                Card(
+            Spacer(modifier = Modifier.height(24.dp))
+            Card(
                     shape = RoundedCornerShape(14.dp),
                     colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
                     border = BorderStroke(1.dp, BorderCard),
@@ -846,7 +850,7 @@ fun LocationFormScreen(
                                     )
                                 )
                                 Text(
-                                    text = "${state.assignedPlants.size} spesies tanaman terhubung",
+                                    text = "${state.assignedPlants.size} tanaman",
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         color = OnSurfaceVariant
                                     )
@@ -865,7 +869,7 @@ fun LocationFormScreen(
                             ) {
                                 Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("+ Tambah Tanaman", fontSize = 12.sp)
+                                Text("Tambah Tanaman", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                             }
                         }
 
@@ -911,7 +915,8 @@ fun LocationFormScreen(
                         } else if (state.assignedPlants.isEmpty()) {
                             Surface(
                                 shape = RoundedCornerShape(10.dp),
-                                color = BackgroundLight,
+                                color = SurfaceCard,
+                                border = BorderStroke(1.dp, BorderCard),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
                                 Column(
@@ -919,13 +924,11 @@ fun LocationFormScreen(
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     Text(
-                                        text = "Belum ada koleksi tanaman di lahan ini.",
-                                        style = MaterialTheme.typography.bodySmall.copy(color = OnSurfaceVariant)
-                                    )
-                                    Spacer(modifier = Modifier.height(2.dp))
-                                    Text(
-                                        text = "Klik '+ Tambah Tanaman' untuk menambahkan dari ensiklopedia.",
-                                        style = MaterialTheme.typography.labelSmall.copy(color = PrimaryForest)
+                                        text = "Belum ada tanaman di lahan ini.",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            color = OnSurfaceVariant,
+                                            fontWeight = FontWeight.Medium
+                                        )
                                     )
                                 }
                             }
@@ -934,8 +937,9 @@ fun LocationFormScreen(
                                 state.assignedPlants.forEach { plant ->
                                     Card(
                                         shape = RoundedCornerShape(10.dp),
-                                        colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                                        colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
                                         border = BorderStroke(1.dp, BorderCard),
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     ) {
                                         Row(
@@ -950,8 +954,8 @@ fun LocationFormScreen(
                                                     .clip(RoundedCornerShape(8.dp))
                                                     .background(BackgroundLight)
                                             ) {
-                                                AsyncImage(
-                                                    model = plant.primaryPhotoUrl ?: plant.defaultPhotoUrl,
+                                                PlantImage(
+                                                    plant = plant,
                                                     contentDescription = plant.nameId,
                                                     contentScale = ContentScale.Crop,
                                                     modifier = Modifier.fillMaxSize()
@@ -963,7 +967,7 @@ fun LocationFormScreen(
                                                     text = plant.nameId,
                                                     style = MaterialTheme.typography.titleSmall.copy(
                                                         fontWeight = FontWeight.Bold,
-                                                        color = TextPrimary
+                                                        color = OnSurfaceDark
                                                     )
                                                 )
                                                 if (plant.nameLatin.isNotBlank()) {
@@ -971,7 +975,7 @@ fun LocationFormScreen(
                                                         text = plant.nameLatin,
                                                         style = MaterialTheme.typography.bodySmall.copy(
                                                             fontStyle = FontStyle.Italic,
-                                                            color = TextSecondary
+                                                            color = OnSurfaceVariant
                                                         )
                                                     )
                                                 }
@@ -984,7 +988,7 @@ fun LocationFormScreen(
                                                 contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                                                 modifier = Modifier.height(34.dp)
                                             ) {
-                                                Text("Lepas dari Lahan", fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                                                Text("Lepas", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
                                             }
                                         }
                                     }
@@ -993,7 +997,6 @@ fun LocationFormScreen(
                         }
                     }
                 }
-            }
 
             Spacer(modifier = Modifier.height(32.dp))
         }
@@ -1056,21 +1059,51 @@ fun LocationFormScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 16.dp)
+                    .fillMaxHeight(0.88f)
+                    .navigationBarsPadding()
+                    .imePadding()
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "Tambah Tanaman ke Lahan",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                            color = OnSurfaceDark
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Tambah Tanaman ke Lahan",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = OnSurfaceDark
+                            )
                         )
-                    )
+                        Text(
+                            text = if (selectedPlantIds.isEmpty()) "Centang tanaman untuk menambahkan" else "${selectedPlantIds.size} tanaman dipilih",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = if (selectedPlantIds.isNotEmpty()) PrimaryForest else OnSurfaceVariant,
+                                fontWeight = if (selectedPlantIds.isNotEmpty()) FontWeight.Bold else FontWeight.Normal
+                            )
+                        )
+                    }
+
+                    if (selectedPlantIds.isNotEmpty()) {
+                        Button(
+                            onClick = {
+                                viewModel.addSelectedPlantsToLahan(selectedPlantIds.toSet(), picUid)
+                                showPlantPickerSheet = false
+                            },
+                            enabled = !state.isSavingInventory,
+                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryForest),
+                            shape = RoundedCornerShape(8.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                            modifier = Modifier.height(34.dp)
+                        ) {
+                            Text("Simpan (${selectedPlantIds.size})", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                        }
+                        Spacer(modifier = Modifier.width(6.dp))
+                    }
+
                     IconButton(onClick = { showPlantPickerSheet = false }) {
                         Icon(Icons.Default.Close, contentDescription = "Tutup")
                     }
@@ -1079,34 +1112,38 @@ fun LocationFormScreen(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Search field
-                OutlinedTextField(
-                    value = plantSearchQuery,
-                    onValueChange = { plantSearchQuery = it },
-                    placeholder = { Text("Cari nama tanaman (Indonesia / Latin)...") },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
-                    trailingIcon = {
-                        if (plantSearchQuery.isNotEmpty()) {
-                            IconButton(onClick = { plantSearchQuery = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = "Bersihkan")
+                Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+                    OutlinedTextField(
+                        value = plantSearchQuery,
+                        onValueChange = { plantSearchQuery = it },
+                        placeholder = { Text("Cari nama tanaman (Indonesia / Latin)...") },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (plantSearchQuery.isNotEmpty()) {
+                                IconButton(onClick = { plantSearchQuery = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = "Bersihkan")
+                                }
                             }
-                        }
-                    },
-                    singleLine = true,
-                    shape = RoundedCornerShape(10.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = PrimaryForest,
-                        unfocusedBorderColor = OutlineGrey,
-                        focusedContainerColor = SurfaceWhite,
-                        unfocusedContainerColor = SurfaceWhite
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                        },
+                        singleLine = true,
+                        shape = RoundedCornerShape(10.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = PrimaryForest,
+                            unfocusedBorderColor = OutlineGrey,
+                            focusedContainerColor = SurfaceWhite,
+                            unfocusedContainerColor = SurfaceWhite
+                        ),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
 
                 // "Tanaman belum terdaftar?" -> "+ Tambah Tanaman Baru"
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -1125,7 +1162,7 @@ fun LocationFormScreen(
                     ) {
                         Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.size(16.dp), tint = PrimaryForest)
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text("+ Tambah Tanaman Baru", fontWeight = FontWeight.Bold, color = PrimaryForest, fontSize = 12.sp)
+                        Text("Tambah Tanaman Baru", fontWeight = FontWeight.Bold, color = PrimaryForest, fontSize = 12.sp)
                     }
                 }
 
@@ -1152,8 +1189,8 @@ fun LocationFormScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .weight(1f, fill = false)
-                        .heightIn(max = 380.dp),
+                        .weight(1f)
+                        .padding(horizontal = 16.dp),
                     verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     if (filteredPlants.isEmpty()) {
@@ -1202,8 +1239,8 @@ fun LocationFormScreen(
                                         .clip(RoundedCornerShape(6.dp))
                                         .background(BackgroundLight)
                                 ) {
-                                    AsyncImage(
-                                        model = plant.primaryPhotoUrl ?: plant.defaultPhotoUrl,
+                                    PlantImage(
+                                        plant = plant,
                                         contentDescription = plant.nameId,
                                         contentScale = ContentScale.Crop,
                                         modifier = Modifier.fillMaxSize()
@@ -1215,7 +1252,7 @@ fun LocationFormScreen(
                                         text = plant.nameId,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             fontWeight = FontWeight.SemiBold,
-                                            color = if (isAssigned) OnSurfaceVariant else TextPrimary
+                                            color = if (isAssigned) OnSurfaceVariant else OnSurfaceDark
                                         )
                                     )
                                     if (plant.nameLatin.isNotBlank()) {
@@ -1264,40 +1301,44 @@ fun LocationFormScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
-
-                // Sticky footer: "X tanaman dipilih" + "Tambahkan X Tanaman" button
+                // Prominent sticky footer: Guaranteed visible, full width above navigation bar
                 Surface(
                     color = SurfaceWhite,
-                    shadowElevation = 4.dp,
+                    shadowElevation = 8.dp,
+                    border = BorderStroke(1.dp, BorderCard),
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                            .padding(horizontal = 16.dp, vertical = 10.dp)
                     ) {
-                        Text(
-                            text = "${selectedPlantIds.size} tanaman dipilih",
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                color = OnSurfaceDark
-                            )
-                        )
-
                         Button(
                             onClick = {
                                 viewModel.addSelectedPlantsToLahan(selectedPlantIds.toSet(), picUid)
                                 showPlantPickerSheet = false
                             },
                             enabled = selectedPlantIds.isNotEmpty() && !state.isSavingInventory,
-                            colors = ButtonDefaults.buttonColors(containerColor = PrimaryForest),
-                            shape = RoundedCornerShape(10.dp)
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = PrimaryForest,
+                                disabledContainerColor = OutlineGrey.copy(alpha = 0.5f),
+                                contentColor = OnPrimaryWhite,
+                                disabledContentColor = OnSurfaceVariant
+                            ),
+                            shape = RoundedCornerShape(12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(48.dp)
                         ) {
+                            Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = if (selectedPlantIds.isNotEmpty()) "Tambahkan ${selectedPlantIds.size} Tanaman" else "Pilih Tanaman",
+                                text = if (selectedPlantIds.isNotEmpty()) {
+                                    "Konfirmasi Tambah (${selectedPlantIds.size} Tanaman)"
+                                } else {
+                                    "Pilih Tanaman untuk Ditambahkan"
+                                },
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold
                             )
                         }

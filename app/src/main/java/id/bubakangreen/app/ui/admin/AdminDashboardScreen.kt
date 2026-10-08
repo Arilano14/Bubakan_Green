@@ -47,8 +47,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import id.bubakangreen.app.ui.components.PlantImage
+import id.bubakangreen.app.ui.theme.BackgroundLight
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -594,9 +598,25 @@ private fun AdminPlantsListContent(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(14.dp),
+                            .padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Box(
+                            modifier = Modifier
+                                .size(52.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(BackgroundLight)
+                        ) {
+                            PlantImage(
+                                plant = plant,
+                                contentDescription = plant.nameId,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.width(12.dp))
+
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = plant.nameId,
@@ -631,7 +651,7 @@ private fun AdminPlantsListContent(
 
                         IconButton(
                             onClick = { onEditPlant(plant) },
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(44.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,

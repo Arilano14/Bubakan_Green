@@ -28,7 +28,7 @@ class FirestoreQuizRepository(
                 val list = snapshot.documents.mapNotNull { it.toQuizQuestion() }
                 val cleanPlantId = plantId.lowercase().removePrefix("pl-").substringBefore("-")
                 val finalList = if (list.isEmpty()) {
-                    id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
+                    id.bubakangreen.app.data.fixture.DefaultLearningData.allQuizQuestions
                         .filter { (it.plantId.equals(plantId, ignoreCase = true) || it.plantId.equals(cleanPlantId, ignoreCase = true)) && it.isActive }
                 } else {
                     list
@@ -37,7 +37,7 @@ class FirestoreQuizRepository(
             }
             .catch { error ->
                 val cleanPlantId = plantId.lowercase().removePrefix("pl-").substringBefore("-")
-                val fallback = id.bubakangreen.app.data.fixture.DefaultLearningData.quizQuestions
+                val fallback = id.bubakangreen.app.data.fixture.DefaultLearningData.allQuizQuestions
                     .filter { (it.plantId.equals(plantId, ignoreCase = true) || it.plantId.equals(cleanPlantId, ignoreCase = true)) && it.isActive }
                 if (fallback.isNotEmpty()) {
                     emit(Result.Success(fallback))

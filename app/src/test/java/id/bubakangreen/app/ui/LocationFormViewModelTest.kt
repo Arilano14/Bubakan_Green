@@ -10,8 +10,12 @@ import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationStatus
 import id.bubakangreen.app.domain.model.LocationType
 import id.bubakangreen.app.domain.model.RegionTag
+import id.bubakangreen.app.data.fixture.DefaultBotanicalData
+import id.bubakangreen.app.domain.model.LocationPlant
+import id.bubakangreen.app.domain.model.MasterPlant
 import id.bubakangreen.app.domain.repository.AuditRepository
 import id.bubakangreen.app.domain.repository.LocationRepository
+import id.bubakangreen.app.domain.repository.PlantRepository
 import id.bubakangreen.app.ui.pic.LocationFormViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -56,6 +60,42 @@ class LocationFormViewModelTest {
         override fun getAuditLogs(): Flow<Result<List<AuditLog>>> = flowOf(Result.Success(emptyList()))
     }
 
+    private class FakePlantRepo(
+        var masterPlants: List<MasterPlant> = emptyList()
+    ) : PlantRepository {
+        val assignedLocationPlants = mutableMapOf<String, MutableList<String>>()
+
+        override fun getAllMasterPlants(): Flow<Result<List<MasterPlant>>> =
+            flowOf(Result.Success(masterPlants))
+
+        override fun getMasterPlantById(plantId: String): Flow<Result<MasterPlant?>> =
+            flowOf(Result.Success(masterPlants.find { it.id == plantId }))
+
+        override fun getPlantsAtLocation(locationId: String): Flow<Result<List<LocationPlant>>> =
+            flowOf(Result.Success(emptyList()))
+
+        override suspend fun createMasterPlant(plant: MasterPlant): Result<String> =
+            Result.Success(plant.id)
+
+        override suspend fun updateMasterPlant(plant: MasterPlant): Result<Unit> =
+            Result.Success(Unit)
+
+        override suspend fun addPlantToLocation(locationPlant: LocationPlant): Result<String> =
+            Result.Success(locationPlant.id)
+
+        override suspend fun addPlantsToLocation(locationId: String, plantIds: List<String>): Result<Int> {
+            val list = assignedLocationPlants.getOrPut(locationId) { mutableListOf() }
+            list.addAll(plantIds)
+            return Result.Success(plantIds.size)
+        }
+
+        override suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit> =
+            Result.Success(Unit)
+
+        override suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit> =
+            Result.Success(Unit)
+    }
+
     private class FakeLocationClient(
         var simulatedLat: Double = -7.09237,
         var simulatedLng: Double = 110.32036,
@@ -74,12 +114,14 @@ class LocationFormViewModelTest {
 
     private lateinit var fakeLocationRepo: FakeLocationRepo
     private lateinit var fakeAuditRepo: FakeAuditRepo
+    private lateinit var fakePlantRepo: FakePlantRepo
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         fakeLocationRepo = FakeLocationRepo()
         fakeAuditRepo = FakeAuditRepo()
+        fakePlantRepo = FakePlantRepo(DefaultBotanicalData.defaultMasterPlants)
     }
 
     @After
@@ -216,5 +258,71 @@ class LocationFormViewModelTest {
         viewModel.onRemovePhoto(0)
         assertThat(viewModel.state.value.photos).containsExactly("photo_replaced.jpg", "photo_3.jpg").inOrder()
         assertThat(viewModel.state.value.photos).hasSize(2)
+    }
+
+    @Test
+    fun initialization_loadsMasterPlantsFromRepository() = runTest(testDispatcher) {
+        val viewModel = LocationFormViewModel(
+            locationRepository = fakeLocationRepo,
+            auditRepository = fakeAuditRepo,
+            plantRepository = fakePlantRepo
+        )
+        advanceUntilIdle()
+
+        assertThat(viewModel.state.value.allMasterPlants).isNotEmpty()
+        assertThat(viewModel.state.value.allMasterPlants.map { it.id })
+            .containsExactlyElementsIn(DefaultBotanicalData.defaultMasterPlants.map { it.id })
+    }
+
+    @Test
+    fun addAndRemovePlants_forNewLocation_updatesAssignedPlantsInMemory() = runTest(testDispatcher) {
+        val viewModel = LocationFormViewModel(
+            locationRepository = fakeLocationRepo,
+            auditRepository = fakeAuditRepo,
+            plantRepository = fakePlantRepo
+        )
+        advanceUntilIdle()
+
+        // Select 2 plants on a new location (locationId == null)
+        val selectedIds = setOf("sereh", "cabai")
+        viewModel.addSelectedPlantsToLahan(selectedIds)
+
+        val assigned = viewModel.state.value.assignedPlants
+        assertThat(assigned).hasSize(2)
+        assertThat(assigned.map { it.id }).containsExactly("sereh", "cabai")
+
+        // Remove 1 plant
+        viewModel.removePlantFromLahan("cabai")
+        assertThat(viewModel.state.value.assignedPlants).hasSize(1)
+        assertThat(viewModel.state.value.assignedPlants.first().id).isEqualTo("sereh")
+    }
+
+    @Test
+    fun saveLocation_withSelectedPlants_persistsPlantsToNewLocation() = runTest(testDispatcher) {
+        val fakeClient = FakeLocationClient(simulatedAccuracy = 10f)
+        val viewModel = LocationFormViewModel(
+            locationRepository = fakeLocationRepo,
+            auditRepository = fakeAuditRepo,
+            plantRepository = fakePlantRepo,
+            locationClient = fakeClient
+        )
+        advanceUntilIdle()
+
+        // Select plants
+        viewModel.addSelectedPlantsToLahan(setOf("sereh", "kangkung"))
+
+        viewModel.onNameChange("Kebun Toga RW 03")
+        viewModel.onAddressChange("Jl. Anggrek RW 03")
+        viewModel.onDescriptionChange("Kebun toga percontohan")
+        viewModel.onRegionTagChange(RegionTag.RW_03)
+        viewModel.captureGps()
+        advanceUntilIdle()
+
+        viewModel.saveLocation("admin_super")
+        advanceUntilIdle()
+
+        assertThat(fakeLocationRepo.createdLocations).hasSize(1)
+        val createdId = fakeLocationRepo.createdLocations.first().id
+        assertThat(fakePlantRepo.assignedLocationPlants[createdId]).containsExactly("sereh", "kangkung")
     }
 }

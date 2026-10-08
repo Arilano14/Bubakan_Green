@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import id.bubakangreen.app.core.di.RepositoryProvider
 import id.bubakangreen.app.core.result.Result
+import id.bubakangreen.app.data.fixture.DefaultBotanicalData
 import id.bubakangreen.app.data.location.LocationClient
 import id.bubakangreen.app.domain.model.AuditLog
 import id.bubakangreen.app.domain.model.CoordinatesStatus
@@ -49,7 +50,7 @@ data class LocationFormState(
 
     // Lahan Inventory Tanaman State
     val assignedPlants: List<MasterPlant> = emptyList(),
-    val allMasterPlants: List<MasterPlant> = emptyList(),
+    val allMasterPlants: List<MasterPlant> = DefaultBotanicalData.defaultMasterPlants,
     val isInventoryLoading: Boolean = false,
     val isSavingInventory: Boolean = false,
     val inventoryFeedback: String? = null
@@ -69,7 +70,23 @@ class LocationFormViewModel(
     private val _saveSuccessEvent = MutableSharedFlow<Unit>()
     val saveSuccessEvent: SharedFlow<Unit> = _saveSuccessEvent.asSharedFlow()
 
+    init {
+        loadAllMasterPlants()
+    }
+
+    private fun loadAllMasterPlants() {
+        viewModelScope.launch {
+            plantRepository.getAllMasterPlants().collect { result ->
+                if (result is Result.Success) {
+                    val plants = result.data.ifEmpty { DefaultBotanicalData.defaultMasterPlants }
+                    _state.update { it.copy(allMasterPlants = plants) }
+                }
+            }
+        }
+    }
+
     fun loadExistingLocation(locationId: String?) {
+        loadAllMasterPlants()
         if (locationId.isNullOrBlank()) return
         viewModelScope.launch {
             val result = locationRepository.getLocationById(locationId).firstOrNull()
@@ -110,7 +127,10 @@ class LocationFormViewModel(
                 plantRepository.getAllMasterPlants()
             ) { locPlantsRes, allPlantsRes ->
                 val locPlants = (locPlantsRes as? Result.Success)?.data ?: emptyList()
-                val allPlants = (allPlantsRes as? Result.Success)?.data ?: emptyList()
+                val repoPlants = (allPlantsRes as? Result.Success)?.data ?: emptyList()
+                val allPlants = repoPlants.ifEmpty {
+                    _state.value.allMasterPlants.ifEmpty { DefaultBotanicalData.defaultMasterPlants }
+                }
 
                 val assignedIds = locPlants.filter { it.isPresent }.map { it.plantId }.toSet()
                 val assignedList = allPlants.filter { it.id in assignedIds }
@@ -304,6 +324,7 @@ class LocationFormViewModel(
                 isPublished = true
             )
 
+            val currentAssignedPlantIds = _state.value.assignedPlants.map { it.id }
             val saveResult = if (current.locationId != null) {
                 locationRepository.updateLocation(location)
             } else {
@@ -312,11 +333,16 @@ class LocationFormViewModel(
 
             when (saveResult) {
                 is Result.Success -> {
+                    val finalLocationId: String = current.locationId ?: (saveResult.data as? String) ?: location.id
+                    if (current.locationId == null && currentAssignedPlantIds.isNotEmpty()) {
+                        // Persist selected plants to the newly created location
+                        plantRepository.addPlantsToLocation(finalLocationId, currentAssignedPlantIds)
+                    }
                     auditRepository.recordAction(
                         AuditLog(
                             id = "AUDIT_${System.currentTimeMillis()}",
                             action = if (current.locationId != null) "LOCATION_UPDATED" else "LOCATION_CREATED",
-                            targetEntityId = locationId,
+                            targetEntityId = finalLocationId,
                             targetEntityType = "LOCATION",
                             actorUid = adminUid,
                             actorRole = "ADMIN",
@@ -346,12 +372,24 @@ class LocationFormViewModel(
     // ==========================================================
 
     fun addSelectedPlantsToLahan(selectedPlantIds: Set<String>, adminUid: String = "admin_kelurahan") {
-        val locationId = _state.value.locationId ?: return
+        val locationId = _state.value.locationId
         val currentlyAssignedIds = _state.value.assignedPlants.map { it.id }.toSet()
         val toAdd = selectedPlantIds.filter { it !in currentlyAssignedIds }
 
         if (toAdd.isEmpty()) {
             _state.update { it.copy(inventoryFeedback = "Semua tanaman terpilih sudah ada di lahan ini.") }
+            return
+        }
+
+        if (locationId == null) {
+            // New Lahan flow: update state in-memory before location is saved
+            val newAssigned = _state.value.allMasterPlants.filter { it.id in toAdd }
+            _state.update {
+                it.copy(
+                    assignedPlants = (it.assignedPlants + newAssigned).distinctBy { p -> p.id },
+                    inventoryFeedback = "${toAdd.size} tanaman ditambahkan ke daftar tanaman lahan."
+                )
+            }
             return
         }
 
@@ -391,9 +429,18 @@ class LocationFormViewModel(
     }
 
     fun removePlantFromLahan(plantId: String, adminUid: String = "admin_kelurahan") {
-        val locationId = _state.value.locationId ?: return
-        val relationId = "${locationId}_${plantId}"
+        val locationId = _state.value.locationId
+        if (locationId == null) {
+            _state.update {
+                it.copy(
+                    assignedPlants = it.assignedPlants.filter { p -> p.id != plantId },
+                    inventoryFeedback = "Tanaman dilepas dari daftar lahan baru."
+                )
+            }
+            return
+        }
 
+        val relationId = "${locationId}_${plantId}"
         viewModelScope.launch {
             _state.update { it.copy(isSavingInventory = true) }
             when (val res = plantRepository.removePlantFromLocation(relationId)) {
@@ -435,7 +482,7 @@ class LocationFormViewModel(
         adminUid: String = "admin_kelurahan",
         onSuccess: () -> Unit
     ) {
-        val locationId = _state.value.locationId ?: return
+        val locationId = _state.value.locationId
         val nameTrim = name.trim()
         if (nameTrim.length < 2) {
             _state.update { it.copy(inventoryFeedback = "Nama tanaman minimal 2 karakter.") }
@@ -494,39 +541,66 @@ class LocationFormViewModel(
                 updatedAt = now
             )
 
-            // 4. ATOMIC CREATION: Writes MasterPlant + LocationPlant together in single batch
-            when (val createRes = plantRepository.createMasterPlantWithLocation(minimalPlant, locationId)) {
-                is Result.Success -> {
-                    auditRepository.recordAction(
-                        AuditLog(
-                            id = "AUDIT_${System.currentTimeMillis()}",
-                            action = "MINIMAL_PLANT_CREATED_FROM_LAHAN",
-                            targetEntityId = plantId,
-                            targetEntityType = "MASTER_PLANT",
-                            actorUid = adminUid,
-                            actorRole = "ADMIN",
-                            details = "Pembuatan minimal tanaman '$nameTrim' langsung dari lahan $locationId"
+            if (locationId != null) {
+                // ATOMIC CREATION: Writes MasterPlant + LocationPlant together in single batch
+                when (val createRes = plantRepository.createMasterPlantWithLocation(minimalPlant, locationId)) {
+                    is Result.Success -> {
+                        auditRepository.recordAction(
+                            AuditLog(
+                                id = "AUDIT_${System.currentTimeMillis()}",
+                                action = "MINIMAL_PLANT_CREATED_FROM_LAHAN",
+                                targetEntityId = plantId,
+                                targetEntityType = "MASTER_PLANT",
+                                actorUid = adminUid,
+                                actorRole = "ADMIN",
+                                details = "Pembuatan minimal tanaman '$nameTrim' langsung dari lahan $locationId"
+                            )
                         )
-                    )
-                    _state.update {
-                        it.copy(
-                            isSavingInventory = false,
-                            inventoryFeedback = "Tanaman baru '$nameTrim' berhasil dibuat dan ditambahkan."
-                        )
+                        _state.update {
+                            it.copy(
+                                isSavingInventory = false,
+                                inventoryFeedback = "Tanaman baru '$nameTrim' berhasil dibuat dan ditambahkan."
+                            )
+                        }
+                        onSuccess()
                     }
-                    onSuccess()
-                }
-                is Result.Error -> {
-                    // Safe failure recovery: delete uploaded image
-                    storageRepository.deleteImage(photoPath)
-                    _state.update {
-                        it.copy(
-                            isSavingInventory = false,
-                            inventoryFeedback = createRes.message ?: "Gagal membuat tanaman baru."
-                        )
+                    is Result.Error -> {
+                        // Safe failure recovery: delete uploaded image
+                        storageRepository.deleteImage(photoPath)
+                        _state.update {
+                            it.copy(
+                                isSavingInventory = false,
+                                inventoryFeedback = createRes.message ?: "Gagal membuat tanaman baru."
+                            )
+                        }
                     }
+                    is Result.Loading -> {}
                 }
-                is Result.Loading -> {}
+            } else {
+                // New Lahan flow: create MasterPlant and assign in-memory
+                when (val createRes = plantRepository.createMasterPlant(minimalPlant)) {
+                    is Result.Success -> {
+                        _state.update {
+                            it.copy(
+                                allMasterPlants = (it.allMasterPlants + minimalPlant).distinctBy { p -> p.id },
+                                assignedPlants = (it.assignedPlants + minimalPlant).distinctBy { p -> p.id },
+                                isSavingInventory = false,
+                                inventoryFeedback = "Tanaman baru '$nameTrim' berhasil dibuat dan ditambahkan ke daftar."
+                            )
+                        }
+                        onSuccess()
+                    }
+                    is Result.Error -> {
+                        storageRepository.deleteImage(photoPath)
+                        _state.update {
+                            it.copy(
+                                isSavingInventory = false,
+                                inventoryFeedback = createRes.message ?: "Gagal membuat tanaman baru."
+                            )
+                        }
+                    }
+                    is Result.Loading -> {}
+                }
             }
         }
     }

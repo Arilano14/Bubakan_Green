@@ -54,8 +54,25 @@ fun PlantImage(
 ) {
     val context = LocalContext.current
     val effectiveLocalAsset = (imageAssetName?.ifBlank { null }
-        ?: primaryPhotoUrl?.takeIf { !it.startsWith("http://") && !it.startsWith("https://") })
-        ?.trim()
+        ?: primaryPhotoUrl?.takeIf { !it.startsWith("http://") && !it.startsWith("https://") }
+        ?: run {
+            val lower = primaryPhotoUrl?.lowercase() ?: ""
+            when {
+                lower.contains("kemangi") -> "plant_kemangi"
+                lower.contains("pegagan") || lower.contains("centella") -> "plant_pegagan"
+                lower.contains("sirih") || lower.contains("piper_betle") -> "plant_sirih"
+                lower.contains("cabai") || lower.contains("cabe") -> "plant_cabai"
+                lower.contains("jahe") -> "plant_jahe"
+                lower.contains("kangkung") -> "plant_kangkung"
+                lower.contains("kencur") -> "plant_kencur"
+                lower.contains("kunyit") -> "plant_kunyit"
+                lower.contains("lidah") || lower.contains("aloe") -> "plant_lidah_buaya"
+                lower.contains("sereh") || lower.contains("serai") -> "plant_sereh"
+                lower.contains("terong") -> "plant_terong"
+                lower.contains("tomat") -> "plant_tomat"
+                else -> null
+            }
+        })?.trim()
 
     val localResId = remember(effectiveLocalAsset) {
         if (!effectiveLocalAsset.isNullOrBlank()) {
@@ -78,6 +95,7 @@ fun PlantImage(
         AsyncImage(
             model = ImageRequest.Builder(context)
                 .data(modelData)
+                .setHeader("User-Agent", "BubakanGreen/1.0 (Android; id.bubakangreen.app)")
                 .crossfade(true)
                 .memoryCachePolicy(coil.request.CachePolicy.ENABLED)
                 .diskCachePolicy(coil.request.CachePolicy.ENABLED)

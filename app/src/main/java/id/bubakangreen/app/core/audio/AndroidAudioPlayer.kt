@@ -75,6 +75,40 @@ class AndroidAudioPlayer(
 
         try {
             _state.value = AudioState.Loading
+
+            // 1. Try MediaPlayer.create (handles raw resource setup directly)
+            val attrs = AudioAttributes.Builder()
+                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                .setUsage(AudioAttributes.USAGE_MEDIA)
+                .build()
+            val created = try {
+                MediaPlayer.create(context, resId, attrs, 0) ?: MediaPlayer.create(context, resId)
+            } catch (e: Exception) {
+                android.util.Log.w("AndroidAudioPlayer", "MediaPlayer.create exception for resId=$resId", e)
+                null
+            }
+
+            if (created != null) {
+                mediaPlayer = created.apply {
+                    isLooping = false
+                    setOnCompletionListener {
+                        android.util.Log.i("AndroidAudioPlayer", "MediaPlayer completed playback")
+                        _state.value = AudioState.Idle
+                        cleanUp()
+                    }
+                    setOnErrorListener { _, what, extra ->
+                        android.util.Log.e("AndroidAudioPlayer", "MediaPlayer error: what=$what extra=$extra")
+                        _state.value = AudioState.Error("Gagal memutar audio lokal.")
+                        cleanUp()
+                        true
+                    }
+                    _state.value = AudioState.Playing
+                    start()
+                }
+                return
+            }
+
+            // 2. Fallback to openRawResourceFd
             val afd = context.resources.openRawResourceFd(resId)
             if (afd == null) {
                 android.util.Log.w("AndroidAudioPlayer", "openRawResourceFd returned null for resId=$resId")

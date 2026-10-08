@@ -12,10 +12,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import id.bubakangreen.app.ui.components.PlantImage
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
@@ -335,8 +337,10 @@ fun MasterPlantFormScreen(
                                 .clip(RoundedCornerShape(8.dp))
                                 .background(BackgroundLight)
                         ) {
-                            AsyncImage(
-                                model = state.primaryPhotoUrl,
+                            PlantImage(
+                                primaryPhotoUrl = state.primaryPhotoUrl,
+                                imageSourceType = "LOCAL",
+                                imageAssetName = state.primaryPhotoUrl,
                                 contentDescription = "Foto Tanaman",
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier.fillMaxSize()
@@ -360,11 +364,12 @@ fun MasterPlantFormScreen(
                                     }
                                 },
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.weight(1f)
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+                                modifier = Modifier.weight(1f).height(40.dp)
                             ) {
                                 Icon(Icons.Default.CameraAlt, contentDescription = null, modifier = Modifier.size(15.dp), tint = PrimaryForest)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Kamera", color = PrimaryForest, fontSize = 12.sp)
+                                Text("Kamera", color = PrimaryForest, fontSize = 12.sp, maxLines = 1, softWrap = false)
                             }
                             OutlinedButton(
                                 onClick = {
@@ -373,20 +378,22 @@ fun MasterPlantFormScreen(
                                     )
                                 },
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.weight(1f)
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+                                modifier = Modifier.weight(1f).height(40.dp)
                             ) {
                                 Icon(Icons.Default.Edit, contentDescription = null, modifier = Modifier.size(15.dp), tint = ForestGreen)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Galeri", color = ForestGreen, fontSize = 12.sp)
+                                Text("Galeri", color = ForestGreen, fontSize = 12.sp, maxLines = 1, softWrap = false)
                             }
                             OutlinedButton(
                                 onClick = { viewModel.onPhotoUrlChange("") },
                                 shape = RoundedCornerShape(8.dp),
-                                modifier = Modifier.weight(1f)
+                                contentPadding = PaddingValues(horizontal = 4.dp, vertical = 4.dp),
+                                modifier = Modifier.weight(1f).height(40.dp)
                             ) {
                                 Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(15.dp), tint = FriendlyRed)
                                 Spacer(modifier = Modifier.width(4.dp))
-                                Text("Hapus", color = FriendlyRed, fontSize = 12.sp)
+                                Text("Hapus", color = FriendlyRed, fontSize = 12.sp, maxLines = 1, softWrap = false)
                             }
                         }
                     }

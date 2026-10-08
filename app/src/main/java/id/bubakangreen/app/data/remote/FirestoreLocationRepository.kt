@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.snapshots
 import id.bubakangreen.app.core.result.Result
+import id.bubakangreen.app.data.fixture.DefaultBotanicalData
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
 import id.bubakangreen.app.domain.model.LocationConditionLog
@@ -35,9 +36,16 @@ class FirestoreLocationRepository(
                 val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
                     loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED && loc.status != LocationStatus.DRAFT
                 }
-                Result.Success(list) as Result<List<Location>>
+                val finalList = if (list.isEmpty()) {
+                    DefaultBotanicalData.defaultLocations.filter { it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }
+                } else {
+                    list
+                }
+                Result.Success(finalList) as Result<List<Location>>
             }
-            .catch { emit(Result.Error(it, it.localizedMessage)) }
+            .catch {
+                emit(Result.Success(DefaultBotanicalData.defaultLocations.filter { it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }))
+            }
     }
 
     override fun getFeaturedLocations(): Flow<Result<List<Location>>> {
@@ -47,9 +55,16 @@ class FirestoreLocationRepository(
                 val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
                     loc.featured && loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED
                 }
-                Result.Success(list) as Result<List<Location>>
+                val finalList = if (list.isEmpty()) {
+                    DefaultBotanicalData.defaultLocations.filter { it.featured && it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }
+                } else {
+                    list
+                }
+                Result.Success(finalList) as Result<List<Location>>
             }
-            .catch { emit(Result.Error(it, it.localizedMessage)) }
+            .catch {
+                emit(Result.Success(DefaultBotanicalData.defaultLocations.filter { it.featured && it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }))
+            }
     }
 
     override fun getLocationsByType(type: LocationType): Flow<Result<List<Location>>> {
@@ -59,21 +74,48 @@ class FirestoreLocationRepository(
                 val list = snapshot.documents.mapNotNull { it.toLocation() }.filter { loc ->
                     loc.type == type && loc.isPublished && loc.status != LocationStatus.INACTIVE && loc.status != LocationStatus.ARCHIVED
                 }
-                Result.Success(list) as Result<List<Location>>
+                val finalList = if (list.isEmpty()) {
+                    DefaultBotanicalData.defaultLocations.filter { it.type == type && it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }
+                } else {
+                    list
+                }
+                Result.Success(finalList) as Result<List<Location>>
             }
-            .catch { emit(Result.Error(it, it.localizedMessage)) }
+            .catch {
+                emit(Result.Success(DefaultBotanicalData.defaultLocations.filter { it.type == type && it.isPublished && it.status != LocationStatus.INACTIVE && it.status != LocationStatus.ARCHIVED }))
+            }
     }
 
     override fun getLocationById(locationId: String): Flow<Result<Location?>> {
         return collection.document(locationId).snapshots().map { snapshot ->
-            Result.Success(snapshot.toLocation()) as Result<Location?>
-        }.catch { emit(Result.Error(it, it.localizedMessage)) }
+            val loc = snapshot.toLocation() ?: DefaultBotanicalData.defaultLocations.find {
+                it.id == locationId ||
+                (locationId == "loc_urban_farming_bubakan" && it.id == "LOC_PREVIEW_01") ||
+                (locationId == "loc_taman_toga_rw03" && it.id == "LOC_PREVIEW_02") ||
+                (locationId == "LOC_PREVIEW_01" && it.id == "loc_urban_farming_bubakan") ||
+                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03")
+            }
+            Result.Success(loc) as Result<Location?>
+        }.catch {
+            val fallback = DefaultBotanicalData.defaultLocations.find {
+                it.id == locationId ||
+                (locationId == "loc_urban_farming_bubakan" && it.id == "LOC_PREVIEW_01") ||
+                (locationId == "loc_taman_toga_rw03" && it.id == "LOC_PREVIEW_02") ||
+                (locationId == "LOC_PREVIEW_01" && it.id == "loc_urban_farming_bubakan") ||
+                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03")
+            }
+            emit(Result.Success(fallback))
+        }
     }
 
     override fun getAllLocations(): Flow<Result<List<Location>>> {
         return collection.snapshots().map { snapshot ->
-            Result.Success(snapshot.documents.mapNotNull { it.toLocation() }) as Result<List<Location>>
-        }.catch { emit(Result.Error(it, it.localizedMessage)) }
+            val list = snapshot.documents.mapNotNull { it.toLocation() }
+            val finalList = if (list.isEmpty()) DefaultBotanicalData.defaultLocations else list
+            Result.Success(finalList) as Result<List<Location>>
+        }.catch {
+            emit(Result.Success(DefaultBotanicalData.defaultLocations))
+        }
     }
 
     override suspend fun createLocation(location: Location): Result<String> {

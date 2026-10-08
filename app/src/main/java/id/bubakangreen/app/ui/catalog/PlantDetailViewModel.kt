@@ -74,11 +74,12 @@ class PlantDetailViewModel @JvmOverloads constructor(
 
         fun getFeedbackRawRes(score: Int): Int {
             return when {
-                score == 100 -> R.raw.audio_feedback_perfect
-                score >= 80 -> R.raw.audio_feedback_excellent
-                score >= 60 -> R.raw.audio_feedback_good
-                score > 0 -> R.raw.audio_feedback_low
-                else -> R.raw.audio_feedback_retry
+                score >= 100 -> R.raw.audio_feedback_perfect       // hebat semuanya benar.aac
+                score >= 80 -> R.raw.audio_feedback_excellent     // bagus sekalii.aac
+                score >= 60 -> R.raw.audio_feedback_good          // lumayan bagus terus berusaha.aac
+                score >= 40 -> R.raw.audio_feedback_low           // berusaha sedikit lagi kamu akan lebih baik.aac
+                score >= 20 -> R.raw.audio_feedback_encouragement // terus semangat kamu pasti bisa.aac
+                else -> R.raw.audio_feedback_retry                // jgn berkecil hati coba lagi.aac
             }
         }
     }

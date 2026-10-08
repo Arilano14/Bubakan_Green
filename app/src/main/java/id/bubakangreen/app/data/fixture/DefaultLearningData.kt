@@ -85,7 +85,7 @@ object DefaultLearningData {
         ),
     )
 
-    val quizQuestions: List<QuizQuestion> = listOf(
+    val coreQuizQuestions: List<QuizQuestion> = listOf(
         QuizQuestion(
             questionId = "q_sereh_001",
             plantId = "sereh",
@@ -1975,6 +1975,227 @@ object DefaultLearningData {
             isActive = true,
             createdAt = 1727670000000L,
             updatedAt = 1727670000000L
+        )
+    )
+
+    val additionalQuizQuestions: List<QuizQuestion> = listOf(
+        // ── DAUN SIRIH (Piper betle) ──
+        QuizQuestion(
+            questionId = "q_sirih_001",
+            plantId = "sirih",
+            question = "Ciri khas bentuk helaian daun sirih (Piper betle) yang paling mudah dikenali adalah...",
+            optionA = "Berbentuk hati pipih dengan ujung meruncing dan urat daun melengkung",
+            optionB = "Berbentuk pita panjang menyerupai rumput",
+            optionC = "Berbentuk jarum kaku berduri tajam",
+            correctAnswer = "A",
+            explanation = "Daun sirih berbentuk menyerupai jantung hati dengan urat daun melengkung 5–7 dan aroma aromatik.",
+            order = 1,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_sirih_002",
+            plantId = "sirih",
+            question = "Kandungan minyak atsiri kavikol dan eugenol pada daun sirih memiliki khasiat utama sebagai...",
+            optionA = "Antiseptik dan antibakteri alami",
+            optionB = "Pewarna sintetis pakaian",
+            optionC = "Pengembang adonan roti",
+            correctAnswer = "A",
+            explanation = "Senyawa kavikol dalam sirih memiliki daya antiseptik beberapa kali lipat lebih kuat dari fenol biasa.",
+            order = 2,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_sirih_003",
+            plantId = "sirih",
+            question = "Tradisi leluhur nusantara mengunyah daun sirih bersama pinang dan kapur sirih dikenal dengan nama...",
+            optionA = "Nginang atau menyirih",
+            optionB = "Nyadran",
+            optionC = "Menoreh getah",
+            correctAnswer = "A",
+            explanation = "Tradisi nginang secara turun-temurun dipraktikkan untuk memperkuat email gigi dan kesehatan gusi.",
+            order = 3,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_sirih_004",
+            plantId = "sirih",
+            question = "Cara perbanyakan tanaman sirih yang paling praktis dan cepat berakar di pekarangan adalah...",
+            optionA = "Stek sulur batang yang memiliki akar lekat pada bukunya",
+            optionB = "Kultur jaringan biji kering",
+            optionC = "Mencangkok pucuk bunga",
+            correctAnswer = "A",
+            explanation = "Stek sulur berakar lekat mudah tumbuh saat ditancapkan ke media tanah gembur berhumus.",
+            order = 4,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_sirih_005",
+            plantId = "sirih",
+            question = "Karena sifat pertumbuhannya yang merambat, tanaman sirih membutuhkan sarana berupa...",
+            optionA = "Tiang rambatan/ajir bambu atau pagar hidup",
+            optionB = "Kolam tergenang air dalam",
+            optionC = "Lantai semen tanpa naungan",
+            correctAnswer = "A",
+            explanation = "Sirih tumbuh merambat dengan akar lekat sehingga memerlukan tiang turus bambu atau dinding pagar.",
+            order = 5,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+
+        // ── PEGAGAN (Centella asiatica) ──
+        QuizQuestion(
+            questionId = "q_pegagan_001",
+            plantId = "pegagan",
+            question = "Bentuk helaian daun herba pegagan (Centella asiatica) umumnya menyerupai...",
+            optionA = "Bentuk ginjal atau tapak kuda dengan tepi berlekuk dangkal",
+            optionB = "Bentuk pedang memanjang berakar tunjang",
+            optionC = "Bentuk duri runcing tanpa tangkai",
+            correctAnswer = "A",
+            explanation = "Daun pegagan berhelai tunggal berbentuk ginjal atau kipas dengan tepi beringgit melengkung.",
+            order = 1,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_pegagan_002",
+            plantId = "pegagan",
+            question = "Dalam dunia herbal modern (gotu kola), pegagan sangat terkenal karena manfaatnya untuk...",
+            optionA = "Meningkatkan sirkulasi darah mikro dan mendukung daya ingat",
+            optionB = "Meningkatkan kadar lemak jenuh tubuh",
+            optionC = "Sebagai bahan baku karet sintetis",
+            correctAnswer = "A",
+            explanation = "Senyawa asiatikosida dalam pegagan mendukung sirkulasi darah pembuluh kapiler dan nutrisi sel saraf otak.",
+            order = 2,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_pegagan_003",
+            plantId = "pegagan",
+            question = "Batang merayap di atas tanah yang menghasilkan anakan baru pada pegagan disebut...",
+            optionA = "Stolon atau geragih",
+            optionB = "Rimpang umbi",
+            optionC = "Kambium gabus",
+            correctAnswer = "A",
+            explanation = "Pegagan merayap di atas tanah melalui stolon panjang yang menumbuhkan tunas daun dan akar baru di setiap bukunya.",
+            order = 3,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_pegagan_004",
+            plantId = "pegagan",
+            question = "Kondisi lingkungan tumbuh yang paling disukai oleh tanaman pegagan adalah...",
+            optionA = "Tanah gembur lembap yang ternaungi sebagian",
+            optionB = "Padang pasir tandus gersang",
+            optionC = "Batu karang asin terik",
+            correctAnswer = "A",
+            explanation = "Pegagan merupakan herba lantai tanah yang menyukai kelembapan tinggi dan naungan sinar matahari ringan.",
+            order = 4,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_pegagan_005",
+            plantId = "pegagan",
+            question = "Selain diseduh air panas, daun pegagan segar di Jawa sering diolah menjadi...",
+            optionA = "Lalapan segar sehat dan campuran urap sayur",
+            optionB = "Pengganti minyak goreng",
+            optionC = "Bahan bakar arang briket",
+            correctAnswer = "A",
+            explanation = "Daun pegagan muda renyah segar lezat dikonsumsi sebagai lalapan mentah pendamping sambal atau olahan urap.",
+            order = 5,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+
+        // ── KEMANGI (Ocimum basilicum) ──
+        QuizQuestion(
+            questionId = "q_kemangi_001",
+            plantId = "kemangi",
+            question = "Aroma wangi segar khas dari daun kemangi (Ocimum basilicum) ditimbulkan oleh minyak atsiri...",
+            optionA = "Sitral, linalool, dan eugenol",
+            optionB = "Klorofil dan getah aloin",
+            optionC = "Minyak kayu putih murni",
+            correctAnswer = "A",
+            explanation = "Perpaduan sitral dan linalool menghasilkan aroma sitrun harum khas yang menjadi ciri kemangi nusantara.",
+            order = 1,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_kemangi_002",
+            plantId = "kemangi",
+            question = "Dalam hidangan nusantara, peran utama daun kemangi segar adalah sebagai...",
+            optionA = "Lalapan segar penyedap aroma hidangan sekaligus penyegar napas",
+            optionB = "Pewarna merah kuah sup",
+            optionC = "Pengental adonan tepung beras",
+            correctAnswer = "A",
+            explanation = "Kemangi sangat populer sebagai lalap mentah peneman ikan/ayam bakar yang menyegarkan aroma rongga mulut.",
+            order = 2,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_kemangi_003",
+            plantId = "kemangi",
+            question = "Perawatan rutin yang dianjurkan agar pohon kemangi terus rimbun berdaun banyak adalah...",
+            optionA = "Memangkas (topping) pucuk bunga yang mulai muncul",
+            optionB = "Memotong seluruh batang pokok hingga rata tanah",
+            optionC = "Membiarkan bunga kering menghasilkan biji tua",
+            correctAnswer = "A",
+            explanation = "Pemangkasan bunga mencegah fase generatif dini dan merangsang tumbuhnya tunas daun baru yang lebat.",
+            order = 3,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_kemangi_004",
+            plantId = "kemangi",
+            question = "Kebutuhan pencahayaan matahari agar daun kemangi wangi optimal adalah...",
+            optionA = "Penuh sepanjang hari (full sun)",
+            optionB = "Gelap gulita di dalam ruangan tanpa ventilasi",
+            optionC = "Cahaya redup malam hari saja",
+            correctAnswer = "A",
+            explanation = "Sinar matahari penuh membantu sintesis minyak atsiri dalam kelenjar daun kemangi sehingga aromanya tajam wangi.",
+            order = 4,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
+        ),
+        QuizQuestion(
+            questionId = "q_kemangi_005",
+            plantId = "kemangi",
+            question = "Manfaat kesehatan pencernaan yang diperoleh dari mengonsumsi daun kemangi adalah...",
+            optionA = "Membantu meredakan perut kembung (karminatif alami)",
+            optionB = "Menyebabkan asam urat akut",
+            optionC = "Mempercepat kantuk berat di siang hari",
+            correctAnswer = "A",
+            explanation = "Senyawa aromatik kemangi bersifat karminatif, membantu merelaksasi saluran cerna dan mengeluarkan kelebihan gas.",
+            order = 5,
+            isActive = true,
+            createdAt = 1727670000000L,
+            updatedAt = 1727670000000L
         ),
     )
+
+    val quizQuestions: List<QuizQuestion> = coreQuizQuestions
+    val allQuizQuestions: List<QuizQuestion> = coreQuizQuestions + additionalQuizQuestions
 }
