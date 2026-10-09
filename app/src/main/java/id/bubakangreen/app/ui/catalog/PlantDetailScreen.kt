@@ -2,8 +2,11 @@ package id.bubakangreen.app.ui.catalog
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -48,6 +51,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -114,6 +118,12 @@ fun PlantDetailScreen(
             viewModel.exitQuiz()
         } else {
             onNavigateBack()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.stopAudio()
         }
     }
 
@@ -679,165 +689,185 @@ private fun QuizInteractiveView(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if (session.isFinished) {
-            // Finished Result Card
+        // Animated Score Result Popup with smooth bounce scale & fade in
+        AnimatedVisibility(
+            visible = session.isFinished,
+            enter = fadeIn(animationSpec = tween(durationMillis = 350)) +
+                    scaleIn(
+                        initialScale = 0.85f,
+                        animationSpec = tween(
+                            durationMillis = 450,
+                            easing = CubicBezierEasing(0.34f, 1.56f, 0.64f, 1f)
+                        )
+                    ),
+            exit = fadeOut(animationSpec = tween(150))
+        ) {
             QuizResultCard(
                 session = session,
                 onRetryQuiz = onRetryQuiz,
                 onExitQuiz = onExitQuiz
             )
-        } else {
+        }
+
+        // Active Question View
+        AnimatedVisibility(
+            visible = !session.isFinished,
+            enter = fadeIn(animationSpec = tween(300)),
+            exit = fadeOut(animationSpec = tween(150))
+        ) {
             val q = session.currentQuestion
             if (q != null) {
-                // Progress Indicator
-                val progress = (session.currentIndex + 1).toFloat() / session.totalQuestions.toFloat()
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "Soal ${session.currentIndex + 1} dari ${session.totalQuestions}",
-                            style = MaterialTheme.typography.labelMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryGreenDark
-                        )
-                        Text(
-                            text = "${((progress) * 100).toInt()}%",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = TextSecondary
+                    // Progress Indicator
+                    val progress = (session.currentIndex + 1).toFloat() / session.totalQuestions.toFloat()
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Soal ${session.currentIndex + 1} dari ${session.totalQuestions}",
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryGreenDark
+                            )
+                            Text(
+                                text = "${((progress) * 100).toInt()}%",
+                                style = MaterialTheme.typography.labelMedium,
+                                color = TextSecondary
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(6.dp))
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+                            color = PrimaryGreen,
+                            trackColor = Color(0xFFE0E0E0)
                         )
                     }
-                    Spacer(modifier = Modifier.height(6.dp))
-                    LinearProgressIndicator(
-                        progress = { progress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                        color = PrimaryGreen,
-                        trackColor = Color(0xFFE0E0E0)
-                    )
-                }
 
-                Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                // Question Card
-                Card(
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color.White),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp)
+                    // Question Card
+                    Card(
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        Text(
-                            text = q.question,
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.ExtraBold,
-                            lineHeight = 24.sp,
-                            color = TextPrimary
-                        )
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // Options A, B, C
-                        QuizOptionItem(
-                            letter = "A",
-                            text = q.optionA,
-                            isSelected = session.selectedOption == "A",
-                            isConfirmed = session.isAnswerConfirmed,
-                            isCorrect = q.correctAnswer == "A",
-                            onSelect = { onSelectOption("A") }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        QuizOptionItem(
-                            letter = "B",
-                            text = q.optionB,
-                            isSelected = session.selectedOption == "B",
-                            isConfirmed = session.isAnswerConfirmed,
-                            isCorrect = q.correctAnswer == "B",
-                            onSelect = { onSelectOption("B") }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        QuizOptionItem(
-                            letter = "C",
-                            text = q.optionC,
-                            isSelected = session.selectedOption == "C",
-                            isConfirmed = session.isAnswerConfirmed,
-                            isCorrect = q.correctAnswer == "C",
-                            onSelect = { onSelectOption("C") }
-                        )
-
-                        // Explanation displayed after confirmation
-                        AnimatedVisibility(
-                            visible = session.isAnswerConfirmed && q.explanation.isNotBlank(),
-                            enter = fadeIn(),
-                            exit = fadeOut()
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(20.dp)
                         ) {
-                            Column {
-                                Spacer(modifier = Modifier.height(16.dp))
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
-                                        .background(Color(0xFFE8F5E9))
-                                        .padding(14.dp)
-                                ) {
-                                    Row(verticalAlignment = Alignment.Top) {
-                                        Icon(
-                                            imageVector = Icons.Default.Info,
-                                            contentDescription = null,
-                                            tint = ForestGreen,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(8.dp))
-                                        Column {
-                                            Text(
-                                                text = "Penjelasan:",
-                                                style = MaterialTheme.typography.labelMedium,
-                                                fontWeight = FontWeight.Bold,
-                                                color = ForestGreen
+                            Text(
+                                text = q.question,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                lineHeight = 24.sp,
+                                color = TextPrimary
+                            )
+
+                            Spacer(modifier = Modifier.height(20.dp))
+
+                            // Options A, B, C
+                            QuizOptionItem(
+                                letter = "A",
+                                text = q.optionA,
+                                isSelected = session.selectedOption == "A",
+                                isConfirmed = session.isAnswerConfirmed,
+                                isCorrect = q.correctAnswer == "A",
+                                onSelect = { onSelectOption("A") }
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            QuizOptionItem(
+                                letter = "B",
+                                text = q.optionB,
+                                isSelected = session.selectedOption == "B",
+                                isConfirmed = session.isAnswerConfirmed,
+                                isCorrect = q.correctAnswer == "B",
+                                onSelect = { onSelectOption("B") }
+                            )
+
+                            Spacer(modifier = Modifier.height(12.dp))
+
+                            QuizOptionItem(
+                                letter = "C",
+                                text = q.optionC,
+                                isSelected = session.selectedOption == "C",
+                                isConfirmed = session.isAnswerConfirmed,
+                                isCorrect = q.correctAnswer == "C",
+                                onSelect = { onSelectOption("C") }
+                            )
+
+                            // Explanation displayed after confirmation
+                            AnimatedVisibility(
+                                visible = session.isAnswerConfirmed && q.explanation.isNotBlank(),
+                                enter = fadeIn(),
+                                exit = fadeOut()
+                            ) {
+                                Column {
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clip(RoundedCornerShape(12.dp))
+                                            .background(Color(0xFFE8F5E9))
+                                            .padding(14.dp)
+                                    ) {
+                                        Row(verticalAlignment = Alignment.Top) {
+                                            Icon(
+                                                imageVector = Icons.Default.Info,
+                                                contentDescription = null,
+                                                tint = ForestGreen,
+                                                modifier = Modifier.size(18.dp)
                                             )
-                                            Spacer(modifier = Modifier.height(2.dp))
-                                            Text(
-                                                text = q.explanation,
-                                                style = MaterialTheme.typography.bodySmall,
-                                                lineHeight = 18.sp,
-                                                color = TextPrimary
-                                            )
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Column {
+                                                Text(
+                                                    text = "Penjelasan:",
+                                                    style = MaterialTheme.typography.labelMedium,
+                                                    fontWeight = FontWeight.Bold,
+                                                    color = ForestGreen
+                                                )
+                                                Spacer(modifier = Modifier.height(2.dp))
+                                                Text(
+                                                    text = q.explanation,
+                                                    style = MaterialTheme.typography.bodySmall,
+                                                    lineHeight = 18.sp,
+                                                    color = TextPrimary
+                                                )
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(24.dp))
 
-                // Bottom confirmation or next button
-                if (!session.isAnswerConfirmed) {
-                    PrimaryButton(
-                        text = "Konfirmasi Jawaban",
-                        onClick = onConfirmAnswer,
-                        enabled = session.selectedOption != null,
-                        height = 52.dp
-                    )
-                } else {
-                    val isLast = session.currentIndex + 1 >= session.totalQuestions
-                    PrimaryButton(
-                        text = if (isLast) "Lihat Hasil" else "Lanjut ke Soal Berikutnya",
-                        onClick = onNextQuestion,
-                        height = 52.dp
-                    )
+                    // Bottom confirmation or next button
+                    if (!session.isAnswerConfirmed) {
+                        PrimaryButton(
+                            text = "Konfirmasi Jawaban",
+                            onClick = onConfirmAnswer,
+                            enabled = session.selectedOption != null,
+                            height = 52.dp
+                        )
+                    } else {
+                        val isLast = session.currentIndex + 1 >= session.totalQuestions
+                        PrimaryButton(
+                            text = if (isLast) "Lihat Hasil" else "Lanjut ke Soal Berikutnya",
+                            onClick = onNextQuestion,
+                            height = 52.dp
+                        )
+                    }
                 }
             }
         }
@@ -1011,7 +1041,7 @@ private fun QuizResultCard(
             }
 
             Text(
-                text = "${session.correctCount} dari ${session.totalQuestions} pertanyaan dijawab dengan benar",
+                text = "Benar ${session.correctCount} dari ${session.totalQuestions} pertanyaan",
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = TextSecondary,

@@ -7,6 +7,7 @@ import id.bubakangreen.app.R
 import id.bubakangreen.app.core.audio.AndroidAudioPlayer
 import id.bubakangreen.app.core.audio.AudioPlayer
 import id.bubakangreen.app.core.audio.AudioState
+import id.bubakangreen.app.core.audio.QuizAudioManager
 import id.bubakangreen.app.core.di.RepositoryProvider
 import id.bubakangreen.app.core.result.Result
 import id.bubakangreen.app.domain.model.Location
@@ -19,6 +20,7 @@ import id.bubakangreen.app.domain.repository.PlantRepository
 import id.bubakangreen.app.domain.repository.QuizRepository
 import id.bubakangreen.app.domain.repository.VoiceRepository
 import id.bubakangreen.app.ui.common.UiState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,6 +49,9 @@ class PlantDetailViewModel @JvmOverloads constructor(
     private val voiceRepository: VoiceRepository = RepositoryProvider.getVoiceRepository(),
     private val audioPlayer: AudioPlayer = AndroidAudioPlayer(application.applicationContext)
 ) : AndroidViewModel(application) {
+
+    private val quizAudioManager: QuizAudioManager =
+        QuizAudioManager(application.applicationContext, viewModelScope)
 
     private val _uiState = MutableStateFlow(PlantDetailUiState())
     val uiState: StateFlow<PlantDetailUiState> = _uiState.asStateFlow()
@@ -95,6 +100,12 @@ class PlantDetailViewModel @JvmOverloads constructor(
         viewModelScope.launch {
             audioPlayer.state.collect { audioState ->
                 _uiState.update { it.copy(audioState = audioState) }
+                // Duck background music during botanical pronunciation or feedback speech
+                if (audioState is AudioState.Playing) {
+                    quizAudioManager.duckMusic()
+                } else {
+                    quizAudioManager.restoreMusic()
+                }
             }
         }
     }
@@ -200,6 +211,8 @@ class PlantDetailViewModel @JvmOverloads constructor(
         if (questions.size < 5) return
         val selected = questions.shuffled().take(5)
         val currentPlantId = (_uiState.value.plant as? UiState.Success)?.data?.id ?: ""
+        audioPlayer.stop()
+        quizAudioManager.startMusic()
         _uiState.update {
             it.copy(
                 quizSession = QuizSession(
@@ -227,6 +240,15 @@ class PlantDetailViewModel @JvmOverloads constructor(
         val session = _uiState.value.quizSession ?: return
         val selected = session.selectedOption ?: return
         if (session.isAnswerConfirmed || session.isFinished) return
+
+        val currentQ = session.currentQuestion
+        val isCorrect = currentQ != null && selected == currentQ.correctAnswer
+        if (isCorrect) {
+            quizAudioManager.playCorrectSound()
+        } else {
+            quizAudioManager.playWrongSound()
+        }
+
         val updatedAnswers = session.userAnswers.toMutableMap()
         updatedAnswers[session.currentIndex] = selected
         _uiState.update {
@@ -258,7 +280,14 @@ class PlantDetailViewModel @JvmOverloads constructor(
             _uiState.update {
                 it.copy(quizSession = finishedSession)
             }
-            handleQuizResultAudio(finishedSession.score)
+            // 1. Soft fade-out background music (~240ms)
+            quizAudioManager.stopMusic(immediate = false)
+
+            // 2. Play Mandarin feedback after brief pause while score popup animates
+            viewModelScope.launch {
+                delay(300)
+                handleQuizResultAudio(finishedSession.score)
+            }
         }
     }
 
@@ -267,6 +296,8 @@ class PlantDetailViewModel @JvmOverloads constructor(
         if (questions.size < 5) return
         val selected = questions.shuffled().take(5)
         val currentPlantId = (_uiState.value.plant as? UiState.Success)?.data?.id ?: ""
+        audioPlayer.stop()
+        quizAudioManager.startMusic()
         _uiState.update {
             it.copy(
                 quizSession = QuizSession(
@@ -283,6 +314,8 @@ class PlantDetailViewModel @JvmOverloads constructor(
     }
 
     fun exitQuiz() {
+        audioPlayer.stop()
+        quizAudioManager.stopMusic(immediate = true)
         _uiState.update { it.copy(quizSession = null) }
     }
 
@@ -293,10 +326,12 @@ class PlantDetailViewModel @JvmOverloads constructor(
 
     fun stopAudio() {
         audioPlayer.stop()
+        quizAudioManager.stopMusic(immediate = true)
     }
 
     override fun onCleared() {
         super.onCleared()
+        quizAudioManager.release()
         audioPlayer.release()
     }
 }
