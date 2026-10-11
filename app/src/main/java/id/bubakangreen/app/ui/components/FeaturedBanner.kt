@@ -67,28 +67,26 @@ fun FeaturedLocationBanner(
                     .aspectRatio(16f / 9f)
                     .background(PrimaryContainerMint)
             ) {
-                if (!location.photoUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = location.photoUrl,
-                        contentDescription = "Foto ${location.name}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(PrimaryContainerMint),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (location.type == LocationType.URBAN_FARMING) "🌱 Urban Farming" else "🌿 Taman Toga",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimarySeedlingGreen
-                        )
+                LocationImage(
+                    location = location,
+                    contentDescription = "Foto ${location.name}",
+                    modifier = Modifier.fillMaxSize(),
+                    placeholderContent = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(PrimaryContainerMint),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (location.type == LocationType.URBAN_FARMING) "🌱 Urban Farming" else "🌿 Taman Toga",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimarySeedlingGreen
+                            )
+                        }
                     }
-                }
+                )
 
                 Surface(
                     shape = RoundedCornerShape(10.dp),

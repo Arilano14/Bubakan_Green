@@ -75,26 +75,24 @@ fun LocationCard(
                     .aspectRatio(16f / 9f)
                     .background(containerColor)
             ) {
-                if (!location.photoUrl.isNullOrBlank()) {
-                    AsyncImage(
-                        model = location.photoUrl,
-                        contentDescription = "Foto lokasi ${location.name}",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.ExtraBold,
-                            color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
-                        )
+                LocationImage(
+                    location = location,
+                    contentDescription = "Foto lokasi ${location.name}",
+                    modifier = Modifier.fillMaxSize(),
+                    placeholderContent = {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
+                            )
+                        }
                     }
-                }
+                )
 
                 // Thematic Category Badge (Overlay top-left)
                 val badgeBg = if (isUrbanFarming) PrimarySeedlingGreen else AccentSunnyGold

@@ -117,6 +117,8 @@ import id.bubakangreen.app.ui.theme.StatusPendingOrange
 import id.bubakangreen.app.ui.theme.StatusVerifiedGreen
 import id.bubakangreen.app.ui.theme.SurfaceCard
 import id.bubakangreen.app.ui.theme.SurfaceWhite
+import id.bubakangreen.app.data.local.LocalLahanImageRegistry
+import id.bubakangreen.app.ui.components.LocationImage
 import id.bubakangreen.app.ui.theme.TextPrimary
 import id.bubakangreen.app.ui.theme.TextSecondary
 import kotlinx.coroutines.launch
@@ -137,6 +139,7 @@ fun LocationFormScreen(
 
     var cameraNoticeMessage by remember { mutableStateOf<String?>(null) }
     var showUrlInputDialog by remember { mutableStateOf(false) }
+    var showLocalTagDialog by remember { mutableStateOf(false) }
     var replaceIndexTarget by remember { mutableStateOf<Int?>(null) }
     var rawUrlInput by remember { mutableStateOf("") }
     var isProcessingPhoto by remember { mutableStateOf(false) }
@@ -562,6 +565,20 @@ fun LocationFormScreen(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text("Tautan URL", fontSize = 12.sp)
                 }
+
+                OutlinedButton(
+                    onClick = {
+                        replaceIndexTarget = null
+                        showLocalTagDialog = true
+                    },
+                    enabled = canAddPhoto,
+                    shape = RoundedCornerShape(10.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = PrimaryForest)
+                ) {
+                    Icon(imageVector = Icons.Default.AddPhotoAlternate, contentDescription = null, modifier = Modifier.size(16.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text("Tag Lokal (Sementara)", fontSize = 12.sp)
+                }
             }
 
             Spacer(modifier = Modifier.height(10.dp))
@@ -615,10 +632,11 @@ fun LocationFormScreen(
                                         .clip(RoundedCornerShape(8.dp))
                                         .background(BackgroundLight)
                                 ) {
-                                    AsyncImage(
+                                    LocationImage(
                                         model = photoUrl,
                                         contentDescription = "Thumbnail foto lahan ${index + 1}",
                                         contentScale = ContentScale.Crop,
+                                        isUrbanFarming = state.type == LocationType.URBAN_FARMING,
                                         modifier = Modifier.fillMaxSize()
                                     )
                                 }
@@ -1044,6 +1062,100 @@ fun LocationFormScreen(
             dismissButton = {
                 TextButton(onClick = { showUrlInputDialog = false }) {
                     Text("Batal")
+                }
+            }
+        )
+    }
+
+    // Dialog for Local Tag Selection (Temporary Pre-Blaze Feature)
+    if (showLocalTagDialog) {
+        AlertDialog(
+            onDismissRequest = { showLocalTagDialog = false },
+            title = {
+                Column {
+                    Text(
+                        text = "Pilih Tag Foto Lokal",
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        color = OnSurfaceDark
+                    )
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Foto lokal tersimpan di APK (sementara selagi Firebase Storage belum aktif).",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = OnSurfaceVariant
+                    )
+                }
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    LocalLahanImageRegistry.ALL_TAGS.forEach { tagItem ->
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            border = BorderStroke(1.dp, BorderCard),
+                            colors = CardDefaults.cardColors(containerColor = SurfaceCard),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    val replaceIdx = replaceIndexTarget
+                                    if (replaceIdx != null) {
+                                        viewModel.onReplacePhoto(replaceIdx, tagItem.tag)
+                                        replaceIndexTarget = null
+                                    } else {
+                                        viewModel.onAddPhoto(tagItem.tag)
+                                    }
+                                    showLocalTagDialog = false
+                                }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                ) {
+                                    LocationImage(
+                                        model = tagItem.drawableRes,
+                                        contentDescription = tagItem.title,
+                                        modifier = Modifier.fillMaxSize()
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = tagItem.title,
+                                        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+                                        color = OnSurfaceDark
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = tagItem.description,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = OnSurfaceVariant,
+                                        maxLines = 2
+                                    )
+                                    Spacer(modifier = Modifier.height(2.dp))
+                                    Text(
+                                        text = "Tag: ${tagItem.tag}",
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                                        color = PrimaryForest
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showLocalTagDialog = false }) {
+                    Text("Tutup")
                 }
             }
         )

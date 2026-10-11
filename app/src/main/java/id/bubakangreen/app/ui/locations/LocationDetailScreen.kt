@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +43,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.mutableIntStateOf
+import id.bubakangreen.app.data.local.LocalLahanImageRegistry
+import id.bubakangreen.app.ui.components.LocationImage
 import coil.compose.AsyncImage
 import id.bubakangreen.app.domain.model.CoordinatesStatus
 import id.bubakangreen.app.domain.model.Location
@@ -149,6 +154,10 @@ fun LocationDetailScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState)
                     ) {
+                        val resolvedPhotos = remember(location) { LocalLahanImageRegistry.resolvePhotosForLocation(location) }
+                        var activePhotoIndex by remember(location.id) { mutableIntStateOf(0) }
+                        val currentPhoto = resolvedPhotos.getOrNull(activePhotoIndex.coerceIn(0, (resolvedPhotos.size - 1).coerceAtLeast(0)))
+
                         // Hero Photograph with rounded bottom corners (16:9)
                         Box(
                             modifier = Modifier
@@ -157,26 +166,25 @@ fun LocationDetailScreen(
                                 .clip(RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp))
                                 .background(if (isUrbanFarming) PrimaryContainerMint else AccentSunnyContainer)
                         ) {
-                            if (!location.photoUrl.isNullOrBlank()) {
-                                AsyncImage(
-                                    model = location.photoUrl,
-                                    contentDescription = "Foto ${location.name}",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
-                            } else {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
-                                    )
+                            LocationImage(
+                                model = currentPhoto,
+                                contentDescription = "Foto ${location.name}",
+                                modifier = Modifier.fillMaxSize(),
+                                isUrbanFarming = isUrbanFarming,
+                                placeholderContent = {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = if (isUrbanFarming) "🌱 Urban Farming" else "🌿 Taman Toga",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isUrbanFarming) PrimarySeedlingGreen else OnAccentGoldDark
+                                        )
+                                    }
                                 }
-                            }
+                            )
 
                             // Category badge
                             Surface(
@@ -191,6 +199,56 @@ fun LocationDetailScreen(
                                     color = if (isUrbanFarming) OnPrimaryWhite else androidx.compose.ui.graphics.Color(0xFF2E1C00),
                                     modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
                                 )
+                            }
+
+                            // Counter Badge if multiple photos are present
+                            if (resolvedPhotos.size > 1) {
+                                Surface(
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = androidx.compose.ui.graphics.Color.Black.copy(alpha = 0.65f),
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(16.dp)
+                                ) {
+                                    Text(
+                                        text = "📷 ${activePhotoIndex + 1}/${resolvedPhotos.size}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = androidx.compose.ui.graphics.Color.White,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        // Thumbnail Gallery Strip (if multiple photos available)
+                        if (resolvedPhotos.size > 1) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                resolvedPhotos.forEachIndexed { idx, photoItem ->
+                                    val isSelected = idx == activePhotoIndex
+                                    Card(
+                                        shape = RoundedCornerShape(10.dp),
+                                        border = BorderStroke(
+                                            width = if (isSelected) 2.5.dp else 1.dp,
+                                            color = if (isSelected) PrimarySeedlingGreen else OutlineOrganic
+                                        ),
+                                        modifier = Modifier
+                                            .size(width = 72.dp, height = 48.dp)
+                                            .clickable { activePhotoIndex = idx }
+                                    ) {
+                                        LocationImage(
+                                            model = photoItem,
+                                            contentDescription = "Thumbnail foto ${idx + 1}",
+                                            modifier = Modifier.fillMaxSize()
+                                        )
+                                    }
+                                }
                             }
                         }
 
