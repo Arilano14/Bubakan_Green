@@ -319,8 +319,50 @@
 
     const state = {
       locations: [
-        { id: 'LOC_01', name: 'Urban Farming Kelurahan', rw: '01', type: 'URBAN_FARMING', address: 'Jl. Raya Bubakan No. 1', desc: 'Sentra percontohan ketahanan pangan mandiri sayur dan buah.' },
-        { id: 'LOC_02', name: 'Taman Toga RW 03', rw: '03', type: 'TAMAN_TOGA', address: 'Lingkungan RW 03 RT 02', desc: 'Apotek hidup warga dengan 24 ragam rimpang dan tanaman obat.' }
+        {
+          id: 'loc_urban_farming_toga_rw01',
+          name: 'Urban Farming dan Taman Toga RW 1',
+          rw: '01',
+          type: 'URBAN_FARMING',
+          address: 'Lingkungan RW 01, Kelurahan Bubakan, Mijen',
+          desc: 'Kawasan budidaya tanaman pangan dan TOGA mandiri warga RW 01.',
+          latitude: -7.092056,
+          longitude: 110.319528,
+          photos: ['/assets/Lahan/RW 1_1.jpeg', '/assets/Lahan/RW 1_2.jpeg', '/assets/Lahan/RW 1_3.jpeg']
+        },
+        {
+          id: 'loc_taman_toga_rw02',
+          name: 'Taman Toga RW 2',
+          rw: '02',
+          type: 'TAMAN_TOGA',
+          address: 'Lingkungan RW 02, Kelurahan Bubakan, Mijen',
+          desc: 'Taman tanaman obat keluarga warga RW 02 Kelurahan Bubakan.',
+          latitude: -7.097694,
+          longitude: 110.320000,
+          photos: ['/assets/Lahan/RW 2_Toga.jpeg', '/assets/Lahan/RW 2_Toga 1.jpeg', '/assets/Lahan/RW 2_Toga 2.jpeg']
+        },
+        {
+          id: 'loc_taman_toga_rw03',
+          name: 'Taman Toga RW 3',
+          rw: '03',
+          type: 'TAMAN_TOGA',
+          address: 'Lingkungan RW 03, Kelurahan Bubakan, Mijen',
+          desc: 'Taman tanaman obat keluarga warga RW 03. Kolaborasi dengan Mahasiswa KKN.',
+          latitude: -7.091944,
+          longitude: 110.325667,
+          photos: ['/assets/Lahan/RW 3_Toga.jpeg', '/assets/Lahan/RW 3_Toga 2.jpeg', '/assets/Lahan/RW 3_Toga 3.jpeg']
+        },
+        {
+          id: 'loc_urban_farming_rw03',
+          name: 'Urban Farming RW 3',
+          rw: '03',
+          type: 'URBAN_FARMING',
+          address: 'Lingkungan RW 03, Kelurahan Bubakan, Mijen',
+          desc: 'Sentra budidaya pertanian mandiri dan tanaman pangan warga RW 03.',
+          latitude: -7.092000,
+          longitude: 110.324806,
+          photos: ['/assets/Lahan/RW 3_Urban.jpeg', '/assets/Lahan/RW 3_Urban 2.jpeg', '/assets/Lahan/RW 3_Urban 3.jpeg']
+        }
       ],
       plants: [
         { id: 'P01', nameId: 'Jahe Merah', nameLatin: 'Zingiber officinale var. rubrum', hanzi: '红姜', pinyin: 'hóng jiāng', desc: 'Rimpang berkhasiat menghangatkan tubuh, antioksidan alami, dan imunostimulan herbal.' },
@@ -526,9 +568,16 @@
                   <span class="badge ${loc.type === 'URBAN_FARMING' ? 'badge-mint' : 'badge-gold'}">${loc.type === 'URBAN_FARMING' ? '🌱 Urban Farming' : '🌿 Taman Toga'}</span>
                   <span class="badge badge-mint">RW ${loc.rw}</span>
                 </div>
+                ${loc.photos && loc.photos.length > 0 ? `
+                  <div style="margin: 10px 0; border-radius: 12px; overflow: hidden; height: 160px; background: #e8f5e9; position: relative;">
+                    <img src="${encodeURI(loc.photos[0])}" alt="${loc.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='/mascot.png';">
+                    <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px;">📷 ${loc.photos.length} Foto</span>
+                  </div>
+                ` : ''}
                 <div class="card-title">${loc.name}</div>
                 <div class="card-subtitle">📍 ${loc.address}</div>
-                <div class="tactile-btn" style="margin-top: 8px;" onclick="alert('Membuka rute Google Maps untuk ${loc.name}...')">
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">🌐 Koordinat: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}</div>
+                <div class="tactile-btn" style="margin-top: 8px;" onclick="alert('Membuka rute Google Maps untuk ${loc.name} (${loc.latitude}, ${loc.longitude})...')">
                   <div class="tactile-btn-inner">📍 Petunjuk Arah ke Kebun Ini</div>
                 </div>
               </div>
