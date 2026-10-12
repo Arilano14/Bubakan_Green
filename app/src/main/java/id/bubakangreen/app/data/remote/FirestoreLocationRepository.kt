@@ -93,7 +93,9 @@ class FirestoreLocationRepository(
                 (locationId == "loc_urban_farming_bubakan" && it.id == "LOC_PREVIEW_01") ||
                 (locationId == "loc_taman_toga_rw03" && it.id == "LOC_PREVIEW_02") ||
                 (locationId == "LOC_PREVIEW_01" && it.id == "loc_urban_farming_bubakan") ||
-                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03")
+                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03") ||
+                (locationId == "loc_urban_farming_toga_rw01" && it.id == "loc_urban_farming_rw01") ||
+                (locationId == "loc_urban_farming_rw01" && it.id == "loc_urban_farming_toga_rw01")
             }
             Result.Success(loc) as Result<Location?>
         }.catch {
@@ -102,7 +104,9 @@ class FirestoreLocationRepository(
                 (locationId == "loc_urban_farming_bubakan" && it.id == "LOC_PREVIEW_01") ||
                 (locationId == "loc_taman_toga_rw03" && it.id == "LOC_PREVIEW_02") ||
                 (locationId == "LOC_PREVIEW_01" && it.id == "loc_urban_farming_bubakan") ||
-                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03")
+                (locationId == "LOC_PREVIEW_02" && it.id == "loc_taman_toga_rw03") ||
+                (locationId == "loc_urban_farming_toga_rw01" && it.id == "loc_urban_farming_rw01") ||
+                (locationId == "loc_urban_farming_rw01" && it.id == "loc_urban_farming_toga_rw01")
             }
             emit(Result.Success(fallback))
         }
@@ -250,8 +254,19 @@ class FirestoreLocationRepository(
     }
 
     override suspend fun deleteLocation(locationId: String): Result<Unit> {
-        // Preferred soft delete per Section 8
-        return deactivateLocation(locationId)
+        return try {
+            collection.document(locationId).delete().await()
+            val plantsSnapshot = firestore
+                .collection("location_plants")
+                .whereEqualTo("locationId", locationId)
+                .get().await()
+            for (doc in plantsSnapshot.documents) {
+                doc.reference.delete().await()
+            }
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
     }
 
     companion object {

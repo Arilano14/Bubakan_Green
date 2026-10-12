@@ -77,7 +77,9 @@ class FirestorePlantRepository(
                         (locationId == "loc_urban_farming_bubakan" && it.locationId == "LOC_PREVIEW_01") ||
                         (locationId == "loc_taman_toga_rw03" && it.locationId == "LOC_PREVIEW_02") ||
                         (locationId == "LOC_PREVIEW_01" && it.locationId == "loc_urban_farming_bubakan") ||
-                        (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03")
+                        (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03") ||
+                        (locationId == "loc_urban_farming_toga_rw01" && it.locationId == "loc_urban_farming_rw01") ||
+                        (locationId == "loc_urban_farming_rw01" && it.locationId == "loc_urban_farming_toga_rw01")
                     }
                 } else {
                     list
@@ -90,7 +92,9 @@ class FirestorePlantRepository(
                     (locationId == "loc_urban_farming_bubakan" && it.locationId == "LOC_PREVIEW_01") ||
                     (locationId == "loc_taman_toga_rw03" && it.locationId == "LOC_PREVIEW_02") ||
                     (locationId == "LOC_PREVIEW_01" && it.locationId == "loc_urban_farming_bubakan") ||
-                    (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03")
+                    (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03") ||
+                    (locationId == "loc_urban_farming_toga_rw01" && it.locationId == "loc_urban_farming_rw01") ||
+                    (locationId == "loc_urban_farming_rw01" && it.locationId == "loc_urban_farming_toga_rw01")
                 }
                 emit(Result.Success(fallback))
             }
@@ -217,6 +221,21 @@ class FirestorePlantRepository(
         return try {
             // Delete junction document only; master_plants document remains 100% untouched
             locationPlantsCollection.document(locationPlantId).delete().await()
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e, e.localizedMessage)
+        }
+    }
+
+    override suspend fun deleteMasterPlant(plantId: String): Result<Unit> {
+        return try {
+            masterPlantsCollection.document(plantId).delete().await()
+            val locPlantsSnapshot = locationPlantsCollection
+                .whereEqualTo("plantId", plantId)
+                .get().await()
+            for (doc in locPlantsSnapshot.documents) {
+                doc.reference.delete().await()
+            }
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e, e.localizedMessage)

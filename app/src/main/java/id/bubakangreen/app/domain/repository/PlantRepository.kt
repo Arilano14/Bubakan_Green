@@ -16,5 +16,6 @@ interface PlantRepository {
     suspend fun createMasterPlantWithLocation(plant: MasterPlant, locationId: String): Result<String> = Result.Success(plant.id)
     suspend fun updateLocationPlant(locationPlant: LocationPlant): Result<Unit>
     suspend fun removePlantFromLocation(locationPlantId: String): Result<Unit>
+    suspend fun deleteMasterPlant(plantId: String): Result<Unit> = Result.Success(Unit)
 }
 

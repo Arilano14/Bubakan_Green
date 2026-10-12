@@ -148,6 +148,32 @@ class AdminDashboardViewModel(
         }
     }
 
+    fun deleteLocation(locationId: String, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            val result = locationRepository.deleteLocation(locationId)
+            if (result is Result.Success) {
+                _actionMessage.value = "Lahan berhasil dihapus."
+                loadData()
+                onComplete()
+            } else {
+                _actionMessage.value = "Gagal menghapus lahan. Coba lagi."
+            }
+        }
+    }
+
+    fun deletePlant(plantId: String, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            val result = plantRepository.deleteMasterPlant(plantId)
+            if (result is Result.Success) {
+                _actionMessage.value = "Tanaman berhasil dihapus."
+                loadData()
+                onComplete()
+            } else {
+                _actionMessage.value = "Gagal menghapus tanaman. Coba lagi."
+            }
+        }
+    }
+
     fun addPlantToLocation(
         locationId: String,
         plantId: String,

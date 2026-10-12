@@ -410,7 +410,7 @@ fun PlantDetailScreen(
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Mascot(
-                                            type = MascotType.HAPPY,
+                                            type = MascotType.SIDE_GOODJOB_PLANT,
                                             size = 140.dp,
                                             animateIdle = true
                                         )

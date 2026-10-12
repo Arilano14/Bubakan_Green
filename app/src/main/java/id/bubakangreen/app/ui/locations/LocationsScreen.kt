@@ -133,7 +133,7 @@ fun LocationsScreen(
                 )
             }
             Mascot(
-                type = MascotType.POINTING,
+                type = MascotType.SIDE_GREEN_ROBO,
                 size = 72.dp,
                 baseRotation = 2f
             )

@@ -48,7 +48,8 @@
 
     /* Phone Device Frame */
     .phone-device {
-      width: 390px;
+      width: 100%;
+      max-width: 390px;
       height: 800px;
       background: #000;
       border-radius: 48px;
@@ -56,6 +57,47 @@
       box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 3px #1E7B4D;
       position: relative;
       flex-shrink: 0;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px 8px;
+      }
+      .phone-device {
+        max-width: 100%;
+        height: 720px;
+        border-radius: 32px;
+        padding: 8px;
+      }
+      .phone-screen {
+        border-radius: 26px;
+      }
+      .screen-pill-container {
+        gap: 6px;
+      }
+      .screen-pill {
+        padding: 6px 12px;
+        font-size: 11px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .phone-device {
+        height: 640px;
+        border-radius: 24px;
+        padding: 6px;
+      }
+      .phone-screen {
+        border-radius: 20px;
+      }
+      .app-topbar {
+        padding: 28px 10px 10px 10px !important;
+      }
+      .app-body {
+        padding: 10px !important;
+        gap: 10px !important;
+      }
     }
 
     .phone-notch {
@@ -201,6 +243,71 @@
     .guide-box { background: rgba(0, 0, 0, 0.3); border-radius: 14px; padding: 16px; border-left: 4px solid var(--primary-forest); }
     .guide-box h4 { font-size: 14px; font-weight: 800; color: #B7E4C7; margin-bottom: 4px; }
     .guide-box p { font-size: 12px; color: #E8EFE9; margin: 0; }
+
+    /* Reusable Side Mascot Presentation Styles */
+    .side-mascot-callout {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      margin-top: 10px;
+      transition: transform 0.2s ease;
+    }
+    .side-mascot-avatar {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .side-mascot-img {
+      display: block;
+      height: auto;
+      object-fit: contain;
+    }
+    .side-mascot-breathe {
+      animation: sideMascotBreathe 4.2s ease-in-out infinite;
+    }
+    @keyframes sideMascotBreathe {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+    .side-mascot-speech {
+      flex: 1;
+      min-width: 0;
+    }
+    .side-mascot-speech-title {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.3px;
+      margin-bottom: 2px;
+      text-transform: uppercase;
+    }
+    .side-mascot-speech-text {
+      font-size: 12px;
+      line-height: 1.4;
+      font-weight: 500;
+    }
+    .side-mascot-theme-mint {
+      background: #E2F7EC;
+      border: 1.5px solid rgba(30, 123, 77, 0.25);
+    }
+    .side-mascot-theme-mint .side-mascot-speech-title { color: #145836; }
+    .side-mascot-theme-mint .side-mascot-speech-text { color: #143625; }
+    .side-mascot-theme-warm {
+      background: #FFF8E7;
+      border: 1.5px solid rgba(255, 183, 3, 0.35);
+    }
+    .side-mascot-theme-warm .side-mascot-speech-title { color: #7A4E00; }
+    .side-mascot-theme-warm .side-mascot-speech-text { color: #3D2600; }
+    .side-mascot-theme-teal {
+      background: #E0F9F6;
+      border: 1.5px solid rgba(23, 195, 178, 0.35);
+    }
+    .side-mascot-theme-teal .side-mascot-speech-title { color: #0B4F48; }
+    .side-mascot-theme-teal .side-mascot-speech-text { color: #083732; }
+    .side-mascot-size-sm .side-mascot-img { width: 44px; }
+    .side-mascot-size-md .side-mascot-img { width: 56px; }
   </style>
 </head>
 <body>
@@ -226,6 +333,19 @@
     <!-- Smartphone Container -->
     <div class="phone-device">
       <div class="phone-notch"><div class="phone-camera"></div></div>
+
+      <!-- Confirmation Modal Popup -->
+      <div id="confirmModal" style="display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.65); border-radius: 44px; z-index: 999; align-items: center; justify-content: center; padding: 20px;">
+        <div style="background: white; border-radius: 24px; padding: 24px; width: 100%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); text-align: center;">
+          <div style="font-size: 36px; margin-bottom: 8px;">⚠️</div>
+          <h3 id="modalTitle" style="color: #143625; font-size: 17px; font-weight: 800; margin-bottom: 8px;">Konfirmasi Hapus</h3>
+          <p id="modalDesc" style="color: #51685B; font-size: 13px; line-height: 1.5; margin-bottom: 20px;">Apakah Anda yakin ingin menghapus data ini secara langsung?</p>
+          <div style="display: flex; gap: 10px;">
+            <button type="button" onclick="closeConfirmModal()" style="flex: 1; padding: 12px; border: 1.5px solid #E5EDE7; background: #FDFBF7; color: #143625; border-radius: 14px; font-weight: 700; font-size: 13px; cursor: pointer;">Batal</button>
+            <button type="button" id="modalConfirmBtn" onclick="executeModalConfirm()" style="flex: 1; padding: 12px; border: none; background: #D62828; color: #FFFFFF; border-radius: 14px; font-weight: 800; font-size: 13px; cursor: pointer; box-shadow: 0 4px 12px rgba(214,40,40,0.3);">Hapus</button>
+          </div>
+        </div>
+      </div>
 
       <div class="phone-screen">
         <!-- Dynamic Top Bar -->
@@ -287,8 +407,16 @@
         <h4>✅ Integritas Backend 100% Terjaga</h4>
         <p>Seluruh skema data Firestore, GPS Single-Shot, kontrak Result, dan 36 unit test tetap utuh dan terverifikasi PASS.</p>
       </div>
+
+      <div class="guide-box">
+        <h4>🦊 Side Mascot Companion System</h4>
+        <p>8 maskot pendamping WebP teroptimasi memperkaya momen belajar, apresiasi, dan panduan kebun tanpa menggeser identitas utama Si Buba.</p>
+      </div>
     </div>
   </div>
+
+  <!-- Reusable Side Mascot Presentation System -->
+  <script src="/side-mascot.js"></script>
 
   <script>
     const bubaSvg = (state = 'GREETING') => `
@@ -320,15 +448,43 @@
     const state = {
       locations: [
         {
-          id: 'loc_urban_farming_toga_rw01',
-          name: 'Urban Farming dan Taman Toga RW 1',
+          id: 'loc_urban_farming_bubakan',
+          name: 'Urban Farming Kelurahan Bubakan',
+          rw: '01',
+          type: 'URBAN_FARMING',
+          address: 'Jl. Raya Bubakan No. 1, Kelurahan Bubakan, Mijen',
+          desc: 'Kebun percontohan budidaya sayuran dan pangan mandiri binaan Kelurahan Bubakan.',
+          latitude: -7.093500,
+          longitude: 110.321500,
+          photos: ['/assets/Lahan/kelurahan_urban 1.png', '/assets/Lahan/Kelurahan Urban 2.jpeg'],
+          plantCount: 5,
+          plantList: ['Sereh', 'Cabai', 'Kangkung', 'Tomat', 'Terong']
+        },
+        {
+          id: 'loc_urban_farming_rw01',
+          name: 'Urban Farming RW 1',
           rw: '01',
           type: 'URBAN_FARMING',
           address: 'Lingkungan RW 01, Kelurahan Bubakan, Mijen',
-          desc: 'Kawasan budidaya tanaman pangan dan TOGA mandiri warga RW 01.',
+          desc: 'Sentra budidaya tanaman pangan dan sayuran pekarangan mandiri warga RW 01.',
           latitude: -7.092056,
           longitude: 110.319528,
-          photos: ['/assets/Lahan/RW 1_1.jpeg', '/assets/Lahan/RW 1_2.jpeg', '/assets/Lahan/RW 1_3.jpeg']
+          photos: ['/assets/Lahan/RW 1_1.jpeg', '/assets/Lahan/RW 1_2.jpeg', '/assets/Lahan/RW 1_3.jpeg'],
+          plantCount: 12,
+          plantList: ['Seledri', 'Kucai', 'Pakcoy', 'Daun Bawang', 'Cabai', 'Tomat', 'Caisim', 'Talas', 'Terong', 'Pepaya', 'Bayam', 'Kacang Panjang']
+        },
+        {
+          id: 'loc_taman_toga_rw01',
+          name: 'Taman Toga RW 1',
+          rw: '01',
+          type: 'TAMAN_TOGA',
+          address: 'Lingkungan RW 01, Kelurahan Bubakan, Mijen (Berdampingan dengan Urban Farming RW 1)',
+          desc: 'Taman tanaman obat keluarga (TOGA) warga RW 01 yang membudidayakan ragam tanaman herbal tradisional berdampingan dengan Urban Farming RW 1.',
+          latitude: -7.092080,
+          longitude: 110.319550,
+          photos: ['/assets/Lahan/RW 1_Taman Toga 1.jpeg', '/assets/Lahan/RW 1_Taman Toga.jpeg'],
+          plantCount: 13,
+          plantList: ['Jahe', 'Lengkuas', 'Kunyit', 'Sereh', 'Kumis Kucing', 'Pegagan', 'Bunga Kenanga', 'Bunga Bugang', 'Kemangi', 'Pandan', 'Mahoni', 'Daun Sintrong', 'Cepokak']
         },
         {
           id: 'loc_taman_toga_rw02',
@@ -339,7 +495,9 @@
           desc: 'Taman tanaman obat keluarga warga RW 02 Kelurahan Bubakan.',
           latitude: -7.097694,
           longitude: 110.320000,
-          photos: ['/assets/Lahan/RW 2_Toga.jpeg', '/assets/Lahan/RW 2_Toga 1.jpeg', '/assets/Lahan/RW 2_Toga 2.jpeg']
+          photos: ['/assets/Lahan/RW 2_Toga.jpeg', '/assets/Lahan/RW 2_Toga 1.jpeg', '/assets/Lahan/RW 2_Toga 2.jpeg'],
+          plantCount: 0,
+          plantList: []
         },
         {
           id: 'loc_taman_toga_rw03',
@@ -350,7 +508,9 @@
           desc: 'Taman tanaman obat keluarga warga RW 03. Kolaborasi dengan Mahasiswa KKN.',
           latitude: -7.091944,
           longitude: 110.325667,
-          photos: ['/assets/Lahan/RW 3_Toga.jpeg', '/assets/Lahan/RW 3_Toga 2.jpeg', '/assets/Lahan/RW 3_Toga 3.jpeg']
+          photos: ['/assets/Lahan/RW 3_Toga.jpeg', '/assets/Lahan/RW 3_Toga 2.jpeg', '/assets/Lahan/RW 3_Toga 3.jpeg'],
+          plantCount: 7,
+          plantList: ['Sereh', 'Jahe', 'Kencur', 'Kunyit', 'Lidah Buaya', 'Ciplukan', 'Kitolot']
         },
         {
           id: 'loc_urban_farming_rw03',
@@ -361,17 +521,40 @@
           desc: 'Sentra budidaya pertanian mandiri dan tanaman pangan warga RW 03.',
           latitude: -7.092000,
           longitude: 110.324806,
-          photos: ['/assets/Lahan/RW 3_Urban.jpeg', '/assets/Lahan/RW 3_Urban 2.jpeg', '/assets/Lahan/RW 3_Urban 3.jpeg']
+          photos: ['/assets/Lahan/RW 3_Urban.jpeg', '/assets/Lahan/RW 3_Urban 2.jpeg', '/assets/Lahan/RW 3_Urban 3.jpeg'],
+          plantCount: 2,
+          plantList: ['Durian', 'Jahe']
         }
       ],
       plants: [
-        { id: 'P01', nameId: 'Jahe Merah', nameLatin: 'Zingiber officinale var. rubrum', hanzi: '红姜', pinyin: 'hóng jiāng', desc: 'Rimpang berkhasiat menghangatkan tubuh, antioksidan alami, dan imunostimulan herbal.' },
-        { id: 'P02', nameId: 'Temulawak', nameLatin: 'Curcuma xanthorrhiza', hanzi: '姜黄', pinyin: 'jiāng huáng', desc: 'Menjaga kesehatan lambung, nafsu makan, dan pelindung fungsi hati alami.' },
-        { id: 'P03', nameId: 'Kencur', nameLatin: 'Kaempferia galanga', hanzi: '沙姜', pinyin: 'shā jiāng', desc: 'Meredakan batuk dan melegakan tenggorokan, bahan baku utama jamu tradisional.' }
+        { id: 'bunga_kenanga', nameId: 'Bunga Kenanga', nameLatin: 'Cananga odorata', hanzi: '依兰', pinyin: 'yī lán', photo: '/assets/plants/plant_bunga_kenanga.webp', desc: 'Bunga harum semerbak penghasil minyak asiri cananga yang menenangkan syaraf dan mempercantik taman.' },
+        { id: 'bayam', nameId: 'Bayam', nameLatin: 'Amaranthus tricolor', hanzi: '苋菜', pinyin: 'xiàn cài', photo: '/assets/plants/plant_bayam.webp', desc: 'Daun bayam hijau segar kaya zat besi dan klorofil tinggi untuk sayur bening keluarga.' },
+        { id: 'pepaya', nameId: 'Pepaya', nameLatin: 'Carica papaya', hanzi: '木瓜', pinyin: 'mù guā', photo: '/assets/plants/plant_pepaya.webp', desc: 'Pohon buah tropis berbuah lebat kaya enzim papain alami untuk kesehatan saluran cerna.' },
+        { id: 'caisim', nameId: 'Caisim', nameLatin: 'Brassica rapa subsp. parachinensis', hanzi: '菜心', pinyin: 'cài xīn', photo: '/assets/plants/plant_caisim.webp', desc: 'Sawi hijau renyah kaya kalsium dan vitamin, tumbuh cepat di bedengan pekarangan.' },
+        { id: 'daun_bawang', nameId: 'Daun Bawang', nameLatin: 'Allium fistulosum', hanzi: '大葱', pinyin: 'dà cōng', photo: '/assets/plants/plant_daun_bawang.webp', desc: 'Sayuran bumbu berdaun silindris gurih kaya allisin penambah daya tahan tubuh.' },
+        { id: 'daun_sintrong', nameId: 'Daun Sintrong', nameLatin: 'Crassocephalum crepidioides', hanzi: '野茼蒿', pinyin: 'yě tóng hāo', photo: '/assets/plants/plant_daun_sintrong.webp', desc: 'Tumbuhan herba liar beraroma wangi lembut yang pucuk daun mudanya digemari sebagai lalapan dan sayuran segar berkhasiat.' },
+        { id: 'durian', nameId: 'Durian', nameLatin: 'Durio zibethinus', hanzi: '榴莲', pinyin: 'liú lián', photo: '/assets/plants/plant_durian.webp', desc: 'Pohon buah tropis penghasil buah berkulit duri tajam dengan aroma khas dan daging buah bertekstur lembut manis.' },
+        { id: 'kacang_panjang', nameId: 'Kacang Panjang', nameLatin: 'Vigna unguiculata subsp. sesquipedalis', hanzi: '豆角', pinyin: 'dòu jiǎo', photo: '/assets/plants/plant_kacang_panjang.webp', desc: 'Tanaman polong merambat dengan buah polong silindris panjang yang produktif untuk urban farming pekarangan.' },
+        { id: 'kemangi', nameId: 'Kemangi', nameLatin: 'Ocimum basilicum var. anisatum', hanzi: '罗勒', pinyin: 'luó lè', photo: '/assets/plants/plant_kemangi.webp', desc: 'Terna semak tegak bercabang banyak dengan daun hijau cerah beraroma wangi sitrun khas dan rasa segar sedikit pedas.' },
+        { id: 'kitolot', nameId: 'Kitolot', nameLatin: 'Hippobroma longiflora', hanzi: '同瓣草', pinyin: 'tóng bàn cǎo', photo: '/assets/plants/plant_kitolot.webp', desc: 'Tanaman herba liar berkhasiat obat dengan bunga putih panjang berbentuk bintang yang umum dimanfaatkan getah encernya.' },
+        { id: 'seledri', nameId: 'Seledri', nameLatin: 'Apium graveolens', hanzi: '芹菜', pinyin: 'qín cài', photo: '/assets/plants/plant_seledri.webp', desc: 'Herba aromatik renyah kaya apigenin yang membantu menjaga tekanan darah stabil.' },
+        { id: 'jahe', nameId: 'Jahe', nameLatin: 'Zingiber officinale', hanzi: '生姜', pinyin: 'shēng jiāng', photo: '/assets/plants/plant_jahe.webp', desc: 'Rimpang berkhasiat menghangatkan tubuh, antioksidan alami, dan imunostimulan herbal.' },
+        { id: 'terong', nameId: 'Terong', nameLatin: 'Solanum melongena', hanzi: '茄子', pinyin: 'qié zi', photo: '/assets/plants/plant_terong.webp', desc: 'Buah ungu kaya antosianin nasunin penangkal radikal bebas dan penjaga kesehatan otak.' },
+        { id: 'cabai', nameId: 'Cabai Rawit', nameLatin: 'Capsicum frutescens', hanzi: '辣椒', pinyin: 'là jiāo', photo: '/assets/plants/plant_cabai.webp', desc: 'Rasa pedas dari kapsaisin alami yang kaya vitamin C dan merangsang metabolisme tubuh.' },
+        { id: 'kangkung', nameId: 'Kangkung', nameLatin: 'Ipomoea aquatica', hanzi: '空心菜', pinyin: 'kōng xīn cài', photo: '/assets/plants/plant_kangkung.webp', desc: 'Sayur daun berbatang rongga air yang sangat cepat tumbuh dan kaya zat besi.' },
+        { id: 'kencur', nameId: 'Kencur', nameLatin: 'Kaempferia galanga', hanzi: '沙姜', pinyin: 'shā jiāng', photo: '/assets/plants/plant_kencur.webp', desc: 'Rimpang berkhasiat melegakan pernapasan, meredakan batuk, dan bahan jamu tradisional.' },
+        { id: 'kunyit', nameId: 'Kunyit', nameLatin: 'Curcuma longa', hanzi: '姜黄', pinyin: 'jiāng huáng', photo: '/assets/plants/plant_kunyit.webp', desc: 'Rimpang jingga kaya kurkuminoid sebagai antiinflamasi dan pelindung fungsi hati alami.' },
+        { id: 'lidah_buaya', nameId: 'Lidah Buaya', nameLatin: 'Aloe vera', hanzi: '芦荟', pinyin: 'lú huì', photo: '/assets/plants/plant_lidah_buaya.webp', desc: 'Sukulen tebal berdaging gel dingin untuk perawatan kulit dan penyejuk pencernaan.' },
+        { id: 'pakcoy', nameId: 'Pakcoy', nameLatin: 'Brassica rapa subsp. chinensis', hanzi: '青江菜', pinyin: 'qīng jiāng cài', photo: '/assets/plants/plant_pakcoy.webp', desc: 'Sawi sendok berdaging renyah berdaun hijau gelap yang cocok untuk budidaya hidroponik.' },
+        { id: 'sereh', nameId: 'Sereh', nameLatin: 'Cymbopogon citratus', hanzi: '柠檬草', pinyin: 'níng méng cǎo', photo: '/assets/plants/plant_sereh.webp', desc: 'Herba rumput wangi kaya sitronelal pengusir serangga alami dan penenang aromaterapi.' },
+        { id: 'tomat', nameId: 'Tomat', nameLatin: 'Solanum lycopersicum', hanzi: '番茄', pinyin: 'fān qié', photo: '/assets/plants/plant_tomat.webp', desc: 'Buah merah kaya likopen antioksidan kuat untuk kesehatan jantung dan peremajaan sel.' }
       ]
     };
 
-    function switchScreen(screenId) {
+    let currentSelectedPlantId = 'bunga_kenanga';
+
+    function switchScreen(screenId, plantParam) {
+      if (plantParam) currentSelectedPlantId = plantParam;
       document.querySelectorAll('.screen-pill').forEach(p => p.classList.remove('active'));
       const activePill = Array.from(document.querySelectorAll('.screen-pill')).find(p => p.getAttribute('onclick')?.includes(screenId));
       if (activePill) activePill.classList.add('active');
@@ -396,14 +579,21 @@
           topSub.textContent = 'Kelurahan Bubakan, Mijen';
           topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('login')">🔒</button><button class="icon-btn" onclick="alert('Bubakan Green App')">ℹ️</button>`;
           body.innerHTML = `
-            <!-- Si Buba Greeting Banner -->
-            <div class="ui-card" style="flex-direction: row; align-items: center; gap: 14px; padding: 14px;">
-              ${bubaSvg('GREETING')}
-              <div>
-                <span class="badge badge-mint" style="margin-bottom: 4px;">PANDUAN BOTANI</span>
-                <div style="font-weight: 700; font-size: 13px; color: var(--text-dark); line-height: 1.4;">
-                  Halo! Yuk, jelajahi tanaman hijau & kebun toga di Bubakan hari ini!
+            <!-- Duolingo-inspired Hero Card: Text on Left, Mascot Flower protruding 1/4 to right (Image 3) -->
+            <div style="background: linear-gradient(135deg, #2D6A4F 0%, #1E7B4D 100%); border-radius: 24px; padding: 22px 18px; margin-bottom: 14px; position: relative; overflow: visible; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 16px rgba(30,123,77,0.25);">
+              <div style="flex: 1; z-index: 2; padding-right: 8px;">
+                <div style="font-size: 10px; font-weight: 800; color: #E2F7EC; letter-spacing: 1.5px; text-transform: uppercase;">BUBAKAN GREEN</div>
+                <div style="font-size: 10.5px; color: rgba(226, 247, 236, 0.8); margin-bottom: 8px;">Kelurahan Bubakan, Mijen</div>
+                <div style="font-size: 21px; font-weight: 800; color: #FFFFFF; line-height: 1.25;">Hai, teman<br>Bubakan!</div>
+                <div style="font-size: 12.5px; color: rgba(255,255,255,0.92); margin-top: 6px; line-height: 1.4;">Yuk, kenalan dengan tanaman di sekitar kita</div>
+                <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px;">
+                  <button type="button" onclick="switchScreen('catalog')" style="background: #FFB703; color: #143625; border: none; border-radius: 22px; padding: 11px 18px; font-weight: 800; font-size: 13px; cursor: pointer; text-align: center; box-shadow: 0 3px 8px rgba(0,0,0,0.15);">Mulai Jelajah</button>
+                  <button type="button" onclick="alert('Membuka pemindai QR Code botani di kebun...')" style="background: rgba(255,255,255,0.15); color: #FFFFFF; border: 1.5px solid rgba(255,255,255,0.6); border-radius: 22px; padding: 9px 18px; font-weight: 700; font-size: 12px; cursor: pointer; text-align: center;">📷 Pindai Label QR</button>
                 </div>
+              </div>
+              <!-- Mascot Flower: Large and positioned without overlapping content, with 1/4 protruding out of frame to right -->
+              <div style="width: 110px; height: 185px; position: relative; flex-shrink: 0; z-index: 3;">
+                <img src="/assets/mascot/mascot_flower.webp" alt="Maskot Bunga Bubakan Green" style="position: absolute; right: -36px; top: -10px; width: 148px; height: 190px; object-fit: contain; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.25)); pointer-events: none;" class="side-mascot-breathe" onerror="this.onerror=null; this.src='/assets/mascot/mascot_flower.png';">
               </div>
             </div>
 
@@ -454,12 +644,12 @@
             <!-- Plant Highlights -->
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px;">
               <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">Koleksi Tanaman Pilihan</div>
-              <a href="javascript:void(0)" onclick="switchScreen('catalog')" style="font-size: 12px; color: var(--primary-forest); font-weight: 800; text-decoration: none;">Semua →</a>
+              <a href="javascript:void(0)" onclick="switchScreen('catalog')" style="font-size: 12px; color: var(--primary-forest); font-weight: 800; text-decoration: none;">Semua (${state.plants.length}) →</a>
             </div>
 
-            ${state.plants.map(p => `
-              <div class="ui-card" style="cursor: pointer; flex-direction: row; gap: 14px; padding: 14px; align-items: center;" onclick="switchScreen('plant_detail')">
-                <div style="width: 68px; height: 68px; background: var(--primary-mint); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">🌱</div>
+            ${state.plants.slice(0, 4).map(p => `
+              <div class="ui-card" style="cursor: pointer; flex-direction: row; gap: 14px; padding: 14px; align-items: center;" onclick="switchScreen('plant_detail', '${p.id}')">
+                <img src="${p.photo}" alt="${p.nameId}" style="width: 68px; height: 68px; border-radius: 16px; object-fit: cover; flex-shrink: 0;" onerror="this.onerror=null; this.src='/assets/brand/new-logo.png';">
                 <div style="flex: 1;">
                   <div style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="card-title" style="font-size: 15px;">${p.nameId}</div>
@@ -479,37 +669,51 @@
           topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">←</button>`;
           body.innerHTML = `
             <div style="position: relative;">
-              <input type="text" placeholder="🔍 Cari jahe, kunyit, bayam, toga..." style="width: 100%; padding: 14px 16px; border-radius: 16px; border: 1.5px solid var(--border-grey); background: var(--surface-white); outline: none; font-size: 13px; font-weight: 600; color: var(--text-dark);">
+              <input type="text" placeholder="🔍 Cari caisim, sintrong, durian, kemangi, kitolot..." oninput="filterCatalog(this.value)" style="width: 100%; padding: 14px 16px; border-radius: 16px; border: 1.5px solid var(--border-grey); background: var(--surface-white); outline: none; font-size: 13px; font-weight: 600; color: var(--text-dark);">
             </div>
-            <div style="font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 4px;">Daftar Ensiklopedia (3 Tanaman)</div>
-            ${state.plants.map(p => `
-              <div class="ui-card" style="cursor: pointer; flex-direction: row; gap: 14px; padding: 14px; align-items: center;" onclick="switchScreen('plant_detail')">
-                <div style="width: 68px; height: 68px; background: var(--primary-mint); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0;">🌱</div>
-                <div style="flex: 1;">
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div class="card-title" style="font-size: 15px;">${p.nameId}</div>
-                    <span class="badge badge-teal">${p.hanzi}</span>
+            <div style="font-size: 13px; font-weight: 800; color: var(--text-dark); margin-top: 4px;">Daftar Ensiklopedia (${state.plants.length} Tanaman Terverifikasi)</div>
+            <div id="catalogList" style="display: flex; flex-direction: column; gap: 12px;">
+              ${state.plants.map(p => `
+                <div class="ui-card" style="cursor: pointer; flex-direction: row; gap: 14px; padding: 14px; align-items: center;" onclick="switchScreen('plant_detail', '${p.id}')">
+                  <img src="${p.photo}" alt="${p.nameId}" style="width: 68px; height: 68px; border-radius: 16px; object-fit: cover; flex-shrink: 0;" onerror="this.onerror=null; this.src='/assets/brand/new-logo.png';">
+                  <div style="flex: 1;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                      <div class="card-title" style="font-size: 15px;">${p.nameId}</div>
+                      <span class="badge badge-teal">${p.hanzi}</span>
+                    </div>
+                    <div class="card-subtitle" style="font-style: italic;">${p.nameLatin}</div>
+                    <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${p.desc.substring(0, 50)}...</div>
+                    <div style="font-size: 12px; color: var(--primary-forest); font-weight: 800; margin-top: 4px;">Pelajari Selengkapnya →</div>
                   </div>
-                  <div class="card-subtitle" style="font-style: italic;">${p.nameLatin}</div>
-                  <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${p.desc.substring(0, 45)}...</div>
-                  <div style="font-size: 12px; color: var(--primary-forest); font-weight: 800; margin-top: 4px;">Pelajari Selengkapnya →</div>
                 </div>
+              `).join('')}
+            </div>
+
+            <!-- Side Mascot Companion: Si Benih (Motivasi Menanam) -->
+            <aside class="side-mascot-callout side-mascot-theme-warm side-mascot-size-sm" role="region" aria-label="Motivasi Menanam" style="margin-top: 14px;">
+              <div class="side-mascot-avatar">
+                <img src="/assets/mascot/seeds_cheer.webp" alt="" aria-hidden="true" class="side-mascot-img side-mascot-breathe" width="44" height="43" loading="lazy">
               </div>
-            `).join('')}
+              <div class="side-mascot-speech">
+                <div class="side-mascot-speech-title">Semangat Menanam Mandiri!</div>
+                <div class="side-mascot-speech-text">Setiap benih yang ditanam di pekarangan rumah memperkuat ketahanan pangan keluarga Anda!</div>
+              </div>
+            </aside>
           `;
           break;
 
         case 'plant_detail':
+          const curPlant = state.plants.find(x => x.id === currentSelectedPlantId) || state.plants[0];
           topTitle.textContent = 'Detail Tanaman';
           topSub.textContent = 'Ensiklopedi Botani Bubakan';
           topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('catalog')">←</button>`;
           body.innerHTML = `
-            <div style="height: 180px; background: var(--primary-mint); border-radius: 0 0 24px 24px; display: flex; align-items: center; justify-content: center; font-size: 64px; margin: -16px -16px 0 -16px;">
-              🌿
+            <div style="height: 190px; border-radius: 0 0 24px 24px; overflow: hidden; margin: -16px -16px 0 -16px; position: relative; background: #e8f5e9;">
+              <img src="${curPlant.photo}" alt="${curPlant.nameId}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='/assets/brand/new-logo.png';">
             </div>
             <div style="padding-top: 8px;">
-              <div class="card-title" style="font-size: 22px;">Jahe Merah</div>
-              <div class="card-subtitle" style="font-style: italic; font-size: 14px; color: var(--secondary-sage);">Zingiber officinale var. rubrum</div>
+              <div class="card-title" style="font-size: 22px;">${curPlant.nameId}</div>
+              <div class="card-subtitle" style="font-style: italic; font-size: 14px; color: var(--secondary-sage);">${curPlant.nameLatin}</div>
             </div>
 
             <!-- Mandarin Discovery Pod -->
@@ -517,13 +721,13 @@
               <div>
                 <span class="badge badge-teal" style="font-size: 10px; margin-bottom: 4px;">BELAJAR NAMA MANDARIN</span>
                 <div style="display: flex; align-items: baseline; gap: 8px;">
-                  <span style="font-size: 28px; font-weight: 800; color: #0B4F48;">红姜</span>
-                  <span style="font-size: 14px; font-weight: 600; color: var(--secondary-sage);">hóng jiāng</span>
+                  <span style="font-size: 28px; font-weight: 800; color: #0B4F48;">${curPlant.hanzi}</span>
+                  <span style="font-size: 14px; font-weight: 600; color: var(--secondary-sage);">${curPlant.pinyin}</span>
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 8px;">
                 <div id="listeningBuba" style="display: none;">${bubaSvg('LISTENING')}</div>
-                <button class="icon-btn" style="background: var(--accent-teal); color: #FFF; width: 48px; height: 48px; font-size: 20px; box-shadow: 0 4px 10px rgba(23, 195, 178, 0.4);" onclick="playAudioDemo()">
+                <button class="icon-btn" style="background: var(--accent-teal); color: #FFF; width: 48px; height: 48px; font-size: 20px; box-shadow: 0 4px 10px rgba(23, 195, 178, 0.4);" onclick="playAudioDemo('${curPlant.pinyin}', '${curPlant.hanzi}')">
                   🔊
                 </button>
               </div>
@@ -536,7 +740,7 @@
                 <div class="card-title" style="font-size: 15px;">Khasiat & Manfaat Sehat</div>
               </div>
               <div style="font-size: 13px; color: var(--text-dark); line-height: 1.5;">
-                Rimpang berkhasiat menghangatkan tubuh, meningkatkan daya tahan tubuh warga, dan membantu peredaran darah alami.
+                ${curPlant.desc}
               </div>
             </div>
 
@@ -546,9 +750,20 @@
                 <div class="card-title" style="font-size: 15px;">Budidaya di Kebun Bubakan</div>
               </div>
               <div style="font-size: 13px; color: var(--text-dark); line-height: 1.5;">
-                Dirawat secara organik oleh warga di Taman Toga RW 03 sebagai program apotek hidup mandiri.
+                Dirawat secara organik oleh warga di kebun binaan Kelurahan Bubakan sebagai program apotek hidup mandiri dan ketahanan pangan.
               </div>
             </div>
+
+            <!-- Side Mascot Companion: Tanaman Mekar (Apresiasi Selesai Pelajaran) -->
+            <aside class="side-mascot-callout side-mascot-theme-teal side-mascot-size-sm" role="region" aria-label="Apresiasi Belajar Botani" style="margin-top: 10px;">
+              <div class="side-mascot-avatar">
+                <img src="/assets/mascot/goodjob_plant.webp" alt="" aria-hidden="true" class="side-mascot-img side-mascot-breathe" width="44" height="70" loading="lazy">
+              </div>
+              <div class="side-mascot-speech">
+                <div class="side-mascot-speech-title">Pelajaran Botani Selesai!</div>
+                <div class="side-mascot-speech-text">Hebat! Anda telah mempelajari nama Mandarin, khasiat sehat, dan panduan budidaya ${curPlant.nameId.toLowerCase()}.</div>
+              </div>
+            </aside>
           `;
           break;
 
@@ -564,42 +779,91 @@
             </div>
             ${state.locations.map(loc => `
               <div class="ui-card">
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span class="badge ${loc.type === 'URBAN_FARMING' ? 'badge-mint' : 'badge-gold'}">${loc.type === 'URBAN_FARMING' ? '🌱 Urban Farming' : '🌿 Taman Toga'}</span>
-                  <span class="badge badge-mint">RW ${loc.rw}</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+                  <div style="display: flex; gap: 6px; align-items: center;">
+                    <span class="badge ${loc.type === 'URBAN_FARMING' ? 'badge-mint' : 'badge-gold'}">${loc.type === 'URBAN_FARMING' ? '🌱 Urban Farming' : '🌿 Taman Toga'}</span>
+                    <span class="badge badge-mint">RW ${loc.rw}</span>
+                  </div>
+                  ${loc.plantCount > 0 ? `<span class="badge badge-teal" style="font-size: 11px;">🌱 ${loc.plantCount} Tanaman</span>` : ''}
                 </div>
                 ${loc.photos && loc.photos.length > 0 ? `
                   <div style="margin: 10px 0; border-radius: 12px; overflow: hidden; height: 160px; background: #e8f5e9; position: relative;">
                     <img src="${encodeURI(loc.photos[0])}" alt="${loc.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.src='/mascot.png';">
-                    <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.6); color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px;">📷 ${loc.photos.length} Foto</span>
+                    <span style="position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.65); color: white; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 700;">📷 ${loc.photos.length} Foto Lahan</span>
                   </div>
+                  ${loc.photos.length > 1 ? `
+                    <div style="display: flex; gap: 6px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 2px;">
+                      ${loc.photos.map((p, idx) => `
+                        <img src="${encodeURI(p)}" alt="Foto ${idx+1}" style="width: 64px; height: 44px; border-radius: 8px; object-fit: cover; border: 1.5px solid var(--border-grey); cursor: pointer;" onclick="alert('Melihat foto ${idx+1}: ${loc.name}')" onerror="this.onerror=null; this.src='/mascot.png';">
+                      `).join('')}
+                    </div>
+                  ` : ''}
                 ` : ''}
                 <div class="card-title">${loc.name}</div>
-                <div class="card-subtitle">📍 ${loc.address}</div>
+                <div class="card-subtitle" style="font-size: 12px; color: var(--text-dark); margin-top: 2px;">${loc.desc}</div>
+                <div class="card-subtitle" style="margin-top: 6px;">📍 ${loc.address}</div>
                 <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">🌐 Koordinat: ${loc.latitude.toFixed(6)}, ${loc.longitude.toFixed(6)}</div>
-                <div class="tactile-btn" style="margin-top: 8px;" onclick="alert('Membuka rute Google Maps untuk ${loc.name} (${loc.latitude}, ${loc.longitude})...')">
+                ${loc.plantList && loc.plantList.length > 0 ? `
+                  <div style="margin-top: 10px; padding: 10px; background: rgba(63, 115, 55, 0.05); border-radius: 12px; border: 1px dashed rgba(63, 115, 55, 0.25);">
+                    <div style="font-size: 11px; font-weight: 800; color: var(--primary-forest); margin-bottom: 6px; display: flex; justify-content: space-between;">
+                      <span>🌿 Koleksi Tanaman (${loc.plantList.length}):</span>
+                    </div>
+                    <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                      ${loc.plantList.map(p => `<span style="font-size: 10.5px; background: #FFFFFF; color: var(--text-dark); padding: 3px 8px; border-radius: 6px; font-weight: 600; border: 1px solid rgba(63, 115, 55, 0.15);">${p}</span>`).join('')}
+                    </div>
+                  </div>
+                ` : ''}
+                <div class="tactile-btn" style="margin-top: 10px;" onclick="alert('Membuka rute Google Maps untuk ${loc.name} (${loc.latitude}, ${loc.longitude})...')">
                   <div class="tactile-btn-inner">📍 Petunjuk Arah ke Kebun Ini</div>
                 </div>
               </div>
             `).join('')}
+
+            <!-- Side Mascot Companion: Robo-Hijau (Etika & Pelestarian Alam) -->
+            <aside class="side-mascot-callout side-mascot-theme-mint side-mascot-size-sm" role="region" aria-label="Etika Jelajah Kebun" style="margin-top: 14px;">
+              <div class="side-mascot-avatar">
+                <img src="/assets/mascot/green_robo_hug.webp" alt="" aria-hidden="true" class="side-mascot-img side-mascot-breathe" width="44" height="43" loading="lazy">
+              </div>
+              <div class="side-mascot-speech">
+                <div class="side-mascot-speech-title">Rawat Kebun Bersama</div>
+                <div class="side-mascot-speech-text">Mari jaga kebersihan dan keasrian tanaman toga saat berkunjung ke kebun binaan warga.</div>
+              </div>
+            </aside>
           `;
           break;
 
         case 'login':
-          topTitle.textContent = 'Masuk Petugas';
-          topSub.textContent = 'Portal Khusus Kelurahan';
+          topTitle.textContent = 'Masuk Petugas & Admin';
+          topSub.textContent = 'Portal Kredensial Terverifikasi';
           topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">←</button>`;
           body.innerHTML = `
-            <div style="text-align: center; padding: 12px 0;">
-              <div style="font-size: 38px;">🔒</div>
-              <h3 style="font-size: 18px; color: var(--primary-forest); margin-top: 6px;">PORTAL PETUGAS</h3>
-              <p style="font-size: 12px; color: var(--text-muted);">Masuk menggunakan kredensial terverifikasi</p>
+            <div style="text-align: center; padding: 10px 0;">
+              <div style="font-size: 36px;">🔒</div>
+              <h3 style="font-size: 17px; color: var(--primary-forest); margin-top: 4px;">PORTAL KELURAHAN</h3>
+              <p style="font-size: 11.5px; color: var(--text-muted);">Masuk menggunakan kredensial resmi terverifikasi</p>
             </div>
-            <div class="ui-card">
-              <div style="font-size: 12px; font-weight: 700; color: var(--text-dark);">Email Akun</div>
-              <input type="text" value="petugas@bubakan.semarangkota.go.id" style="padding: 12px; border-radius: 12px; border: 1.5px solid var(--border-grey); outline: none;">
+
+            <!-- Admin Login Card -->
+            <div class="ui-card" style="border: 1.5px solid rgba(255,183,3,0.55); background: var(--accent-gold-container);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <span class="badge badge-gold" style="font-size: 10px;">AKUN ADMINISTRATOR</span>
+                <span style="font-size: 11px; color: #5A3E00; font-weight: 800;">Hak Akses Penuh</span>
+              </div>
+              <div style="font-size: 11.5px; font-weight: 700; color: #2E1C00;">Username / Email:</div>
+              <div style="font-size: 13.5px; font-weight: 800; color: #143625; margin-bottom: 6px;">admin@bubakan.id</div>
+              <div style="font-size: 11.5px; font-weight: 700; color: #2E1C00;">Password:</div>
+              <div style="font-size: 13.5px; font-weight: 800; color: #143625; margin-bottom: 12px;">AdminBubakan2026</div>
+              <div class="tactile-btn" onclick="switchScreen('admin_dash')" style="background: #FFB703;">
+                <div class="tactile-btn-inner" style="color: #2E1C00; font-weight: 800;">Masuk Sebagai Admin →</div>
+              </div>
+            </div>
+
+            <!-- Petugas Lapangan Option -->
+            <div class="ui-card" style="margin-top: 8px;">
+              <span class="badge badge-mint" style="font-size: 10px; margin-bottom: 8px;">PETUGAS LAPANGAN (PIC)</span>
+              <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">petugas@bubakan.semarangkota.go.id</div>
               <div class="tactile-btn" onclick="switchScreen('pic_dash')">
-                <div class="tactile-btn-inner">Masuk Sebagai Petugas</div>
+                <div class="tactile-btn-inner">Masuk Sebagai PIC Kebun →</div>
               </div>
             </div>
           `;
@@ -630,26 +894,92 @@
           topSub.textContent = 'Pemerintah Kelurahan Bubakan';
           topActions.innerHTML = `<button class="icon-btn" onclick="switchScreen('home')">🚪</button>`;
           body.innerHTML = `
+            <!-- Admin Header Overview -->
             <div class="ui-card" style="background: var(--accent-gold-container); border-color: rgba(255,183,3,0.4);">
-              <div class="card-title">Pusat Kendali Kelurahan</div>
-              <div class="card-subtitle">Pengawasan kebun warga, validasi GPS lapangan, dan persetujuan publikasi.</div>
-            </div>
-            <div class="ui-card">
-              <div style="display: flex; justify-content: space-between;">
-                <div class="card-title" style="font-size: 14px;">Total Kebun Terdaftar</div>
-                <span class="badge badge-mint">3 Kebun</span>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-title">Pusat Kendali Kelurahan</div>
+                <span class="badge badge-gold" style="font-size: 10px;">ADMIN</span>
               </div>
-              <div style="display: flex; justify-content: space-between;">
-                <div class="card-title" style="font-size: 14px;">Master Tanaman</div>
-                <span class="badge badge-gold">12 Spesies</span>
+              <div class="card-subtitle" style="margin-top: 4px;">Akun: <strong>admin@bubakan.id</strong> (Hak akses penuh kelola lahan & tanaman)</div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <div class="ui-card" style="padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary-forest);">${state.locations.length}</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Total Lahan</div>
+              </div>
+              <div class="ui-card" style="padding: 12px; text-align: center;">
+                <div style="font-size: 20px; font-weight: 800; color: var(--primary-forest);">${state.plants.length}</div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Master Tanaman</div>
               </div>
             </div>
+
+            <!-- ================= KELOLA LAHAN SECTION ================= -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">🌱 Kelola Lahan (${state.locations.length})</div>
+              <button onclick="alert('Form tambah lahan baru siap digunakan.')" style="background: var(--primary-forest); color: white; border: none; border-radius: 12px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">+ Tambah Lahan</button>
+            </div>
+
+            ${state.locations.map(loc => `
+              <div class="ui-card" style="padding: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                  <div style="flex: 1; min-width: 0;">
+                    <div class="card-title" style="font-size: 14px;">${loc.name}</div>
+                    <div style="display: flex; gap: 6px; align-items: center; margin-top: 4px; flex-wrap: wrap;">
+                      <span class="badge ${loc.type === 'URBAN_FARMING' ? 'badge-mint' : 'badge-gold'}" style="font-size: 10px;">
+                        ${loc.type === 'URBAN_FARMING' ? '🌱 Urban Farming' : '🌿 Taman Toga'}
+                      </span>
+                      <span class="badge badge-mint" style="font-size: 10px;">RW ${loc.rw}</span>
+                      ${loc.plantCount > 0 ? `<span class="badge badge-teal" style="font-size: 10px;">${loc.plantCount} Tanaman</span>` : ''}
+                    </div>
+                  </div>
+                  <!-- Direct Delete Button with Confirmation Popup -->
+                  <button type="button" onclick="triggerDeleteLocation('${loc.id}', '${loc.name.replace(/'/g, "\\'")}')" style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;">
+                    🗑️ Hapus
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+
+            <!-- ================= KELOLA TANAMAN SECTION ================= -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px;">
+              <div style="font-size: 14px; font-weight: 800; color: var(--text-dark);">🌿 Kelola Tanaman (${state.plants.length})</div>
+              <button onclick="alert('Form tambah tanaman baru siap digunakan.')" style="background: var(--primary-forest); color: white; border: none; border-radius: 12px; padding: 4px 10px; font-size: 11px; font-weight: 700; cursor: pointer;">+ Tambah Tanaman</button>
+            </div>
+
+            ${state.plants.map(p => `
+              <div class="ui-card" style="padding: 10px; flex-direction: row; align-items: center; gap: 10px;">
+                <img src="${p.photo}" alt="${p.nameId}" style="width: 48px; height: 48px; border-radius: 10px; object-fit: cover; flex-shrink: 0;" onerror="this.onerror=null; this.src='/assets/brand/new-logo.png';">
+                <div style="flex: 1; min-width: 0;">
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <div class="card-title" style="font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nameId}</div>
+                    <span class="badge badge-teal" style="font-size: 9.5px;">${p.hanzi}</span>
+                  </div>
+                  <div class="card-subtitle" style="font-size: 11px; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nameLatin}</div>
+                </div>
+                <!-- Direct Delete Button with Confirmation Popup -->
+                <button type="button" onclick="triggerDeletePlant('${p.id}', '${p.nameId.replace(/'/g, "\\'")}')" style="background: #FEE2E2; color: #DC2626; border: 1px solid #FCA5A5; border-radius: 8px; padding: 6px 10px; font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0; display: inline-flex; align-items: center; gap: 4px;">
+                  🗑️ Hapus
+                </button>
+              </div>
+            `).join('')}
+
+            <!-- Side Mascot Companion: Robo-Hijau (Validasi Berhasil) -->
+            <aside class="side-mascot-callout side-mascot-theme-mint side-mascot-size-sm" role="region" aria-label="Validasi Berhasil" style="margin-top: 14px;">
+              <div class="side-mascot-avatar">
+                <img src="/assets/mascot/green_robo_goodjob.webp" alt="" aria-hidden="true" class="side-mascot-img side-mascot-breathe" width="44" height="53" loading="lazy">
+              </div>
+              <div class="side-mascot-speech">
+                <div class="side-mascot-speech-title">Validasi Spasial 100%</div>
+                <div class="side-mascot-speech-text">Semua koordinat kebun dan spesimen tanaman terdata secara presisi di Kelurahan Bubakan.</div>
+              </div>
+            </aside>
           `;
           break;
       }
     }
 
-    function playAudioDemo() {
+    function playAudioDemo(pinyin, hanzi) {
       const listeningBuba = document.getElementById('listeningBuba');
       if (listeningBuba) {
         listeningBuba.style.display = 'block';
@@ -657,7 +987,83 @@
           listeningBuba.style.display = 'none';
         }, 1800);
       }
-      alert('Memutar pelafalan audio Mandarin: hóng jiāng (红姜) 🔊\nSi Buba menyimak dengan seksama!');
+      alert('Memutar pelafalan audio Mandarin: ' + (pinyin || 'hóng jiāng') + ' (' + (hanzi || '红姜') + ') 🔊\nSi Buba menyimak dengan seksama!');
+    }
+
+    function filterCatalog(val) {
+      const q = (val || '').toLowerCase().trim();
+      const container = document.getElementById('catalogList');
+      if (!container) return;
+      const filtered = state.plants.filter(p => 
+        p.nameId.toLowerCase().includes(q) || 
+        p.nameLatin.toLowerCase().includes(q) || 
+        p.hanzi.includes(q) || 
+        p.pinyin.toLowerCase().includes(q)
+      );
+      container.innerHTML = filtered.map(p => `
+        <div class="ui-card" style="cursor: pointer; flex-direction: row; gap: 14px; padding: 14px; align-items: center;" onclick="switchScreen('plant_detail', '${p.id}')">
+          <img src="${p.photo}" alt="${p.nameId}" style="width: 68px; height: 68px; border-radius: 16px; object-fit: cover; flex-shrink: 0;" onerror="this.onerror=null; this.src='/assets/brand/new-logo.png';">
+          <div style="flex: 1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div class="card-title" style="font-size: 15px;">${p.nameId}</div>
+              <span class="badge badge-teal">${p.hanzi}</span>
+            </div>
+            <div class="card-subtitle" style="font-style: italic;">${p.nameLatin}</div>
+            <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;">${p.desc.substring(0, 50)}...</div>
+            <div style="font-size: 12px; color: var(--primary-forest); font-weight: 800; margin-top: 4px;">Pelajari Selengkapnya →</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    let pendingModalAction = null;
+
+    function openConfirmModal(title, message, action) {
+      const modal = document.getElementById('confirmModal');
+      const titleEl = document.getElementById('modalTitle');
+      const descEl = document.getElementById('modalDesc');
+      if (!modal || !titleEl || !descEl) return;
+      titleEl.textContent = title;
+      descEl.textContent = message;
+      pendingModalAction = action;
+      modal.style.display = 'flex';
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirmModal');
+      if (modal) modal.style.display = 'none';
+      pendingModalAction = null;
+    }
+
+    function executeModalConfirm() {
+      if (pendingModalAction) {
+        pendingModalAction();
+      }
+      closeConfirmModal();
+    }
+
+    function triggerDeleteLocation(id, name) {
+      openConfirmModal(
+        'Hapus Lahan?',
+        'Apakah Anda yakin ingin menghapus lahan "' + name + '"? Tindakan ini akan menghapus data lahan beserta tanaman di dalamnya secara langsung.',
+        () => {
+          state.locations = state.locations.filter(l => l.id !== id);
+          switchScreen('admin_dash');
+          alert('Lahan "' + name + '" berhasil dihapus!');
+        }
+      );
+    }
+
+    function triggerDeletePlant(id, name) {
+      openConfirmModal(
+        'Hapus Tanaman?',
+        'Apakah Anda yakin ingin menghapus tanaman "' + name + '"? Data tanaman akan dihapus secara langsung dari master data dan kebun.',
+        () => {
+          state.plants = state.plants.filter(p => p.id !== id);
+          switchScreen('admin_dash');
+          alert('Tanaman "' + name + '" berhasil dihapus!');
+        }
+      );
     }
 
     // Initialize

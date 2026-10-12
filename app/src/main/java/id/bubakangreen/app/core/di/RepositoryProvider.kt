@@ -278,8 +278,10 @@ private object UiPreviewOnlyLocationRepository : LocationRepository {
     override suspend fun getPendingLocations(): Result<List<Location>> =
         Result.Success(previewLocations.filter { it.status == LocationStatus.PENDING_APPROVAL })
 
-    override suspend fun deleteLocation(locationId: String): Result<Unit> =
-        deactivateLocation(locationId)
+    override suspend fun deleteLocation(locationId: String): Result<Unit> {
+        previewLocations.removeAll { it.id == locationId }
+        return Result.Success(Unit)
+    }
 }
 
 
@@ -303,7 +305,9 @@ private object UiPreviewOnlyPlantRepository : PlantRepository {
             (locationId == "loc_urban_farming_bubakan" && it.locationId == "LOC_PREVIEW_01") ||
             (locationId == "loc_taman_toga_rw03" && it.locationId == "LOC_PREVIEW_02") ||
             (locationId == "LOC_PREVIEW_01" && it.locationId == "loc_urban_farming_bubakan") ||
-            (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03")
+            (locationId == "LOC_PREVIEW_02" && it.locationId == "loc_taman_toga_rw03") ||
+            (locationId == "loc_urban_farming_toga_rw01" && it.locationId == "loc_urban_farming_rw01") ||
+            (locationId == "loc_urban_farming_rw01" && it.locationId == "loc_urban_farming_toga_rw01")
         }
         return flowOf(Result.Success(matches))
     }
@@ -371,6 +375,12 @@ private object UiPreviewOnlyPlantRepository : PlantRepository {
         previewLocationPlants.removeAll { it.id == locationPlantId }
         return Result.Success(Unit)
     }
+
+    override suspend fun deleteMasterPlant(plantId: String): Result<Unit> {
+        previewPlants.removeAll { it.id == plantId }
+        previewLocationPlants.removeAll { it.plantId == plantId || it.masterPlantId == plantId }
+        return Result.Success(Unit)
+    }
 }
 
 /**
@@ -391,7 +401,7 @@ private object UiPreviewOnlyAuthRepository : AuthRepository {
     override suspend fun signInWithEmail(email: String, password: String): Result<UserSession> {
         val session = when {
             email.contains("admin", ignoreCase = true) -> {
-                if (password != "admin_bubakan" && password != "admin" && password != "admin123") {
+                if (password != "AdminBubakan2026" && password != "admin_bubakan" && password != "admin" && password != "admin123") {
                     return Result.Error(Exception("Password salah."))
                 }
                 val adminSession = UserSession(

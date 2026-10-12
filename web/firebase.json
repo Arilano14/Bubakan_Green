@@ -11,6 +11,18 @@
       "**/node_modules/**",
       "downloads/**"
     ],
+    "redirects": [
+      {
+        "source": "/downloads/bubakan-green.apk",
+        "destination": "https://www.dropbox.com/scl/fi/5f0307as5awimpj0h8iar/Bubakan-Green.apk?rlkey=bc2j9f4g51b0sq70o8u0n7lrj&st=48c5cbaq&dl=1",
+        "type": 302
+      },
+      {
+        "source": "/downloads/bubakan-green-debug.apk",
+        "destination": "https://www.dropbox.com/scl/fi/5f0307as5awimpj0h8iar/Bubakan-Green.apk?rlkey=bc2j9f4g51b0sq70o8u0n7lrj&st=48c5cbaq&dl=1",
+        "type": 302
+      }
+    ],
     "headers": [
       {
         "source": "/.well-known/assetlinks.json",

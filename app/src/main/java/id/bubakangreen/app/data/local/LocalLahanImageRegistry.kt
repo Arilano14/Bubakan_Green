@@ -164,11 +164,55 @@ object LocalLahanImageRegistry {
         locationIdHint = "loc_urban_farming_rw03"
     )
 
+    // ==========================================
+    // Kelurahan: Urban Farming Kelurahan Bubakan
+    // ==========================================
+    val TAG_KELURAHAN_URBAN_1 = LocalLahanTag(
+        tag = "lahan_kelurahan_urban_1",
+        title = "Kelurahan — Urban Farming Sentra",
+        description = "Kebun percontohan budidaya sayuran dan pangan mandiri Kelurahan Bubakan",
+        drawableRes = R.drawable.lahan_kelurahan_urban_1,
+        rw = "Kelurahan",
+        locationIdHint = "loc_urban_farming_bubakan"
+    )
+
+    val TAG_KELURAHAN_URBAN_2 = LocalLahanTag(
+        tag = "lahan_kelurahan_urban_2",
+        title = "Kelurahan — Area Produksi & Sayuran",
+        description = "Fasilitas budidaya sayuran pangan mandiri Kelurahan Bubakan",
+        drawableRes = R.drawable.lahan_kelurahan_urban_2,
+        rw = "Kelurahan",
+        locationIdHint = "loc_urban_farming_bubakan"
+    )
+
+    // ==========================================
+    // RW 01: Taman TOGA (Samping Urban Farming RW 01)
+    // ==========================================
+    val TAG_RW1_TOGA_1 = LocalLahanTag(
+        tag = "lahan_rw1_toga_1",
+        title = "RW 01 — Taman TOGA Utama",
+        description = "Koleksi tanaman obat keluarga (TOGA) berdampingan dengan Urban Farming RW 01",
+        drawableRes = R.drawable.lahan_rw1_toga_1,
+        rw = "01",
+        locationIdHint = "loc_taman_toga_rw01"
+    )
+
+    val TAG_RW1_TOGA_2 = LocalLahanTag(
+        tag = "lahan_rw1_toga_2",
+        title = "RW 01 — Koleksi Rimpang & Herbal",
+        description = "Bedengan dan penataan pot tanaman herbal obat keluarga RW 01",
+        drawableRes = R.drawable.lahan_rw1_toga_2,
+        rw = "01",
+        locationIdHint = "loc_taman_toga_rw01"
+    )
+
     val ALL_TAGS: List<LocalLahanTag> = listOf(
         TAG_RW1_1, TAG_RW1_2, TAG_RW1_3,
+        TAG_RW1_TOGA_1, TAG_RW1_TOGA_2,
         TAG_RW2_TOGA_1, TAG_RW2_TOGA_2, TAG_RW2_TOGA_3,
         TAG_RW3_TOGA_1, TAG_RW3_TOGA_2, TAG_RW3_TOGA_3,
-        TAG_RW3_URBAN_1, TAG_RW3_URBAN_2, TAG_RW3_URBAN_3
+        TAG_RW3_URBAN_1, TAG_RW3_URBAN_2, TAG_RW3_URBAN_3,
+        TAG_KELURAHAN_URBAN_1, TAG_KELURAHAN_URBAN_2
     )
 
     /**
@@ -228,7 +272,15 @@ object LocalLahanImageRegistry {
         fun matches(pattern: String): Boolean = clean.contains(pattern) || decoded.contains(pattern)
 
         return when {
-            // RW 1
+            // Kelurahan Urban
+            matches("kelurahan_urban 1") || matches("kelurahan_urban_1") || matches("kelurahan urban 1") || matches("kelurahan_urban1") -> TAG_KELURAHAN_URBAN_1
+            matches("kelurahan urban 2") || matches("kelurahan_urban_2") || matches("kelurahan_urban 2") || matches("kelurahan_urban2") -> TAG_KELURAHAN_URBAN_2
+
+            // RW 1 Toga
+            matches("rw 1_taman toga 1") || matches("rw1_taman_toga_1") || matches("rw1_taman toga 1") || matches("rw_1_taman_toga_1") -> TAG_RW1_TOGA_1
+            matches("rw 1_taman toga") || matches("rw1_taman_toga") || matches("rw_1_taman_toga") -> TAG_RW1_TOGA_2
+
+            // RW 1 Urban
             matches("rw 1_1") || matches("rw1_1") || matches("rw_1_1") -> TAG_RW1_1
             matches("rw 1_2") || matches("rw1_2") || matches("rw_1_2") -> TAG_RW1_2
             matches("rw 1_3") || matches("rw1_3") || matches("rw_1_3") -> TAG_RW1_3
@@ -291,7 +343,15 @@ object LocalLahanImageRegistry {
             val rw = location.rw.trim()
 
             return when {
-                // RW 1
+                // Kelurahan
+                locId.contains("kelurahan") || locId.contains("bubakan") || name.contains("kelurahan") -> {
+                    listOf(TAG_KELURAHAN_URBAN_1.drawableRes, TAG_KELURAHAN_URBAN_2.drawableRes)
+                }
+                // RW 1 Toga
+                locId == "loc_taman_toga_rw01" || (name.contains("toga") && (name.contains("rw 1") || name.contains("rw 01") || rw in listOf("01", "1", "RW 01", "RW 1"))) -> {
+                    listOf(TAG_RW1_TOGA_1.drawableRes, TAG_RW1_TOGA_2.drawableRes)
+                }
+                // RW 1 Urban
                 locId.contains("rw01") || locId.contains("rw1") || rw in listOf("01", "1", "RW 01", "RW 1") || name.contains("rw 1") || name.contains("rw 01") -> {
                     listOf(TAG_RW1_1.drawableRes, TAG_RW1_2.drawableRes, TAG_RW1_3.drawableRes)
                 }

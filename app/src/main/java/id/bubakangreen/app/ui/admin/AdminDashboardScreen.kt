@@ -24,9 +24,13 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.automirrored.filled.FactCheck
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Grass
 import androidx.compose.material.icons.filled.Place
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -37,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -240,6 +245,7 @@ fun AdminDashboardScreen(
                                 plants = data.masterPlants,
                                 onBackToHub = { activeSection = AdminSection.OVERVIEW },
                                 onEditPlant = { onNavigateToMasterPlantForm(it.id) },
+                                onDeletePlant = { viewModel.deletePlant(it.id) },
                                 onAddPlant = { onNavigateToMasterPlantForm(null) }
                             )
                         }
@@ -249,6 +255,7 @@ fun AdminDashboardScreen(
                                 locations = data.locations,
                                 onBackToHub = { activeSection = AdminSection.OVERVIEW },
                                 onEditLocation = { onNavigateToLocationForm(it.id) },
+                                onDeleteLocation = { viewModel.deleteLocation(it.id) },
                                 onAddLocation = { onNavigateToLocationForm(null) }
                             )
                         }
@@ -326,7 +333,7 @@ private fun AdminOverviewContent(
                         contentAlignment = Alignment.Center
                     ) {
                         Mascot(
-                            type = MascotType.GREETING,
+                            type = MascotType.SIDE_ROBO_GOODJOB,
                             size = 88.dp,
                             animateIdle = false
                         )
@@ -540,8 +547,47 @@ private fun AdminPlantsListContent(
     plants: List<MasterPlant>,
     onBackToHub: () -> Unit,
     onEditPlant: (MasterPlant) -> Unit,
+    onDeletePlant: (MasterPlant) -> Unit,
     onAddPlant: () -> Unit
 ) {
+    var plantToDelete by remember { mutableStateOf<MasterPlant?>(null) }
+
+    plantToDelete?.let { plant ->
+        AlertDialog(
+            onDismissRequest = { plantToDelete = null },
+            title = {
+                Text(
+                    text = "Hapus Tanaman?",
+                    fontWeight = FontWeight.Bold,
+                    color = ForestGreen
+                )
+            },
+            text = {
+                Text(
+                    text = "Apakah Anda yakin ingin menghapus tanaman \"${plant.nameId}\"? Data tanaman akan dihapus secara langsung dari master data dan kebun.",
+                    color = TextPrimary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val target = plant
+                        plantToDelete = null
+                        onDeletePlant(target)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = FriendlyRed)
+                ) {
+                    Text("Hapus", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { plantToDelete = null }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -647,16 +693,27 @@ private fun AdminPlantsListContent(
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
 
                         IconButton(
                             onClick = { onEditPlant(plant) },
-                            modifier = Modifier.size(44.dp)
+                            modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit Tanaman ${plant.nameId}",
                                 tint = ForestGreen
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { plantToDelete = plant },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Hapus Tanaman ${plant.nameId}",
+                                tint = FriendlyRed
                             )
                         }
                     }
@@ -680,8 +737,47 @@ private fun AdminLocationsListContent(
     locations: List<Location>,
     onBackToHub: () -> Unit,
     onEditLocation: (Location) -> Unit,
+    onDeleteLocation: (Location) -> Unit,
     onAddLocation: () -> Unit
 ) {
+    var locationToDelete by remember { mutableStateOf<Location?>(null) }
+
+    locationToDelete?.let { loc ->
+        AlertDialog(
+            onDismissRequest = { locationToDelete = null },
+            title = {
+                Text(
+                    text = "Hapus Lahan?",
+                    fontWeight = FontWeight.Bold,
+                    color = ForestGreen
+                )
+            },
+            text = {
+                Text(
+                    text = "Apakah Anda yakin ingin menghapus lahan \"${loc.name}\"? Data lahan beserta tanaman di dalamnya akan dihapus secara langsung.",
+                    color = TextPrimary
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val target = loc
+                        locationToDelete = null
+                        onDeleteLocation(target)
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = FriendlyRed)
+                ) {
+                    Text("Hapus", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { locationToDelete = null }) {
+                    Text("Batal", color = TextSecondary)
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -773,16 +869,27 @@ private fun AdminLocationsListContent(
                             }
                         }
 
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(4.dp))
 
                         IconButton(
                             onClick = { onEditLocation(loc) },
-                            modifier = Modifier.size(48.dp)
+                            modifier = Modifier.size(40.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "Edit Lahan ${loc.name}",
                                 tint = ForestGreen
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { locationToDelete = loc },
+                            modifier = Modifier.size(40.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Hapus Lahan ${loc.name}",
+                                tint = FriendlyRed
                             )
                         }
                     }

@@ -28,17 +28,26 @@ import id.bubakangreen.app.R
 enum class MascotType {
     DEFAULT,
     GREETING,
+    HERO_FLOWER,
     LEARNING,
     HAPPY,
     THINKING,
     WARNING,
     POINTING,
-    CTA_PROCESS
+    CTA_PROCESS,
+    SIDE_SEEDS_GUIDE,
+    SIDE_SEEDS_CHEER,
+    SIDE_GOODJOB_PLANT,
+    SIDE_GREEN_HELLO,
+    SIDE_GREEN_LOVE,
+    SIDE_GREEN_ROBO,
+    SIDE_ROBO_GOODJOB,
+    SIDE_ROBO_HUG
 }
 
 /**
  * Reusable Bubakan Green Mascot Component.
- * Renders verified local raster assets with strictly maintained 1:1 aspect ratio,
+ * Renders verified local raster assets with strictly maintained aspect ratio,
  * zero layout shift, ContentScale.Fit, and optional native Compose micro-motion.
  *
  * Micro-motion specs:
@@ -51,32 +60,55 @@ enum class MascotType {
 fun Mascot(
     type: MascotType,
     size: Dp = 160.dp,
+    width: Dp? = null,
+    height: Dp? = null,
     modifier: Modifier = Modifier,
     baseRotation: Float = 0f,
     animateIdle: Boolean = false,
     contentDescription: String? = null
 ) {
+    val actualWidth = width ?: size
+    val actualHeight = height ?: size
+
     @DrawableRes
     val drawableRes = when (type) {
         MascotType.DEFAULT -> R.drawable.mascot_default
         MascotType.GREETING -> R.drawable.mascot_greeting
+        MascotType.HERO_FLOWER -> R.drawable.mascot_flower
         MascotType.LEARNING -> R.drawable.mascot_learning
         MascotType.HAPPY -> R.drawable.mascot_happy
         MascotType.THINKING -> R.drawable.mascot_thinking
         MascotType.WARNING -> R.drawable.mascot_warning
         MascotType.POINTING -> R.drawable.mascot_pointing
         MascotType.CTA_PROCESS -> R.drawable.mascot_cta_process
+        MascotType.SIDE_SEEDS_GUIDE -> R.drawable.side_mascot_seeds_guide
+        MascotType.SIDE_SEEDS_CHEER -> R.drawable.side_mascot_seeds_cheer
+        MascotType.SIDE_GOODJOB_PLANT -> R.drawable.side_mascot_goodjob_plant
+        MascotType.SIDE_GREEN_HELLO -> R.drawable.side_mascot_green_hello
+        MascotType.SIDE_GREEN_LOVE -> R.drawable.side_mascot_green_love
+        MascotType.SIDE_GREEN_ROBO -> R.drawable.side_mascot_green_robo
+        MascotType.SIDE_ROBO_GOODJOB -> R.drawable.side_mascot_green_robo_goodjob
+        MascotType.SIDE_ROBO_HUG -> R.drawable.side_mascot_green_robo_hug
     }
 
     val desc = contentDescription ?: when (type) {
         MascotType.DEFAULT -> "Maskot Bubakan Green"
         MascotType.GREETING -> "Maskot Bubakan Green Menyapa"
+        MascotType.HERO_FLOWER -> "Maskot Bunga Bubakan Green"
         MascotType.LEARNING -> "Maskot Bubakan Green Belajar Tanaman"
         MascotType.HAPPY -> "Maskot Bubakan Green Merayakan Pembelajaran"
         MascotType.THINKING -> "Maskot Bubakan Green Berpikir"
         MascotType.WARNING -> "Maskot Bubakan Green Khawatir"
         MascotType.POINTING -> "Maskot Bubakan Green Menunjuk Petunjuk"
         MascotType.CTA_PROCESS -> "Maskot Bubakan Green Panduan Proses"
+        MascotType.SIDE_SEEDS_GUIDE -> "Maskot Benih Botani"
+        MascotType.SIDE_SEEDS_CHEER -> "Maskot Benih Semangat"
+        MascotType.SIDE_GOODJOB_PLANT -> "Maskot Tanaman Mekar Sukses"
+        MascotType.SIDE_GREEN_HELLO -> "Maskot Hijau Menyapa"
+        MascotType.SIDE_GREEN_LOVE -> "Maskot Hijau Apresiasi Kasih"
+        MascotType.SIDE_GREEN_ROBO -> "Maskot Robot Panduan Spasial"
+        MascotType.SIDE_ROBO_GOODJOB -> "Maskot Robot Sukses Tugas"
+        MascotType.SIDE_ROBO_HUG -> "Maskot Robot Peduli Lingkungan"
     }
 
     val animModifier = if (animateIdle) {
@@ -126,14 +158,14 @@ fun Mascot(
     Box(
         modifier = modifier
             .then(animModifier)
-            .requiredSize(size),
+            .requiredSize(actualWidth, actualHeight),
         contentAlignment = Alignment.Center
     ) {
         Image(
             painter = painterResource(id = drawableRes),
             contentDescription = desc,
             contentScale = ContentScale.Fit,
-            modifier = Modifier.requiredSize(size)
+            modifier = Modifier.requiredSize(actualWidth, actualHeight)
         )
     }
 }

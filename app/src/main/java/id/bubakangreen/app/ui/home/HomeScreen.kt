@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -379,18 +380,20 @@ private fun WelcomeHero(
                     )
                 }
 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(8.dp))
 
-                // Mascot in reserved layout space (Section 14 & 15)
+                // Mascot: Large flower mascot placed without overlapping content, with 1/4 protruding to the right
                 Box(
-                    modifier = Modifier.width(136.dp),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.width(130.dp),
+                    contentAlignment = Alignment.CenterStart
                 ) {
                     Mascot(
-                        type = MascotType.GREETING,
-                        size = 136.dp,
-                        baseRotation = 2f,
-                        animateIdle = true
+                        type = MascotType.HERO_FLOWER,
+                        width = 184.dp,
+                        height = 230.dp,
+                        baseRotation = 1f,
+                        animateIdle = true,
+                        modifier = Modifier.offset(x = 32.dp)
                     )
                 }
             }
@@ -539,7 +542,7 @@ private fun DailyTipSection(
                 contentAlignment = Alignment.Center
             ) {
                 Mascot(
-                    type = MascotType.THINKING,
+                    type = MascotType.SIDE_SEEDS_GUIDE,
                     size = 96.dp,
                     baseRotation = 3f
                 )

@@ -181,7 +181,7 @@ fun AboutScreen(
                         }
 
                         Mascot(
-                            type = MascotType.CTA_PROCESS,
+                            type = MascotType.SIDE_SEEDS_CHEER,
                             size = 100.dp,
                             modifier = Modifier.padding(start = 8.dp)
                         )
@@ -235,6 +235,43 @@ fun AboutScreen(
                         color = TextSecondary,
                         lineHeight = 18.sp
                     )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Apresiasi Komunitas (Side Mascot: Si Hijau Apresiasi Kasih)
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                colors = CardDefaults.cardColors(containerColor = PrimaryGreenLight),
+                border = BorderStroke(1.5.dp, PrimaryGreen.copy(alpha = 0.3f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.padding(18.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Mascot(
+                        type = MascotType.SIDE_GREEN_LOVE,
+                        size = 64.dp,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Terima Kasih, Warga Hebat!",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = PrimaryGreenDark
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Dukungan aktif Anda dalam menanam toga dan sayuran mandiri adalah kontribusi nyata mewujudkan Bubakan yang asri dan berdaya.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = TextPrimary,
+                            lineHeight = 18.sp
+                        )
+                    }
                 }
             }
 

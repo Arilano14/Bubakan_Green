@@ -101,7 +101,7 @@ fun CatalogScreen(
                     )
                 }
                 Mascot(
-                    type = MascotType.THINKING,
+                    type = MascotType.SIDE_SEEDS_GUIDE,
                     size = 64.dp,
                     baseRotation = 3f
                 )
