@@ -11,7 +11,7 @@
 
 <br/>
 
-**[📱 Unduh Langsung Berkas APK](https://www.dropbox.com/scl/fi/5f0307as5awimpj0h8iar/Bubakan-Green.apk?rlkey=bc2j9f4g51b0sq70o8u0n7lrj&st=48c5cbaq&dl=1)** &nbsp;•&nbsp; **[🌐 Kunjungi Website Resmi](https://bubakan-green.web.app)** &nbsp;•&nbsp; **[📖 Ringkasan Pengembangan](docs/PHASE_DEVELOPMENT_SUMMARY.md)**
+**[📱 Unduh Langsung Berkas APK](https://www.dropbox.com/scl/fi/5f0307as5awimpj0h8iar/Bubakan-Green.apk?rlkey=bc2j9f4g51b0sq70o8u0n7lrj&st=48c5cbaq&dl=1)** &nbsp;•&nbsp; **[🌐 Kunjungi Website Resmi](https://bubakan-green.web.app)**
 
 <br/>
 
